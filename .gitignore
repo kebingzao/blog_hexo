@@ -1,0 +1,10 @@
+.idea/
+.svn/
+_build/
+_docs/
+docs/
+node_modules/
+.deploy_git
+public/
+*.iml
+*.mkm
