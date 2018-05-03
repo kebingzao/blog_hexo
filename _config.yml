@@ -80,3 +80,5 @@ theme: next
 deploy:
   type: git
   repo: git@github.com:kebingzao/kebingzao.github.io.git
+  
+  

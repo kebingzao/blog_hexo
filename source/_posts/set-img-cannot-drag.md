@@ -1,7 +1,8 @@
 ---
 title: web 上设置图片不能拖拽
 date: 2018-05-03 14:51:35
-tags: 前端相关
+tags: html
+categories: 前端相关
 ---
 ### web上的图片如果要设置成不能拖拽，有两种情况
 
