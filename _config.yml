@@ -80,5 +80,11 @@ theme: next
 deploy:
   type: git
   repo: git@github.com:kebingzao/kebingzao.github.io.git
+
+algolia:
+  applicationID: J235M6G0L1
+  apiKey: a0a700b756e601762eb3467caacb17e8
+  indexName: test_blog
+  chunkSize: 5000
   
   
