@@ -1,5 +1,5 @@
 ---
-title: 前端工具集（1）--jsonp原生实现
+title: 前端工具集(1) -- jsonp原生实现
 date: 2018-05-06 01:08:31
 tags: js
 categories: 前端工具集
