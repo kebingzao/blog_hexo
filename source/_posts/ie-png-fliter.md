@@ -10,7 +10,7 @@ categories: 前端相关
 后面发现在 ie 6 下，不支持透明背景的图片，一般的PNG透明都是 png 32，但是ie6 不支持 png32，只支持png 8.
 
 ![angry png](ie-png-fliter/angry.jpg)
-
+<!--more-->
 比如原来的样式是这样写的：
 
 {% codeblock lang:css %}

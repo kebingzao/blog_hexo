@@ -15,7 +15,7 @@ categories: 前端相关
 * 全屏 fullScreen
 
 这些事件只能在用户主动触发的事件中，比如click，调用才会被实现，而且只能同步调用。
-
+<!--more-->
 举个例子，以window.open 方法为例，如果直接在浏览器的代码片段直接触发的话，默认会被浏览器所block掉
 
 ![step one](browser-trigger/1.png)

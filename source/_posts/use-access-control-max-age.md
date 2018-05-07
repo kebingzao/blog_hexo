@@ -8,7 +8,7 @@ categories: 后端相关
 因为多了一个自定义头部的原因，这时候前端的请求全部就变成了非简单请求了。
 包括get请求和post请求，这样就导致每个请求都要先进行一次options的预请求处理。
 导致会增加多余的http请求时间。
-
+<!--more-->
 后面查了一下资料：
 
 {% blockquote mozilla https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Access-Control-Max-Age %}

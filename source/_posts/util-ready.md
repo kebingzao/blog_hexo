@@ -10,7 +10,7 @@ categories: 前端工具集
 因此就自己去扣 jquery的 document.ready, 然后拿过来用（还能再无耻一点吗）
 
 ### 前端实现
-
+<!--more-->
 {% codeblock lang:js %}
 // document ready
 

@@ -24,7 +24,7 @@ if (window.location != window.parent.location) {
 // 顶层窗口中放入代码 var location = document.location;
 // 或者 var location = "";
 
-
+<!--more-->
 #### 方法2：使用 X-Frame-Options  header
 
 使用X-Frame-Options防止网页被Frame

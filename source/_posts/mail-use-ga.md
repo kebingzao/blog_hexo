@@ -10,7 +10,7 @@ categories: 前端相关
 
 后面参照了这位大佬的文章终于找到了解决方案： [传送门](http://www.lunametrics.com/blog/2013/06/17/email-tracking-google-analytics/)
 这篇文章讲的还是很详细的，其方法就是用 image src 请求，抛送 ga 请求 
-
+<!--more-->
 当然ga请求的参数有很多，我这边大概列了，本次需要的字段的说明，其中 tid 就是GA统计的哪个id值
 ![1](mail-use-ga/1.png)
 接下来我们使用post man试下抛送

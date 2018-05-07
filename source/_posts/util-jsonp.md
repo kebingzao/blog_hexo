@@ -18,7 +18,7 @@ jsonp是一种跨域通信的手段，它的原理其实很简单：
 3. 由于使用script标签的src属性，因此只支持get方法
 
 ### 前端实现工具类
-
+<!--more-->
 {% codeblock lang:js %}
 // jsonp 方法
 window.util.jsonp = function (url, data, successCb, failCb, alwaysCb) {
