@@ -15,4 +15,6 @@ categories: 支付相关
 [2017-09-30 09:10:45] Paypal.DEBUG: paypal webhook headers debug: {"content-type":["application\/json"],"content-length":["1276"],"accept":["*\/*"],"paypal-transmission-id":["36ef79d0-a5bf-11e7-86d9-77339302725b"],"paypal-transmission-time":["2017-09-30T09:10:33Z"],"paypal-transmission-sig":
 {% endcodeblock %}
 
-这样就没问题了，通过将测试环境也部署到国外的服务器，就可以在沙盒模式下也可以收到webhook了
+这样就没问题了，通过将测试环境也部署到国外的服务器，就可以在沙盒模式下也可以收到webhook了。
+
+ps：但是这样不是最优的，因为服务器在国外，但是测试的库是在国内的，这样会导致线路往返，从而接口超时了，因此后面又进行了优化 {% post_link paypal-back %} 
