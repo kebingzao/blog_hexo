@@ -160,15 +160,19 @@ Error: Connection refused: Not authorized
     at emitOne (events.js:77:13)
     at emit (events.js:169:7)
 {% endcodeblock %}
-所以密码文件校验，就是这样了，而且这种方式只能适用于单个用户，因为我一旦创建了其他的用户，那么原本文件里面的内容就会被覆盖了
+所以密码文件校验，就是这样了。
+当然也可以创建多个用户，就是不用-c， 那么就会添加在后面
 {% codeblock lang:js %}
-[root@VM_156_200_centos vernemq]# vmq-passwd -c vmq.passwd kbz
-Password:
-Reenter password:
 [root@VM_156_200_centos vernemq]# cat vmq.passwd
 kbz:$6$sbh/s6diN2ZGA6kI$zWKPObfeLEu0L8EYveoEnC5GkfkgB1B73E/t1j7Uciz/evcGvyWgwoNoX36tHQOX6psOC3wga6LekQVFbQhMVA==
+[root@VM_156_200_centos vernemq]# vmq-passwd vmq.passwd zach
+Password: 
+Reenter password: 
+[root@VM_156_200_centos vernemq]# cat vmq.passwd 
+kbz:$6$sbh/s6diN2ZGA6kI$zWKPObfeLEu0L8EYveoEnC5GkfkgB1B73E/t1j7Uciz/evcGvyWgwoNoX36tHQOX6psOC3wga6LekQVFbQhMVA==
+zach:$6$kxThdGLFMCLh7BuH$/DUv2QRvGXfy31V0k3JDNkOdd4kj9Z56+LY0KN++9B6UDDBDpXX7/KoXo6OfhhYP+lbkoXbYnOfxQypFJM8cmQ==
 {% endcodeblock %}
-之前的zach 马上被 kbz 覆盖了
+这样就有两个用户了
 
 ---
 
