@@ -5,7 +5,7 @@ tags: mqtt
 categories: webrtc相关
 ---
 通过{% post_link vernemq-verify %} 我们已经将VerneMQ 的权限校验设置成redis校验了。我们知道VerneMQ作为一个开源的基于MQTT的broker服务，它是支持分布式集群的。也就是说客户端可以连接到任何的节点，并且从其他的节点中接收消息。
-举个例子：有两台服务器A和B，这两台服务器构成一个集群，然后 client1 连上A服务器，并监听(sub)这个主题"say"， 这时候client2 连上B服务器，并给主题"say" 发布（pub）了一个消息，这时候client1就会收到这一条消息了。
+举个例子：有两台服务器A和B，这两台服务器构成一个集群，然后 client1 连上A服务器，并订阅(sub)这个主题"say"， 这时候client2 连上B服务器，并给主题"say" 发布（pub）了一个消息，这时候client1就会收到这一条消息了。
 官网的文档说的还是挺详细的 https://vernemq.com/docs/clustering/ ，我这边主要是根据我的理解简单说下几个要注意的点。
 <!--more-->
 ### 几个要注意的点
@@ -56,12 +56,12 @@ vmq-admin cluster leave node=<NodeThatShouldGo> (only the first step!)
 {% codeblock lang:js %}
 vmq-admin cluster leave node=<NodeThatShouldGo>
 {% endcodeblock %}
-停止节点的mqtt监听，让他不会再去接收新连接，但他也不会中断现有的连接，现在他还不会从集群中离开（相当于隐居幕后），现有用户还是可以继续发布和接收消息。这个是为了有一个宽限期，为了让现有用户不会受到影响， 这个时间你可以自己判断，可以是一天，也可以是一个小时，反正就是要等这些现有用户的连接都释放了。
+停止节点的mqtt订阅，让他不会再去接收新连接，但他也不会中断现有的连接，现在他还不会从集群中离开（相当于隐居幕后），现有用户还是可以继续发布和接收消息。这个是为了有一个宽限期，为了让现有用户不会受到影响， 这个时间你可以自己判断，可以是一天，也可以是一个小时，反正就是要等这些现有用户的连接都释放了。
 接着执行：
 {% codeblock lang:js %}
 vmq-admin cluster leave node=<NodeThatShouldGo> -k
 {% endcodeblock %}
-到这一步，就会把这台node的所有的mqtt监听器全部断开了，就是不监听了， 当然如果一开始就不想要这些连接了，也可以直接执行这一步，然后接下来，就会将这一台的剩余的队列迁移到其他的节点node，并重新建立起mqtt监听器。 不过可能会漏掉一些离线队列。
+到这一步，就会把这台node的所有的mqtt订阅器全部断开了，就是不订阅了， 当然如果一开始就不想要这些连接了，也可以直接执行这一步，然后接下来，就会将这一台的剩余的队列迁移到其他的节点node，并重新建立起mqtt订阅器。 不过可能会漏掉一些离线队列。
 最后执行：
 {% codeblock lang:js %}
 vmq-admin cluster leave node=<NodeThatShouldGo> -k -i 5 -t 120
@@ -88,7 +88,7 @@ vmq-admin cluster show
 比如：
 erlang.distribution.port_range.minimum = 6000
 erlang.distribution.port_range.maximum = 7999
-上面只是设置订阅和发布的端口。 如果真的用来做分布式分发监听的话，那么下面这个就得设置：
+上面只是设置订阅和发布的端口。 如果真的用来做分布式分发订阅的话，那么下面这个就得设置：
 listener.vmq.clustering = 0.0.0.0:44053
 这边也要设置为外网ip。 这个端口不需要每个节点都要设置成一样， 节点会相互嗅探。
 
@@ -199,7 +199,7 @@ client2.on('message', function (topic, message) {
 });
 console.log("start");
 {% endcodeblock %}
-初始化了两个客户端（client1 和 client2 分别属于不同的服务器）， 刚开始 client1 连上的时候，开始监听， 然后 client2 连上之后，2s 之后，开始 publish 一条消息给client1,我们的理想情况，就是 client1 可以收到 client2 publish 的消息。
+初始化了两个客户端（client1 和 client2 分别属于不同的服务器）， 刚开始 client1 连上的时候，开始订阅， 然后 client2 连上之后，2s 之后，开始 publish 一条消息给client1,我们的理想情况，就是 client1 可以收到 client2 publish 的消息。
 但是试了一下， client2 publish 之后， client1 一直没有收到消息
 {% codeblock lang:js %}
 F:\airdroid_code\nodejs\mqtt>node app2.js
