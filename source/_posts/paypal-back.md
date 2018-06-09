@@ -1,7 +1,9 @@
 ---
 title: paypal的webhook走转发代理
 date: 2018-06-04 01:00:12
-tags: paypal
+tags: 
+    - paypal
+    - nginx
 categories: 支付相关
 ---
 通过 {% post_link paypal-test %} 为了解决测试环境下收不到paypal webhook的情况，我们将pay项目的测试环境放到国外的服务器，但是这个又引发了新的问题，就是接口请求速度太慢了。相当于跨区请求，而且测试库又在国内， 所以就导致， 请求从国内到国外，然后国外从国内连接数据库， 随后response从国外传回国内。 来来回回至少两趟， 因此接口会经常超时。导致测试很不方便。
