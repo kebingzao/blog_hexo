@@ -177,7 +177,8 @@ categories: 前端工具集
             dataType = opts.dataType;
             type = opts.type;
             // 是否允许跨域的时候，带上cookie
-            withCredentials = !!opts.withCredentials;
+            // 如果是同步请求的话，必须要为false，不然会报错
+            withCredentials = async ? !!opts.withCredentials : false;
 
             if ('data' in opts && typeof data !== 'string') {
                 data = toUrlParam(data);
