@@ -177,6 +177,9 @@ xhr一共有8个相关事件：7个XMLHttpRequestEventTarget事件+1个独有的
 8. 触发xhr.onload
 9. 触发xhr.onloadend
 
+### ie8，ie9 怎么跨域请求？
+我们知道ie10才开始支持xhr对象，那么ie8，ie9的跨域请求只能通过 XDomainRequest 对象来进行，可以参考这一篇： {% post_link ie-xdomainrequest %}，至于ie8以下的异步跨域请求，那就不能用ajax的方式了，得用其他的方式，比如如果是get的话，那么就可以用jsonp来处理，可以参照这个：{% post_link util-jsonp %}
+
 ---
 
 参照的资料：
