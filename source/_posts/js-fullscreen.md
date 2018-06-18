@@ -9,7 +9,7 @@ HTML 5中的full screen 就是用来做全屏API的。不过还是会有一些�
 ![1](js-fullscreen/1.png)
 可以看到IE下只有IE11才支持。而且其他支持的主流浏览器，也大部分都要使用前缀才行。主要有以下几个API：
 <!--more-->
-### element.requestFullScreen()
+### 请求全屏 element.requestFullScreen()
 作用：请求某个元素element全屏
 {% codeblock lang:js %}
 Document.getElementById(“myCanvas”).requestFullScreen()
@@ -127,7 +127,8 @@ html:fullscreen {
 {% endcodeblock %}
 
 ### 具体例子
-我的github有写了一个简单的例子：[传送门](https://github.com/kebingzao/js-fullscreen/)
+我的github有写了一个简单的例子：[传送门](https://github.com/kebingzao/js-fullscreen/) 
+演示demo： [demo 地址](https://kebingzao.com/html5Demo/fullscreen/index.html)
 截图如下：
 全屏之前：
 ![1](js-fullscreen/3.png)
