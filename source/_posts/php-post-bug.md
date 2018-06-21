@@ -2,6 +2,7 @@
 title: php 本地调试出现 $HTTP_RAW_POST_DATA is deprecated
 date: 2018-06-07 01:12:25
 tags: php
+categories: php相关
 ---
 之前在用一个php项目在做本地调试的时候，用postman 来进行 post 请求，有报了一个这个错误：
 ![1](php-post-bug/1.png)

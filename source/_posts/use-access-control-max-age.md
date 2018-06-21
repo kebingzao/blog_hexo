@@ -2,7 +2,7 @@
 title: 配置Access-Control-Max-Age让服务端缓存options预检请求
 date: 2018-05-05 18:20:44
 tags: http
-categories: 后端相关
+categories: php相关
 ---
 之前在做企业版的管理后台的时候， 因为要做jwt的token校验， 所以前端将utoken作为一个头部项放到 ajax 的 header 头部里面。
 因为多了一个自定义头部的原因，这时候前端的请求全部就变成了非简单请求了。

@@ -2,6 +2,7 @@
 title: windows 使用composer install 报一些奇怪的错误
 date: 2018-05-05 16:23:24
 tags: php
+categories: php相关
 ---
 之前在windows下装composer依赖的时候，会报一些奇怪的错误，有些跟版本，或者平台还有关系
 
