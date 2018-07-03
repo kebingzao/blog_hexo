@@ -1,7 +1,9 @@
 ---
 title: webrtc 的 signal 服务器 VerneMQ 的搭建
 date: 2018-05-30 00:25:38
-tags: mqtt
+tags: 
+    - mqtt
+    - vernemq
 categories: webrtc相关
 ---
 这段时间正在做一个基于webrtc 技术的项目，其中就涉及到了 signal 服务器的搭建， 因为都是长链接， 相对于比较重的websocket，我选择更轻量级的 mqtt 协议来进行SDP 和 ICE 信息的传输， 

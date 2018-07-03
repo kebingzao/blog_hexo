@@ -1,7 +1,9 @@
 ---
 title: webrtc 的 signal 服务器 VerneMQ 的权限校验
 date: 2018-06-03 01:43:13
-tags: mqtt
+tags: 
+    - mqtt
+    - vernemq
 categories: webrtc相关
 ---
 通过 {% post_link vernemq-install %} 我们已经安装了VerneMQ 服务，接下来就是设置校验了。vernemq 有三种权限校验的方式： 我们接下来一个一个用：

@@ -1,7 +1,9 @@
 ---
 title: webrtc 的 signal 服务器 VerneMQ 的集群设置
 date: 2018-06-07 23:20:49
-tags: mqtt
+tags: 
+    - mqtt
+    - vernemq
 categories: webrtc相关
 ---
 通过{% post_link vernemq-verify %} 我们已经将VerneMQ 的权限校验设置成redis校验了。我们知道VerneMQ作为一个开源的基于MQTT的broker服务，它是支持分布式集群的。也就是说客户端可以连接到任何的节点，并且从其他的节点中接收消息。
