@@ -103,18 +103,18 @@ Expires是http1.0的规范，它的值是一个绝对时间的GMT格式的时间
 ![1](browser-cache/4.png)
 那么表示资源可以被缓存的最长时间为 31536000。
 注意： <font color=red>Cache-Control与Expires可以在服务端配置同时启用，同时启用的时候Cache-Control优先级高</font>。
-### 协商缓存
+## 协商缓存
 协商缓存就是由服务器来确定缓存资源是否可用，所以客户端与服务器端要通过某种标识来进行通信，从而让服务器判断请求资源是否可以缓存访问，这主要涉及到下面两组header字段，这两组搭档都是成对出现的，即第一次请求的响应头带上某个字段（Last-Modified或者Etag），则后续请求则会带上对应的请求字段（If-Modified-Since或者If-None-Match），若响应头没有Last-Modified或者Etag字段，则请求头也不会有对应的字段。
 通过这两组参数，如果符合，那么服务器就会返回304状态码并带上新的response header通知浏览器从缓存中读取资源。
 普通刷新会启用协商缓存，忽略强缓存。只有在地址栏或收藏夹输入网址、通过链接引用资源等情况下，浏览器才会启用强缓存，这也是为什么有时候我们更新一张图片、一个js文件，页面内容依然是旧的，但是直接浏览器访问那个图片或文件，看到的内容却是新的， 因为直接访问是属于主资源的，这时候是不能用强缓存的，只能用协商缓存。
-#### Last-Modify/If-Modify-Since
+### Last-Modify/If-Modify-Since
 浏览器第一次请求一个资源的时候，服务器返回的header中会加上Last-Modify，Last-modify是一个时间标识该资源的最后修改时间，例如Last-Modify: Thu,31 Dec 2037 23:59:59 GMT。
 当浏览器再次请求该资源时，request的请求头中会包含If-Modify-Since，该值为缓存之前返回的Last-Modify。服务器收到If-Modify-Since后，根据资源的最后修改时间判断是否命中缓存。
 如果命中缓存，则返回304，并且不会返回资源内容，并且不会返回Last-Modify。
-#### ETag/If-None-Match
+### ETag/If-None-Match
 与Last-Modify/If-Modify-Since不同的是，Etag/If-None-Match返回的是一个校验码（Apache中，ETag的值，默认是对文件的索引节（INode），大小（Size）和最后修改时间（MTime）进行Hash后得到的）。ETag可以保证每一个资源是唯一的，资源变化都会导致ETag变化。服务器根据浏览器上送的If-None-Match值来判断是否命中缓存。
 与Last-Modified不一样的是，当服务器返回304 Not Modified的响应时，由于ETag重新生成过，response header中还会把这个ETag返回，即使这个ETag跟之前的没有变化。
-#### 为什么要有Etag？
+### 为什么要有Etag？
 你可能会觉得使用Last-Modified已经足以让浏览器知道本地的缓存副本是否足够新，为什么还需要Etag呢？HTTP1.1中Etag的出现主要是为了解决几个Last-Modified比较难解决的问题：
 - 一些文件也许会周期性的更改，但是他的内容并不改变(仅仅改变的修改时间)，这个时候我们并不希望客户端认为这个文件被修改了，而重新GET；
 - 某些文件修改非常频繁，比如在秒以下的时间内进行修改，(比方说1s内修改了N次)，If-Modified-Since能检查到的粒度是s级的，这种修改无法判断(或者说UNIX记录MTIME只能精确到秒)；
