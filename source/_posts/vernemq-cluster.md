@@ -106,7 +106,6 @@ listener.vmq.clustering = 0.0.0.0:44053
 listener.vmq.clustering = 172.16.16.13:44053
 nodename = VerneMQ@172.16.16.13
 distributed_cookie = vmq_xxx
-queue_deliver_mode = balance
 erlang.distribution.port_range.minimum = 6000
 erlang.distribution.port_range.maximum = 7999
 {% endcodeblock %}
