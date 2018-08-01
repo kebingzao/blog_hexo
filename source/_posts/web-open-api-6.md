@@ -136,20 +136,11 @@ categories: 前端相关
                     });
                 },
                 。。。省略一堆开放的方法
-                // lite 下 dfp recommend 传过来，移除recommend dom
-                removeRecommendDom: function(trans, params){
-                    Airdroid.RecommendManage.fireEvent(Airdroid.RecommendManage.EVENT_TYPE.remove_dom, {});
-                },
-                showRecommendDom: function(trans, params){
-                    Airdroid.RecommendManage.fireEvent(Airdroid.RecommendManage.EVENT_TYPE.show_dom, {});
-                },
-                //====================widgetDemo 事例接口 start =======================
                 sayHello: function(trans, params){
                     trans.delayReturn(true);
                     Airdroid.Util.alert(params.msg);
                     trans.complete();
                 }
-                //====================widgetDemo 事例接口 end =======================
             };
             // 主要是跟一些系统方法相关的开放接口
             self.SYSTEM_APIS = {
@@ -426,6 +417,15 @@ categories: 前端相关
 {% endcodeblock %}
 从代码可以看到即所有的 server 系列和 system 系列的方法，都要通过 providerAll 方法重新包装一遍，这样才能在方法的入口处，对这两个系列的方法进行accessToken 校验和 方法授权允许校验。
 
+---
+完整系列：
+{% post_link web-open-api-1 %}
+{% post_link web-open-api-2 %}
+{% post_link web-open-api-3 %}
+{% post_link web-open-api-4 %}
+{% post_link web-open-api-5 %}
+{% post_link web-open-api-6 %}
+{% post_link web-open-api-7 %}
 
 
 

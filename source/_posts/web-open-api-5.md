@@ -1088,6 +1088,15 @@ prompt : function(title,fieldName,defaultValue,yesCallback,cancelCallback,valida
 {% endcodeblock %}
 不管你这个流程有几个回调，只要没有注销，那么就会一直存在。所以每次我们用完就要把它注销掉。
 
+---
+完整系列：
+{% post_link web-open-api-1 %}
+{% post_link web-open-api-2 %}
+{% post_link web-open-api-3 %}
+{% post_link web-open-api-4 %}
+{% post_link web-open-api-5 %}
+{% post_link web-open-api-6 %}
+{% post_link web-open-api-7 %}
 
 
 

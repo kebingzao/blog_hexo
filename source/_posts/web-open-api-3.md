@@ -445,3 +445,13 @@ if (event_type == self.EventTypes.msg_access_offline) {
     self.fireEvent(event_type, {});
 }
 {% endcodeblock %}
+
+---
+完整系列：
+{% post_link web-open-api-1 %}
+{% post_link web-open-api-2 %}
+{% post_link web-open-api-3 %}
+{% post_link web-open-api-4 %}
+{% post_link web-open-api-5 %}
+{% post_link web-open-api-6 %}
+{% post_link web-open-api-7 %}

@@ -32,3 +32,13 @@ SYSTEM_METHODS : [
 - 事件监听
 
 后面会一一讲解
+
+---
+完整系列：
+{% post_link web-open-api-1 %}
+{% post_link web-open-api-2 %}
+{% post_link web-open-api-3 %}
+{% post_link web-open-api-4 %}
+{% post_link web-open-api-5 %}
+{% post_link web-open-api-6 %}
+{% post_link web-open-api-7 %}

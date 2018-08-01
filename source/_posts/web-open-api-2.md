@@ -77,4 +77,13 @@ github项目地址：https://github.com/mozilla/jschannel
 这样子，在子页面加载完之后，就会跟父页面建立channel通道，并绑定一个 **reverse** 的事件,然后父对象跟子对象创建成功的时候，就会向子页面传递一个叫 **reverse** 的方法，这样就会触发 子页面的 **reverse** 的方法了。
 反之亦然，如果在父页面绑定了事件，然后子页面call该对象的话，也是可以的。当然还有一些其他的用法，比如 trans 参数的意思等等，都会再后面说到。
 
+---
+完整系列：
+{% post_link web-open-api-1 %}
+{% post_link web-open-api-2 %}
+{% post_link web-open-api-3 %}
+{% post_link web-open-api-4 %}
+{% post_link web-open-api-5 %}
+{% post_link web-open-api-6 %}
+{% post_link web-open-api-7 %}
 

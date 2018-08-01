@@ -224,7 +224,17 @@ waitApiReady: function(cb){
 }
 {% endcodeblock %}
 其实就是为了确认 init 已经成功，这样调用的时候，才能保证调用成功。
-也就是说后续如果还要添加api文档的话，就按照这种方式，继续添加js和对应的tmp文件就行了
+也就是说后续如果还要添加api文档的话，就按照这种方式，继续添加js和对应的tpl模板文件就行了。
+
+---
+完整系列：
+{% post_link web-open-api-1 %}
+{% post_link web-open-api-2 %}
+{% post_link web-open-api-3 %}
+{% post_link web-open-api-4 %}
+{% post_link web-open-api-5 %}
+{% post_link web-open-api-6 %}
+{% post_link web-open-api-7 %}
 
 
 
