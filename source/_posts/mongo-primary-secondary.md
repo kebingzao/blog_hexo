@@ -251,6 +251,7 @@ func GetChannelByKey(key string) (Channel, error) {
 
 ---
 <font color=red>后面发现mongoDB官方已经不建议使用主从模式了，替代方案是采用副本集的模式，而且从 mongo4.0 开始，就移除主从的支持了： [传送门](https://docs.mongodb.com/master/core/master-slave/)</font>
-所以我们后面又换成副本集的方式。
+
+所以我们后面又换成副本集的方式: {% post_link mongo-replica-sets %}。
 
 
