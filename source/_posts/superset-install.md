@@ -108,8 +108,35 @@ Python superset init
 # 启动服务，端口 8088, 使用 -p 更改端口号。
 Python superset runserver -d
 {% endcodeblock %}
-
 这时候就配置完了，接下来就打开浏览器查看登录页面了： http://localhost:8088
+{% codeblock lang:js %}
+(env) D:\pycharm\superset\env\Lib\site-packages\superset\bin>Python superset runserver -d
+?[34m-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+?[33mStarting Superset server in ?[31mDEBUG?[33m mode
+?[34m-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+?[0m
+2018-08-14 11:21:26,805:INFO:werkzeug: * Restarting with stat
+?[34m-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+?[33mStarting Superset server in ?[31mDEBUG?[33m mode
+?[34m-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+?[0m
+2018-08-14 11:21:30,112:WARNING:werkzeug: * Debugger is active!
+2018-08-14 11:21:30,116:INFO:werkzeug: * Debugger PIN: 243-075-165
+2018-08-14 11:21:30,126:INFO:werkzeug: * Running on http://0.0.0.0:8088/ (Press CTRL+C to quit)
+2018-08-14 11:21:30,958:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:30] "GET /superset/welcome HTTP/1.1" 200 -
+2018-08-14 11:21:31,191:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:31] "GET /static/assets/images/favicon.png HTTP/1.1" 200 -
+2018-08-14 11:21:31,241:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:31] "GET /superset/fave_dashboards/1/ HTTP/1.1" 200 -
+2018-08-14 11:21:31,266:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:31] "GET /dashboardmodelviewasync/api/read?_oc_DashboardModelViewAsync=changed_on&_od_DashboardModelViewAsync=desc HTTP/1.1" 200 -
+2018-08-14 11:21:31,296:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:31] "GET /superset/fave_slices/1/ HTTP/1.1" 200 -
+2018-08-14 11:21:31,318:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:31] "GET /superset/recent_activity/1/?limit=50 HTTP/1.1" 200 -
+2018-08-14 11:21:45,502:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:45] "GET /lang/zh HTTP/1.1" 302 -
+2018-08-14 11:21:45,757:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:45] "GET /lang/zh HTTP/1.1" 302 -
+2018-08-14 11:21:45,811:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:45] "GET / HTTP/1.1" 302 -
+2018-08-14 11:21:45,818:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:45] "GET / HTTP/1.1" 302 -
+2018-08-14 11:21:46,237:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:46] "GET /superset/welcome HTTP/1.1" 200 -
+2018-08-14 11:21:46,600:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:46] "GET /superset/welcome HTTP/1.1" 200 -
+2018-08-14 11:21:46,877:INFO:werkzeug:127.0.0.1 - - [14/Aug/2018 11:21:46] "GET /superset/welcome HTTP/1.1" 200 -
+{% endcodeblock %}
 登录就要输入刚才设置的用户名和密码。
 ![1](superset-install/3.png)
 可以看到有四个是刚才加载的 example demo
