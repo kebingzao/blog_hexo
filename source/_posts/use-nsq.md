@@ -154,7 +154,8 @@ docker.io/nsqio/nsq     latest              2714222e1b39        12 months ago   
 ![1](use-nsq/1.png)
 
 ## pub/sub
-接下来用golang实现一下 pub 和 sub：
+接下来用golang实现一下 pub 和 sub： 这边用官网推荐的golang 的库来实作：[地址](https://nsq.io/clients/client_libraries.html)
+![1](use-nsq/6.png)
 **send.go**:
 ```$xslt
 //Nsq发送测试
