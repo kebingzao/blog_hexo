@@ -1,7 +1,9 @@
 ---
 title: 官网构建优化流程(2) - 旧版grunt打包构建流程
 date: 2018-09-12 18:06:44
-tags: js
+tags: 
+- js
+- grunt
 categories: 
 - 前端相关
 - 官网构建优化流程
