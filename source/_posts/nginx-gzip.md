@@ -2,7 +2,7 @@
 title: nginx 配置gzip以优化站点资源加载速度
 date: 2018-06-10 01:03:42
 tags: nginx
-categories: 前端相关
+categories: nginx相关
 ---
 将官网的一些静态资源，比如 js ，css， 图片 设置成 gzip 压缩的方式, 可以提高静态资源的加载速度
 因为我们用的是nginx，所以可以通过nginx来配置，直接在<font color=red>nginx.conf</font>添加一下代码：
