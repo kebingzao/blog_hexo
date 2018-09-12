@@ -13,7 +13,7 @@ categories:
 ## 具体构建分析
 具体的构建流程是：**Gruntfile.js** (我知道你们根本不会看，但是我还是要贴代码 ʅ（´◔౪◔）ʃ)
 <!--more-->
-```
+```javascript
 var _ = module.require('underscore');
 module.exports = function (grunt) {
     'use strict';
@@ -680,7 +680,7 @@ min => ['jst', 'useminPrepare', 'concat', 'uglify', 'jst_concat', 'cssmin', 'use
 window["ajst"][name + '.html'](obj)
 ```
 来获取模板,调用模板的代码如下：
-```
+```javascript
 window.util.getTemplate = function (name, obj) {
   var tpl, url, file_url;
   url = this.getTemplateBaseUrl() + '/tpl/' + name;
@@ -744,7 +744,7 @@ gzip=>['copy:gzip', 'compress:main']
 ### package.json 文件
 以上就是所有的详细步骤，其实还有没有说的一点就是，上面没有指定要构建哪些html文件，其实不是所有的html文件都要构建的，其实是要在setting文件指定的。
 **package.json**:
-```
+```javascript
 {
   "name": "airdroid_web_www",
   "version": "1.0.0",
