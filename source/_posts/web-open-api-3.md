@@ -4,7 +4,9 @@ date: 2018-07-26 19:54:42
 tags: 
     - js
     - open api
-categories: 前端相关
+categories: 
+- 前端相关
+- web站点 开放第三方API流程
 ---
 通过 {% post_link web-open-api-2 %} 我们知道了iframe和父页面通信的方式。那么接下来就要描述下 具体 web api 要怎么设计。
 ## 一个Iframe对应一个channel，并且具有唯一性

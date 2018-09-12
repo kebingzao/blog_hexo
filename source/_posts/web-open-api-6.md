@@ -4,7 +4,9 @@ date: 2018-08-01 20:11:20
 tags: 
     - js
     - open api
-categories: 前端相关
+categories: 
+- 前端相关
+- web站点 开放第三方API流程
 ---
 通过 {% post_link web-open-api-5 %} 可以知道 demo 中 sdk 的运行逻辑了。本节主要是完整的列一下 父页面的 sdk的 js，该讲的，前面就讲完了
 由于开放的方法比较多，我这边就不所有的代码都列出来了。只简单列几个：

@@ -4,7 +4,9 @@ date: 2018-07-25 21:12:55
 tags: 
     - js
     - open api
-categories: 前端相关
+categories: 
+- 前端相关
+- web站点 开放第三方API流程
 ---
 本节主要是围绕这个 {% post_link web-open-api-1 %} 中的那个 demo演示模块 来介绍。既然是iframe两个不同域之间的通信，那么就要用到一个html5知识 -- **postMessage**。
 ## postMessage

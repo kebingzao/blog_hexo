@@ -4,7 +4,9 @@ date: 2018-07-31 19:54:49
 tags: 
     - js
     - open api
-categories: 前端相关
+categories: 
+- 前端相关
+- web站点 开放第三方API流程
 ---
 本篇主要是围绕着这个 demo 来做进一步的讲解。 再看一下这个demo的截图：
 ![1](web-open-api-4/1.png)

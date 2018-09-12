@@ -4,7 +4,9 @@ date: 2018-08-01 20:25:04
 tags: 
     - js
     - open api
-categories: 前端相关
+categories: 
+- 前端相关
+- web站点 开放第三方API流程
 ---
 我们都知道，google的广告在 ip地址下其实是显示不出来的，那么我们怎么在ip地址下的页面显示google的广告呢？
 很简单，把google的广告部署在线上，然后作为一个iframe嵌入到你的ip地址的页面去。这样就可以正常显示了。
