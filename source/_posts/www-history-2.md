@@ -50,10 +50,10 @@ module.exports = function (grunt) {
     var apiVersion = pkg.apiVersion;
 
     // 如果指定 static_base_url，那么所有链接最终会被换成带版本号的绝对路径
-    // 以static_base_url = 'http://www.airdroid.com' 为例，
+    // 以static_base_url = 'http://www.xxx.com' 为例，
     // <script type="text/javascript" src="./js/all.js"></script>
     // 构建结果如下
-    // <script type="text/javascript" src="http://www.airdroid.com/1406191728/js/all.js"></script>
+    // <script type="text/javascript" src="http://www.xxx.com/1406191728/js/all.js"></script>
     var staticBaseUrl = pkg.static_base_url || '.';
     if (isDebug) {
         staticBaseUrl = pkg.static_base_url.replace('//', '//test-');
@@ -347,17 +347,17 @@ module.exports = function (grunt) {
                         {
                             // release url 修改
                             pattern: /(idUrl\s*:\s*['"]*)(.*?)(['"]*[,;\s])/,
-                            replacement: '$1https://id4.airdroid.com/$3'
+                            replacement: '$1https://id4.xxx.com/$3'
                         },
                         {
                             // release url 修改
                             pattern: /(payUrl\s*:\s*['"]*)(.*?)(['"]*[,;\s])/,
-                            replacement: '$1https://pay.airdroid.com/$3'
+                            replacement: '$1https://pay.xxx.com/$3'
                         },
                         {
                             // release url 修改
                             pattern: /(serverUrl\s*:\s*['"]*)(.*?)(['"]*[,;\s])/,
-                            replacement: '$1https://srv3.airdroid.com/$3'
+                            replacement: '$1https://srv3.xxx.com/$3'
                         },
                         {
                             // api 版本修改
@@ -485,7 +485,7 @@ module.exports = function (grunt) {
                                 //.replace(/ data-twttr-rendered="true"/, '')
                                 //.replace(/<iframe id="twitter-widget-0".*<\/iframe>/, '<a href="https://twitter.com/share" class="twitter-share-button" data-lang="en">Tweet</a>')
                                 //.replace(/<div.*plusone.*?\/div>/, '<g:plusone size="medium"></g:plusone>')
-                                //.replace(/<div.*fb-like.*<\/div>/, '<div class="fb-like item-social-buttons-fb-like" data-href="http://www.airdroid.com" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true"></div>')
+                                //.replace(/<div.*fb-like.*<\/div>/, '<div class="fb-like item-social-buttons-fb-like" data-href="http://www.xxx.com" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true"></div>')
                                 //.replace(/<div.*fb-root.*<\/div>/, '<div id="fb-root"></div>')
 
                                 // 消除 jsonp 请求产生的 script 标签
@@ -746,7 +746,7 @@ gzip=>['copy:gzip', 'compress:main']
 **package.json**:
 ```javascript
 {
-  "name": "airdroid_web_www",
+  "name": "xxx_web_www",
   "version": "1.0.0",
   "dependencies": {},
   "workDir": "workspace",
@@ -800,7 +800,7 @@ gzip=>['copy:gzip', 'compress:main']
     "html/attachment.html"
   ],
   "apiVersion": "p14",
-  "static_base_url": "//www.airdroid.com",
+  "static_base_url": "//www.xxx.com",
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-autoprefixer": "~0.8.1",
