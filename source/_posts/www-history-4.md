@@ -248,6 +248,21 @@ langTaskListMap[`${lang}-staticfy`] = gulp.task(`${lang}-staticfy`, function() {
 也就是说，在这个任务中，要让每一个语言都串行的执行，那么就要有这个return。不然就会全部走异步并行，导致出错。
 <font color=red>ps：这地方当时在做的时候，踩过坑，当时搞了好久，所以这边也着重再提下</font>
 
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
 
 

@@ -246,6 +246,21 @@ if (lang != urlPathLang && lang != 'en') {
 如果 url里面已经带了语种了，并且不等于本地获取的语种，并且该语种不等于 en，并且不是 404 页面，那么就会进行跳转。
 还是以 **https://www.xxx.com/download.html** 为例， 这时候可以看到他的 urlPathLang 是空的, 然后lang是有的，**zh-cn**（参数没有，cookie没有，从浏览器中有获取 zh-cn，并且在语言列表里面，所以就是 zh-cn），所以条件成立，并且不是 404 页面，所以前端就会再进行一次重定向到： **https://www.xxx.com/zh-cn/download.html**
 
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
 
 

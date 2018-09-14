@@ -331,6 +331,21 @@ staticfy: (function () {
 
 后面会通过用gulp进行这个组件的重写，来解决这些问题。
 
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
 
 

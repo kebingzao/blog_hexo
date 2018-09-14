@@ -37,6 +37,20 @@ categories:
 可以看到文本都变成对应的语言了。
 那么怎么实现这个效果呢。其实就在打包的逻辑里面。下一节主要讲打包的逻辑。
 
-
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
 

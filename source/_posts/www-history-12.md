@@ -44,6 +44,21 @@ s3上的资源截图是这样的：
 最后放上一张Jenkins构建，上传到cos和s3的截图：
 ![1](www-history-12/7.png)
 
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
 
 

@@ -579,6 +579,21 @@ gulp.task('i18n', seq("move_tpl", "staticfy", "copy_and_move_en", "change_debug_
 ![1](www-history-6/2.png)
 但是这个其实不是最终版本，后面还会遇到一些问题。
 
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
 
 

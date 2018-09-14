@@ -134,4 +134,19 @@ The 'Access-Control-Allow-Origin' header has a value 'https://*.xxx.com' that is
 而且这边要注意一点的是，这个 ip 地址，有效期很短的，所以测完之后，没问题之后，就可以把这个host 指向从 hosts 文件去掉了。下一次要测的话，再ping一个新的ip就行了。
 <font color=red>因为之前我就有遇到这个一个情况，就是这个host没有删掉，结果等了一段时间之后，重新访问官网，结果全部出现 403 forbidden 提示，原来是这个ip地址 校验已经过期了。</font>
 
+---
+系列文章
+{% post_link www-history-1 %}
+{% post_link www-history-2 %}
+{% post_link www-history-3 %}
+{% post_link www-history-4 %}
+{% post_link www-history-5 %}
+{% post_link www-history-6 %}
+{% post_link www-history-7 %}
+{% post_link www-history-8 %}
+{% post_link www-history-9 %}
+{% post_link www-history-10 %}
+{% post_link www-history-11 %}
+{% post_link www-history-12 %}
+{% post_link www-history-13 %}
 
