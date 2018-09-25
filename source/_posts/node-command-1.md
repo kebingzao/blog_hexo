@@ -126,9 +126,9 @@ inquirer.prompt([{
             options.replaceReg = result.replaceReg;
             options.jsonData = result.jsonData;
             fs.writeFileSync(TD_OPTIONS_FILE, JSON.stringify(options, null, 2));
-            process.stdout.write('初始化完成, 现在可以使用 td-helper update 命令更新语言包了.\n');
+            console.log(chalk.green('初始化完成, 现在可以使用 td-helper update 命令更新语言包了.'));
         } else {
-            process.stdout.write('已取消\n');
+            console.log(chalk.red('已取消'));
         }
     }).catch(function (e) {
         return console.log(e);
