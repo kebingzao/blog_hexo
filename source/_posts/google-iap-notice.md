@@ -103,8 +103,8 @@ $postBody->setStatus(self::STATUS_ACTIVE);
 ## 退款问题
 google 内购是可以退款的，但是只能退循环订阅的那一种，普通支付不能退款，退款API: [API refund DOC](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions/refund),而且很神奇的是，他只能退当期循环支付的钱，并不会把订阅取消掉。也就是说，如果没有把循环取消掉，那么当下一期的循环周期来临的时候，google还是会继续的扣钱的。
 所以你如果要退款，并且要终止循环的话，就不能用这个api，而是要用这个api: [API revoke DOC](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions/revoke), 这个就会把退款和终止循环 一起处理。
-
-
+## 单次订阅的最长周期
+google iap 的单次订阅的最长周期是一年。 另外 paypal 和 stripe 的最长单次订阅周期也是一年。
 
 
 
