@@ -112,8 +112,8 @@ allow_subscribe_during_netsplit = on
 ##   - on or off
 allow_unsubscribe_during_netsplit = on
 ```
-其实就是当检测到网络分区的时候，是否还允许集群中的其他台可以正常进行 CONNECT, PUBLISH, SUBSCRIBE, 和 UNSUBSCRIBE 请求。
-但是很神奇的是，我们的三台机器虽然是在不同的大区，一个国内，一个香港，一个硅谷，但是都是通过内网连接的。按照道理来说的话，应该不至于会有网络割裂的问题。
+其实就是当检测到网络分区(分区间的节点无法进行网络通信)的时候，是否还允许集群中的其他台可以正常进行 CONNECT, PUBLISH, SUBSCRIBE, 和 UNSUBSCRIBE 请求。
+但是很神奇的是，我们的三台机器虽然是在不同的大区，一个国内，一个香港，一个硅谷，但是都是通过内网连接的。按照道理来说的话，应该不至于会有网络分区的问题。
 但是神奇的是，这几个配置开起来之后，后面如果有一台集群挂了之后，其他两台也能正常work了。
 
 
