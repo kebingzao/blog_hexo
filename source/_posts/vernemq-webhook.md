@@ -334,6 +334,14 @@ plugins.vmq_acl = off
 发现还是挺快的，基本没什么差别。 所以怀疑是webhook的问题。为什么会怀疑是webhook的问题。是因为webhook 是一个同步请求。尤其是  auth_on_register，auth_on_publish，auth_on_subscribe 这三个事件，如果接口那边返回的不是 200 和 ok。 那么是可以拒绝连接和拒绝 pub 和 sub 的。所以肯定是同步请求。至于其他的几个事件是不是也是同步的，这个得测下。首先在权限开启的时候，把 webhook 也开启来 **plugins.vmq_webhooks = on**
 开了之后，重启了一下服务，果然发现连接的时长多了4,5s了。所以就是因为webhook的同步请求，导致速度变慢了。
 而且后面如果把 auth_on_register，auth_on_publish，auth_on_subscribe 这三个事件注释掉，只监听其他事件的话，会不会时间会短点？？ 数据证明，虽然比没有注释的时候快，但是还是比全部关掉的时候满了2s左右，所以应该也是同步请求。
+## 解决webhook的耗时问题
+后面发现有时候还是需要通过webhook来查看 pub， sub 的问题的，虽然可以通过以下这种方式，临时添加webhook，而不需要重启
+```javascript
+$ vmq-admin webhooks register hook=auth_on_register endpoint="http://localhost"
+```
+前提就是这个配置要开着 **plugins.vmq_webhooks = on**
+但是当问题出现了，再开的话，已经跟踪不到了。所以后面想了几种方式可以减少 webhook 接口的消耗：
+- 将webhook的接口地址，部署在 vernemq 的本机环境，这样同一台机子访问，速度是非常快的，可以减少接口的响应消耗
+- 因为webhook log 我们要入库，导致这边还会有数据库的插入时间的消耗，所以将入库操作放到异步队列，这样就不会有数据库的消耗了
 
-
-
+通过这两个优化，后面我们实测，就算加了webhook，但是时间上还是相差无几的， 在可接受范围之类。
