@@ -272,3 +272,30 @@ var a = eval('({"name":"kk"})')
 ```
 这种会更好，就不会变成全局变量了。
 ![1](ie-compatible/3.png)
+## IE7及以下使用activexobject进行同域异步请求
+具体看这个：{% post_link ie-xdomainrequest %}
+简单的来说，就是 IE8 和 IE9 如果要进行请求跨域的时候，那么就要用 XDomainRequest 对象，IE10 及以上和其他的浏览器 都用 xhr 对象来进行跨域请求。
+也就是 IE7 及以下是不能进行异步跨域请求的，只能用异步同域请求。那么是用什么对象来进行异步同域请求的呢？？？
+ActiveXObject 这个对象是 ie5 才加进去的。
+也就是如果要在 ie5 及以上（ie5， ie6， ie7， ie8， ie9）要执行同域下的异步请求的话， 那么就用这个。
+```javascript
+if(window.ActiveXObject)//IE
+{
+    try {
+        //IE6以及以后版本中可以使用
+        xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+    }
+    catch (e) {
+        //IE5.5以及以后版本可以使用
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+}
+```
+        
+
+
+
+
+
+
+
