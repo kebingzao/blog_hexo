@@ -165,6 +165,16 @@ sudo supervisorctl turnserver start
 可以直接访问 3478 端口:
 ![1](turn-install/1.png)
 
+也可以看输出的日志了：
+```html
+[kbz@VM_16_13_centos ~]$ tail -f /var/log/supervisor/turnserver.info.log
+200428: session 003000000000002007: realm <pano> user <1531992181:28888f252480d1af366b693162e112ec_21_24_18153164>: incoming packet BINDING processed, success
+200428: session 004000000000001287: realm <pano> user <1531993610:5075a3126b483f336d79705035d36e06_21_24_18154148>: incoming packet BINDING processed, success
+200428: session 002000000000000749: closed (2nd stage), user <1531994358:e404da3f835436e43f6a1cceac91f485_21_25_tomwang304@gmail.com> realm <pano> origin <>, local 172.16.16.13:3478, remote 220.130.xxx.xxx:2463, reason: allocation timeout
+200428: session 002000000000000749: delete: realm=<pano>, username=<1531994358:e404da3f835436e43f6a1cceac91f485_21_25_tomwang304@gmail.com>
+200430: session 004000000000001245: realm <pano> user <1531986896:97f711c420972472e31e7599b0b78372_21_24_18154458>: incoming packet BINDING processed, success
+200431: session 002000000000000745: realm <pano> user <1531993978:d5651643a0a1f66c720fc3502769dd96_21_24_18154654>: incoming packet BINDING processed, success
+```
 
 
 
