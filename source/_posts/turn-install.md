@@ -158,7 +158,7 @@ stderr_logfile = /var/log/supervisor/turnserver.error.log
 这样子，输出的log就到了 /var/log/supervisor/turnserver.info.log 这个文件了
 然后启动就变成这样
 ```html
-sudo supervisorctl turnserver start
+sudo supervisorctl start turnserver 
 ```
 
 这样就启动起来了。
