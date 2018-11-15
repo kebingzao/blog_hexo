@@ -91,15 +91,6 @@ openssl req -x509 -newkey rsa:2048 -keyout /etc/turn_server_pkey.pem -out /etc/t
 ```
 以下是修改的内容：
 ```html
-# 要监听的设备，不推荐，默认注释
-#listening-device=eth0
-
-# turn 的 udp 和 tcp 的监听端口号,注释掉的话，就会取默认值 3478
-#listening-port=3478
-
-# 设置延迟转发的设备，不推荐设置
-#relay-device=eth0
-
 # 设置转发的ip（局域网ip），如果不设置，他会自己选择默认的
 relay-ip=172.16.184.108
 
@@ -108,9 +99,6 @@ external-ip=47.96.xx.xx
 
 # 转发的线程数，其实默认不设置最好
 relay-threads=5
-
-# 主要是要输出日志的，其实不推荐，因为会输出大量烦人的log
-#Verbose
 
 # WebRTC 的消息里会用到
 fingerprint
@@ -125,11 +113,11 @@ use-auth-secret
 # 这里我们使用“静态”的 KEY，Google 自己也用的这个
 static-auth-secret=1234567890
 
+# 统计状态信息的redis db
+redis-statsdb="ip=59.57.xx.xx dbname=13 port=6379 connect_timeout=30"
+
 # 用户登录域
 realm=pano
-
-# 校验的时间生命周期，默认600s，超过就会得到438错误，然后客户端只能重新校验
-#stale-nonce=600
 
 # 证书
 cert=/etc/turn_server_cert.pem
@@ -137,29 +125,42 @@ cert=/etc/turn_server_cert.pem
 # 证书key
 pkey=/etc/turn_server_pkey.pem
 
-# 输出的log
-log-file=/var/log/turn/turn.log
+# 不输出log
+#no-stdout-log
 
-# 用于禁止回传地址
-#no-loopback-peers
+# 输出的log，将log输出到前台，然后会用supervisor来捕获
+log-file=stdout
 
-# 用于禁止广播
-#no-multicast-peers
+#syslog
 
 # 存放进程的地方
 pidfile="/var/run/turnserver.pid"
-
-# 开启移动ICE的支持
-#mobility
-
-# 禁用本地 telnet cli 管理接口
-#no-cli
 ```
 ## 启动service
 ```html
 [root@VM_156_200_centos turnserver]# service turnserver  start
 Redirecting to /bin/systemctl start  turnserver.service
 ```
+
+当然因为我们用supervisor来捕获输出的log，所以其实后面就改用supervisor来启动了，supervisor 的配置文件如下：
+```html
+[kbz@VM_16_13_centos ~]$ cat /etc/supervisor/conf.d/turnserver.conf 
+[program:turnserver]
+command = /usr/bin/turnserver -c /etc/turnserver/turnserver.conf -v
+user = root
+autostart = true
+autorestart = true
+stdout_logfile = /var/log/supervisor/turnserver.info.log
+stdout_logfile_maxbytes = 100MB
+stdout_logfile_backups = 5
+stderr_logfile = /var/log/supervisor/turnserver.error.log
+```
+这样子，输出的log就到了 /var/log/supervisor/turnserver.info.log 这个文件了
+然后启动就变成这样
+```html
+sudo supervisorctl turnserver start
+```
+
 这样就启动起来了。
 可以直接访问 3478 端口:
 ![1](turn-install/1.png)
