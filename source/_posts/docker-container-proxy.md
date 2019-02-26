@@ -305,7 +305,38 @@ URL    : http://www.cip.cc/119.xx.xx.79
 ```
 果然又可以代理了。
 
+---
 
-
-
-
+后面有出现了一个问题：我现在容器里面可以使用宿主机的代理了，但是我发现在宿主机使用 docker pull 下载镜像，会报错，但是进入容器，网络又正常？？ 而且宿主机的网络也正常
+```html
+[root@VM_156_200_centos .docker]# docker pull centos
+Using default tag: latest
+Error response from daemon: Get https://registry-1.docker.io/v2/: proxyconnect tcp: dial tcp 172.17.0.1:8118: connect: connection refused
+```
+后面查了一下，原来是之前我在进行尝试的时候，在docker的配置文件，增加了两个配置文件：
+```html
+[root@VM_156_200_centos .docker]# cd /etc/systemd/system/docker.service.d/
+[root@VM_156_200_centos docker.service.d]# ll
+total 8
+-rw-r--r-- 1 root root 124 Feb 19 11:48 http-proxy.conf
+-rw-r--r-- 1 root root 125 Feb 19 11:49 https-proxy.conf
+```
+但是因为之前尝试失败，就放在那边，而且重装的时候，也一直还在，导致还一直在生效，所以这个要删掉才行,并且重启docker
+```html
+[root@VM_156_200_centos docker.service.d]# cd ..
+[root@VM_156_200_centos system]# rm -rf docker.service.d/
+[root@VM_156_200_centos system]# systemctl daemon-reload
+[root@VM_156_200_centos system]# systemctl restart docker
+[root@VM_156_200_centos system]# systemctl show --property=Environment docker
+Environment=
+```
+这样 docker pull 就正常了：
+```html
+[root@VM_156_200_centos system]# docker pull centos
+Using default tag: latest
+latest: Pulling from library/centos
+a02a4930cb5d: Pull complete 
+Digest: sha256:184e5f35598e333bfa7de10d8fb1cebb5ee4df5bc0f970bf2b1e7c7345136426
+Status: Downloaded newer image for centos:latest
+```
+所以之后尝试失败的东西，一定要清干净！！！
