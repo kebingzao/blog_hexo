@@ -621,6 +621,7 @@ x
 参考资料：
 [深入理解Docker Volume（一）](http://dockone.io/article/128)
 [深入理解Docker Volume（二）](http://dockone.io/article/129)
+[Use volumes](https://docs.docker.com/storage/volumes/)
 [关于Docker目录挂载的总结](https://www.cnblogs.com/ivictor/p/4834864.html)
 [Docker容器学习梳理--Volume数据卷使用](https://www.cnblogs.com/kevingrace/p/6238195.html)
 
