@@ -291,6 +291,10 @@ if(window.ActiveXObject)//IE
     }
 }
 ```
+## IE6 仅支持 a:hover
+:hover是在CSS中用来制作效果最常用到的一个伪类，比如：标签或div上的鼠标悬停效果 li:hover,div:hover等. 
+但这种效果是css2及以上版本才添加的，对于只支持css1的浏览器就显示不出来。 
+但在IE6中只兼容a:hover
         
 
 
