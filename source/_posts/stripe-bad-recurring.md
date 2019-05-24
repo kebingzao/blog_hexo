@@ -34,9 +34,9 @@ stripe 的升降级订单机制，可以完美的解决这个问题： [文档](
 
 以上就是补差价的方式，也就是说，如果不想补差价的话，即我升级上来之后，下次就要扣全款，那么在创建plan的时候，就要把 prorate 参数设置为 false
 ```html
-\Stripe\Stripe::setApiKey("sk_test_BQokikJOvBiI2HlWgH4olfQ2");
+\Stripe\Stripe::setApiKey("sk_test_BQokikJOvBiI2HlWgxxxxx");
 
-$subscription = \Stripe\Subscription::retrieve('sub_49ty4767H20z6a');\Stripe\Subscription::update('sub_49ty4767H20z6a', [
+$subscription = \Stripe\Subscription::retrieve('sub_49ty4767H20zxx');\Stripe\Subscription::update('sub_49ty4767H20zxx', [
     'items' => [
         [
             'id' => $subscription->items->data[0]->id,
