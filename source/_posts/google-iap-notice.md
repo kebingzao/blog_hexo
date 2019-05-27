@@ -96,7 +96,8 @@ $postBody->setStatus(self::STATUS_ACTIVE);
 [2018-04-09 07:25:32] Pay.INFO: google iap change status to  inactive... [] []
 [2018-04-09 07:25:34] Pay.ERROR: change google status error:{  "error": {   "errors": [    {     "domain": "androidpublisher",     "reason": "inAppProductDeactivateSubscription",     "message": "Subscription cannot be deactivated."    }   ],   "code": 403,   "message": "Subscription cannot be deactivated."  } }  [] []
 ```
-所以如果要修改价格的话，只能重新创建一个新的订阅商品了。
+~~所以如果要修改价格的话，只能重新创建一个新的订阅商品了~~。
+ps: 现在是2019-05-27, 现在循环订阅是可以修改价格了，只不过对于已经订阅的用户来说，还是依然继续用旧价格，新的用户才用新价格了。
 ## 单次购买的商品没法复用
 我们知道 已经激活的订阅商品 是不能再被取消激活和修改价钱的，也不能删除。但是 单次购买的商品是可以删除的。 可以在google play 后台删除。 但是删除之后，这个商品id就不能再复用了。
 也就是说，假设之前有一个 id 是 month_1 的商品id， 那么后台删掉了。这时候你是不能再建一个同样名称的 month_1 的商品的，会报错。 也就是说，只要创建商品了，不管这个商品有没有被删掉，这个商品id都是唯一的。后来者都不能再复用
