@@ -44,8 +44,11 @@ server {
 }
 ```
 然后默认也走 https, 然后就是通过 nginx 代理转发到 官网的这个页面就行了 https://www.example.com/testFlight.html。
-这样子其实浏览器地址栏，会经历三层跳转： 
+这样子，其实会经历两层跳转： 
 ```html
 ios.example.com -> www.example.com/testFlight.html -> testflight.apple.com/join/NIxxxxx
 ```
-
+但是因为第一层跳转是代理转发，所以浏览器地址栏是不会变的。所以地址栏的变化是：
+```html
+ios.example.com -> testflight.apple.com/join/NIxxxxx
+```
