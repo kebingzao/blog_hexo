@@ -1,5 +1,5 @@
 ---
-title: 将带参数的某一个站点代理到另一个站点的某一个页面
+title: 将带参数的A站点代理到B站点的某一个页面
 date: 2019-05-30 18:06:21
 tags: nginx
 categories: nginx相关

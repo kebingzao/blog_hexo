@@ -1,5 +1,5 @@
 ---
-title: 将某一个站点代理到另一个站点的某一个页面
+title: 将A站点代理到B站点的某一个页面
 date: 2019-05-30 17:44:48
 tags: nginx
 categories: nginx相关
