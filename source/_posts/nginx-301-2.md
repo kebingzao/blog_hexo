@@ -74,3 +74,17 @@ server {
 	}
 }
 ```
+然后在 action 这个页面的函数里面，加上域名的判断，如果是 foo.at 的域名，那么就得到后面的参数, 不管有没有多语言，最后一个路径就是参数
+```html
+function init () {
+    var hostname = window.location.hostname;
+    if (hostname.indexOf('foo.at') !== -1) {
+        var pathArr = window.location.pathname.split('/');
+        code = pathArr[pathArr.length - 1];
+        beginProcess();
+    }
+}
+```
+
+
+

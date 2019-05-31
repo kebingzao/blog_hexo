@@ -10,6 +10,7 @@ categories: 前端相关
 这边总结了一下，当页面跳转的时候，如果我们想要浏览器的地址栏地址保持不变的几种方式：
 - js 实现
 - iframe 实现
+- nginx 转发代理
 - DNS CNAME 指向
 
 ## js 实现
@@ -83,8 +84,21 @@ location / {
 4. iframe 会阻塞主页面的加载，所以会感觉到页面加载变慢了
 5. 目标页面不能有**X-Frame-Options** 这个头部，不然 iframe 会加载不了， 具体：{% post_link web-forbidden-iframe-embed %}
 
+## nginx 实现反向代理
+还有一种方式，就是将请求代理转发到另一个域名：
+```html
+location / {
+         proxy_set_header Host www.baidu.com;
+         proxy_set_header X-Real-IP $remote_addr;
+         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+         proxy_pass https://www.baidu.com;
+}
+```
+这样就可以将这个站点，代理转发到百度了。
+![1](4.png)
+
 ## 直接用 DNS CNAME 解析
-其实上面那两种，现在正常的网页设计都很少在用了。 如果真的要用 A 网站显示 B 网站的内容，但是地址栏还是 A 网站的地址。那最好的方式就是将 A 网站的域名指向 B 网站的域名。
+无论是 js 还是 iframe 的实现，现在正常的网页设计都很少在用了。 如果真的要用 A 网站显示 B 网站的内容，但是地址栏还是 A 网站的地址。那最好的方式就是将 A 网站的域名指向 B 网站的域名。
 举个例子，其实现在很多的 CDN 都是这么用的，比如我们使用了 AWS 的 S3 服务，将我们的代码上传到 S3 的bucket， 然后我们使用了 AWS 的 CDN 服务（cloudfront 服务），这时候就会生成一个域名，域名是长这样子的：**d3jnxxxxxgltl.cloudfront.net**， 事实上这个域名也是可以配置成可以直接访问的，但是我们一般不怎么做，而是更愿意换成我们自己的域名，所以这时候就要把我们自己的域名指向这个 cloudfront 域名就可以了。
 ![1](3.png)
 
