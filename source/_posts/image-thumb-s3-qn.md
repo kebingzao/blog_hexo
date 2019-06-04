@@ -1,7 +1,10 @@
 ---
 title: 针对国内和国外的图片资源和缩略图做CDN优化
 date: 2019-06-03 15:38:34
-tags: aws
+tags: 
+- aws
+- qiniu
+- lambda
 categories: aws 相关
 ---
 ## 前言

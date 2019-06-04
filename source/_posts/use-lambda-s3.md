@@ -1,7 +1,10 @@
 ---
 title: 项目使用 aws 的 lambda服务来生成s3的缩略图
 date: 2018-08-13 20:10:59
-tags: aws
+tags: 
+- aws
+- qiniu
+- lambda
 categories: aws 相关
 ---
 ## 前因
