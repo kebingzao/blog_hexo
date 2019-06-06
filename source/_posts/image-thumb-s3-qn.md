@@ -80,8 +80,7 @@ Amazon Route 53 是一种可用性高、可扩展性强的云域名系统 (DNS) 
 #### 创建一个 layer 层
 这次跟我去年创建的最大的差别就是多了一个叫做 layer 的层机制。那么这个 layer 是干啥用的。
 {% blockquote https://docs.aws.amazon.com/zh_cn/lambda/latest/dg/configuration-layers.html %}
-您可以将 Lambda 函数配置为以层的形式拉入其他代码和内容。层是包含库、自定义运行时或其他依赖项的 ZIP 存档。
-利用层，您可以在函数中使用库，而不必将库包含在部署程序包中。
+您可以将 Lambda 函数配置为以层的形式拉入其他代码和内容。层是包含库、自定义运行时或其他依赖项的 ZIP 存档。利用层，您可以在函数中使用库，而不必将库包含在部署程序包中。
 {% endblockquote %}
 说白了就是存放第三方库的地方，去年我在上传 Python 代码的时候， 真正可编辑的代码文件只有一个： **CreateThumbnail.py**, 其他的全部都是依赖的第三方库：
 ![1](14.png)

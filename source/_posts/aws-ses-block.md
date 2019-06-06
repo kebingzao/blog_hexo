@@ -1,7 +1,9 @@
 ---
 title: 记一次AWS SES 邮件服务账号被禁的情况
 date: 2019-05-29 14:08:33
-tags: aws
+tags: 
+- aws
+- ses
 categories: aws 相关
 ---
 ## 前言
