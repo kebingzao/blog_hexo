@@ -203,6 +203,35 @@ if ($order == null) {
 }
 ```
 这样子就大大的提高了成功率。事实上，这样做之后，就再也没有出现这种情况了。
+## 支付成功，completed 没有过来，只过来 update 状态
+最近经常有出现过 paypal 支付成功了，但是却没有升级上来的情况，后面发现原来是没有 **completed** 事件，而是改成 **update** 事件了。
+![1](4.png)
+**解决方法**:
+通过观察我们发现， 当为 update 状态的时候，有一种情况，一种是如果用户没有支付完成的时候，这时候订单号其实是循环单号，而不是真正的订单号，只有当用户支付成功之后，这时候如果 update 状态过来，这时候的订单号才是真正的订单号。
+所以我们这么改： 如果是 update 事件，并且当前的 order id 不是循环 id 的话，那么说明就是有效订单，那么就要升级上来， 这时候就不要再去等 completed 的 webhook 了，直接升级, 因为有可能 completed 的 webhook 会非常慢。
+```php
+//如果是Updated,orderid不等于recurringid,则认为是支付成功的。
+if ($transaction->status == 'Updated') {
+    if ($orderId == $this->recurringId) {
+        return false;
+    }
+    ... do upgrade
+}
+```
+## 关于 paypal 的循环支付的 return 接口返回两次的问题
+之前有出现了一种情况，就是： 在 paypal  的  return  接口的时候， 有时候会发现 paypal 会调用两次。导致会出现两种情况：
+- 第一次和第二次相隔的时间会比较长的时候，这时候在第二单的时候， 我的 EC-TOKEN 已经被用掉了，接下来已经找不到对应的订单了
+- 第一次和第二次的时间差不多，第二次到的时候，第一次可能还没有执行完。但是这时候第二次就会在请求 agreement 的时候，就会报这个错，结果页面就直接跳到错误页面了
 
+第二种情况就会出现这个 400 错误：
+```javascript
+{
+	"code": 400,
+	"msg": "Got Http response code 400 when accessing https:\/\/api.paypal.com\/v1\/payments\/billing-agreements\/EC-64M23731Jxxxxxx\/agreement-execute.",
+	"url": "https:\/\/api.paypal.com\/v1\/payments\/billing-agreements\/EC-64M23731Jxxxxxx\/agreement-execute",
+	"data": "{\"name\":\"SUBSCRIPTION_UNMAPPED_ERROR\",\"message\":\"A successful Billing Agreement has already been created for this token.\",\"information_link\":\"https:\/\/developer.paypal.com\/docs\/api\/payments.billing-agreements#errors\",\"debug_id\":\"6412fd645a4f3\"}"
+}
+```
+其实处理方式很简单，先把第一次 return 过来的数据，先保存下来（保存到 redis），如果第二个过来的时候，找不到订单的话，直接通过 token 作为 key，从 redis 里面取出数据，然后继续执行接下来的流程。
 
 
