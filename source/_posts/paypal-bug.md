@@ -66,7 +66,7 @@ $merchantPreferences->setReturnUrl($returnUrl)
     ->setMaxFailAttempts("0")
     ->setSetupFee(new Currency(array('value' => $setupFee, 'currency' => 'USD')));
 ```
-导致订阅了这个用户，就会附加上这个配置。 改虽然可以改，但是不能批量改，而是只能一个用户一个用户的改: [这边](https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/manage_subscriptions/)。
+导致订阅了这个用户，就会附加上这个配置。 而且用户如果已经订阅了之后，还不能在 paypal 后台改: [这边](https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/manage_subscriptions/)。
 那么能不能直接改这个 plan 的设置呢：
 ```html
     public function getPlan(){
