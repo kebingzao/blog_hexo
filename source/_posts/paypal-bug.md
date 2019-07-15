@@ -233,5 +233,25 @@ if ($transaction->status == 'Updated') {
 }
 ```
 其实处理方式很简单，先把第一次 return 过来的数据，先保存下来（保存到 redis），如果第二个过来的时候，找不到订单的话，直接通过 token 作为 key，从 redis 里面取出数据，然后继续执行接下来的流程。
+## 支付成功，completed 没有过来，但是过来 update 状态的问题
+最近经常有出现过 paypal 支付了，但是却没有升级上来的情况，后面发现原来是在检查交易记录的时候，发现没有 completed 事件，而是 改成 update 事件了。而且这个 update 事件前面的 order id，有可能是循环单号，也有可能是支付单号。
+所以后面如果是收到 updated 的情况，如果当前的订单号，不是循环单号，而是真正的支付单号的话，那么就说明其实用户已经支付成功了，这时候其实就应该升级了。不应该再去等待 completed 过来，因为有可能 completed 过来会非常慢。
+代码如下：
+```javascript
+//如果是Updated,orderid不等于recurringid,则认为是支付成功的。
+if ($transaction->status == 'Updated') {
+    if ($orderId == $this->recurringId) {
+        $this->logger->info("[pay-skip]status=".$transaction->status."; order_id=".$orderId."; recurring_id=".$this->recurringId);
+        return false;
+    }
+    $this->logger->info("[pay-success]status=".$transaction->status."; order_id=".$orderId."; recurring_id=".$this->recurringId);
+    // do upgrade handle
+}
+```
+
+
+
+
+
 
 
