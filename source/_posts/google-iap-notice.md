@@ -5,7 +5,7 @@ tags: google iap
 categories: 支付相关
 ---
 ## 前言
-之前项目有用到了一些第三方支付，包括 paypal，google iap， stripe， 还有国内的 alipay。其中每个支付类型都有一些坑，本章讲的是google 内购支付，即 google iap 的一些需要注意的点，或者是一些踩过的坑， 将会持续更新。
+之前项目有用到了一些第三方支付，包括 paypal, google iap, stripe, apple iap, 还有国内的 alipay。其中每个支付类型都有一些坑，本章讲的是google 内购支付，即 google iap 的一些需要注意的点，或者是一些踩过的坑， 将会持续更新。
 ## 创建商品的最低价钱
 之前有一个需求，就是服务端要调用google的 iap API 来动态创建商品项， [API INSERT DOC](https://developers.google.com/android-publisher/api-ref/inappproducts/insert), 打算建一个 $0.5 的订单， 后面发现竟然报错了：
 <!--more-->
@@ -148,8 +148,26 @@ google iap 的单次订阅的最长周期是一年。 另外 paypal 和 stripe �
     }
 ```
 这样就可以解决测试账号影响我们的线上数据的问题了。
-
-
+## google iap 的请求数超出限制
+早期在没有接入 GCP 的时候，是没有 webhook 的，所以我们早期就做了定时脚本，用来定时检查订单的续费情况。不过有一次发现报了这个错误：
+```javascript
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "usageLimits",
+    "reason": "dailyLimitExceeded",
+    "message": "Daily Limit Exceeded. The quota will be reset at midnight Pacific Time (PT). You may monitor your quota usage and adjust limits in the API Console: https://console.developers.google.com/apis/api/androidpublisher.googleapis.com/quotas?project=1000238825303",
+    "extendedHelp": "https://console.developers.google.com/apis/api/androidpublisher.googleapis.com/quotas?project=1000238825303"
+   }
+  ],
+```
+后面查了一下，发现是因为今天的api请求连接数已经满了，所以返回错误。而且这个请求次数，每天可以有 20万次，我们竟然把他用完了，也是厉害。
+{% blockquote https://developer.android.com/google/play/developer-api.html#quota %}
+配额
+对于使用 Google Play Developer API 的应用来说，初始免费配额被限制为每天 200000 次请求（每款应用）。此配额应当可以满足发布 Activity 和正常的订阅验证需求。
+{% endblockquote %}
+如果还想要更多的话，就要单独申请。
 
 
 
