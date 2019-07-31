@@ -10,7 +10,7 @@ categories: 前端相关
 <!--more-->
 ## 解决
 所以原来的bizHome.html是不能动的。 而且还要在项目根目录增加一个 business 目录，里面的 index.html 文件要跟 bizHome.html 的内容一样。当然我们不可能直接复制代码，那样太 low 了，而且不好维护。 有考虑过直接在 business/index.html 直接将 location.href 指向 bizHome.html 这个页面。这样也是可以的，但是这样子地址栏就会变了，多了一层跳转，变成 bizHome.html, 感觉体验也不太好。
-后面的解决方法，就是通过 meta 标签的 refresh 操作，将 content 指向 bizHome.html，这样子既可以实现显示 bizHome.html 的内容，而且地址栏还不会变。代码如下：
+后面的解决方法，就是通过 meta 标签的 refresh 操作，将 content 指向 bizHome.html，这样子就可以实现显示 bizHome.html 的内容。代码如下：
 ```html
 <!DOCTYPE html>
 <html>
@@ -24,7 +24,7 @@ categories: 前端相关
 </body>
 </html>
 ```
-
+不过这样也会导致地址栏又会变成 bizHome.html。 不过因为我们这个站点有做 phantomJS 的静态化页面预编译，这样子构建之后。 bizHome.html 和 business/index.html 这两个页面一模一样了。
 
 
 
