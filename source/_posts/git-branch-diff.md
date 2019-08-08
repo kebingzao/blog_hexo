@@ -32,6 +32,7 @@ admin@admin-PC MINGW64 /f/airdroid_code/id-airdroid-com (master)
 $ git log origin/develop ^origin/master
 
 ```
-
+## 备忘
+之前用这个指令的时候，发现在 IDEA 这个 IDE 自带的 Terminal 窗口会有问题。明明 develop 和 master 完全一样，但是就是会有一堆的 commit 出来。后面用 git 自带的 shell terminal 窗口，才没问题。
 
 
