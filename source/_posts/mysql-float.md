@@ -4,7 +4,7 @@ date: 2019-09-27 20:48:18
 tags: mysql
 categories: mysql遇到的小问题
 ---
-## 前言
+## 问题
 之前在用 mysql 查询有 `float` 字段的时候，比如某一个字段 fee，明明有一条是  fee 为 1.99 的记录，但是就是查不到？？
 ```mysql
 select * from fee_mode where is_pp_recurring = 1 and is_enable = 1 and fee = 1.99
