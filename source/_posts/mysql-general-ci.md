@@ -57,6 +57,46 @@ mysql 有很多种排序规则，如果字符集选的是 `utf8` 的话，那么
 2. 后缀带 `ci` 就是大小写不敏感， 带 `cs` 就是大小写敏感，所以像存邮箱和用户名之类的，一般都是不区分大小写的，都要用这种来存
 3. 带`general` 和带 `unicode` 其实差不多(除非有小语种)，不过从速度上来说，`utf8_general_ci` 校对速度快，但准确度稍差。`utf8_unicode_ci` 准确度高，但校对速度稍慢。
 
+### 举个例子喽
+建三个表（第二个和第三个其实一样的）：
+```mysql
+CREATE TABLE `t_bin` (
+`id` int(11) DEFAULT NULL,
+`name` varchar(20) DEFAULT NULL,
+UNIQUE KEY `uk_name` (`name`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE `t_ci` (
+`id` int(11) DEFAULT NULL,
+`name` varchar(20) DEFAULT NULL,
+UNIQUE KEY `uk_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+CREATE TABLE `t_default` (
+`id` int(11) DEFAULT NULL,
+`name` varchar(20) DEFAULT NULL,
+UNIQUE KEY `uk_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+然后试着插入数据：
+```mysql
+//可以插入
+insert into t_bin values (1, 'Zach');	
+//可以插入
+insert into t_bin values (2, 'zach');		
+ 
+//可以插入
+insert into t_ci values (1, 'Zach');		
+//[Err] 1062 - Duplicate entry 'zach' for key 'uk_name'
+insert into t_ci values (2, 'zach');		
+
+//可以插入
+insert into t_default values (1, 'Zach');		
+//[Err] 1062 - Duplicate entry 'zach' for key 'uk_name'
+insert into t_default values (2, 'zach');		
+```
+最终`t_bin`表中会有两条记录，而`t_ci`和`t_default`表中，只有第一条记录。
+
 ## 解决
 所以上述问题出现的原因，其实就是排序规则不一样， `code` 字段是 `utf8_general_ci` 所以不区分大小写，而`coupon_code` 字段的排序规则是 `utf8_bin`， 是区分大小写的。所以就会导致连表的时候，如果存储的字串不完全一样，就会匹配不上。
 ### 方法一： 将表和字段的COLLATE属性修改为utf8_general_ci
