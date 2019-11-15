@@ -120,13 +120,21 @@ invisible 下的 `image challenge`  :
 
 #### 创建 reCaptcha 
 
-见 [recaptcha admin](https://www.google.com/recaptcha/admin/create) ， 注意，创建时最好勾选 `验证 reCAPTCHA 解决方案来源`。
-标签随便填一个好认的，然后域名填写你要验证的前端站点域名，最后创建成功之后会生成：
+在 https://www.google.com/recaptcha/admin/create 页面，创建一个新网站。 根据提示填写，我们选用 reCaptcha 第2版的 `隐形reCAPTCHA徽章`。
+标签随便填一个好认的，然后域名填写你要验证的前端站点域名。创建完成后，转到“设置”，在配置中，完善配置。
+
+- 将 “网站密钥” 和 ”密钥“ 发送给前后端开发者。
+- 安全偏好设置，根据需求来选择，目前我们应该选 "用户使用最方便“ 等级。
+- 切记勾选 “验证 erCAPTCHA 解决方案来源"
+
+最后创建成功之后会生成：
 
 1. site key (用于前端嵌入页面)  
 2. secret key (用于服务端调用 `recaptcha api` 验证)
 
 ![](1.png) 
+
+![](rev_finished_setup.png)
 
 ![](2.png) 
 
@@ -274,6 +282,10 @@ public static function checkGoogleRecaptcha($token = '')
 ```
 
 这样子服务端的校验就完成了。
+google 返回的验证错误码,如下图：  
+
+![](rev_error_codes.png)
+
 
 ## 总结
 其实对于大部分的正常用户来说，基本上就是不需要强制的图片验证码，所以使用体验几乎跟之前没有差别，只有刷接口或者是频繁操作页面的使用者，这时候 google 会判断是否需要显示图片验证码。
