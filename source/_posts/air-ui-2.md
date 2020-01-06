@@ -73,6 +73,7 @@ element
   |---src/
   |     |---directives/     放置自定义指令
   |     |---locale/         放置语言的配置文件
+  |     |     |---lang/     放置多语言
   |     |---mixins/         放置组件用的混合文件
   |     |---transitions/    放置动画配置文件
   |     |---utils/          放置用到工具函数文件
