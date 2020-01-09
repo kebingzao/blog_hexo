@@ -309,8 +309,8 @@ export default Notification;
   所以 `Notification` 这个对象其实就是工厂函数，只要被调用，那么就会实例化一个拥有 notification vue 组件的全新的对象。
 2. 实例化对象进行挂载，并且添加到 body 中，显示出来
 ```javascript
-instance.$mount();
-document.body.appendChild(instance.$el);
+instance.$mount();  //没有 el 参数，就会挂载到一个未挂载的实例,模板将被渲染为文档之外的的元素
+document.body.appendChild(instance.$el); // 这时候必须使用原生 DOM API 把它插入文档中
 ```
 3. 接下来就是这个 `Notification` 这个对象的其他方法，比如 `close` 之类的，同时还有一个处于闭包状态的全局对象 `instances` 来存放这些实例化的对象，并通过 id 对这些实例进行操作
 
