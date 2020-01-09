@@ -422,6 +422,66 @@ export default {
 }
 ```
 
+## 测试
+接下来我们在 `home.vue` 进行测试, 在 `template` 加上这个:
+```html
+<air-button
+  type="primary"
+  @click="openFullScreen1"
+  v-loading.fullscreen.lock="fullscreenLoading">
+  指令方式
+</air-button>
+<air-button
+  type="primary"
+  @click="openFullScreen2">
+  服务方式
+</air-button>
+```
+表示两种方式的调用方式， 然后在 `script` 里面加上对应的参数和方法:
+```javascript
+<script>
+  export default {
+    data () {
+      return {
+        ...
+        fullscreenLoading: false
+      }
+    },
+    methods: {
+      ...
+      openFullScreen1() {
+        this.fullscreenLoading = true;
+        setTimeout(() => {
+          this.fullscreenLoading = false;
+        }, 2000);
+      },
+      openFullScreen2() {
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'air-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        setTimeout(() => {
+          loading.close();
+        }, 2000);
+      }
+    }
+  }
+</script>
+```
+这样就可以看到效果了：
+
+![1](1.png)
+
+接下来点击指令方式，可以看到效果
+
+![1](2.png)
+
+点击服务方式，也可以看到效果，同时服务方式的定制化更高
+
+![1](3.png)
+
 ## 总结
 这样子指令类型的组件的创建就完成了。 下节我们讲一下，怎么部分引入组件
 
