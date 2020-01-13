@@ -337,6 +337,45 @@ export default DemoBlock
 
 ![1](1.gif)
 
+## prod 打包静态文件
+如果后面要通过 `CI` 构建将文档更新到站点的话，就必须打包成静态文件，那么指令就是:
+```javascript
+yarn docs:build
+```
+```javascript
+"docs:build": "vuepress build docs"
+```
+默认的生成路径是： `docs\.vuepress\dist` , 这样就可以了。 
+
+不过这边要注意一个细节，就是打包的静态文件的资源的相对 url 的配置，是在 `docs/.vuepress/config.js` 里面配置的：
+```html
+base: '/',
+```
+这个很重要，因为我默认设置的是根目录。如果要跑起来的话，那么就要创建一个以 dist 为根目录的 webserver。
+
+假设你有安装了[http-server](https://www.npmjs.com/package/http-server)的情况下：
+```html
+npm install http-server -g
+```
+那么我们就可以通过执行这个指令把服务启动起来：
+```html
+http-server ./docs/.vuepress/dist -p 8085
+```
+这样就可以了：
+```html
+F:\code\vue-ui>http-server ./docs/.vuepress/dist -p 8085
+Starting up http-server, serving ./docs/.vuepress/dist
+Available on:
+  http://192.168.40.51:8085
+  http://192.168.111.1:8085
+  http://192.168.218.1:8085
+  http://192.168.56.1:8085
+  http://192.168.99.1:8085
+  http://127.0.0.1:8085
+Hit CTRL-C to stop the server
+```
+
+
 ## 总结
 本节主要讲 `air-ui` 怎么选用 `vuepress` 作为写文档的框架。 并且初步完成了一个简单的 button 的文档页面。 但是这个只是最基础的，事实上哪有那么简单，而且还有很多东西要优化和要解决，比如：
 
