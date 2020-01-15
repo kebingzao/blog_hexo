@@ -55,6 +55,64 @@ categories:
 
 当然除了以上几点，还会有一些小的优化，比如  eslint， 构建方面等等，后面都会提到。
 
+## air-ui 的引入方式
+首先要说明的一点就是 `air-ui` 并没有开源，所以 npmjs 上面的那个 `air-ui` 不是我做的这个： 另一个 [air-ui](https://www.npmjs.com/package/air-ui)。
+
+完整来说，`air-ui`的引入方式其实有 3 个:
+### 1.完整引入
+在`main.js`文件下添加如下配置:
+```js
+import Vue from 'vue';
+import AirUI from 'air-ui'
+import 'air-ui/lib/styles/index.css'
+import App from './App.vue';
+
+Vue.use(AirUI);
+
+new Vue({
+  render: h => h(App)
+}).$mount('#app');
+```
+以上代码便完成了 `air-ui` 的引入。需要注意的是，样式文件需要单独引入。
+
+### 2.部分引入(但是全部加载)
+如果你只希望引入部分组件，比如 `Button` 和 `Row`，那么需要在 `main.js` 中写入以下内容：
+```js
+import Vue from 'vue';
+import { Button, Row } from 'air-ui';
+import 'air-ui/lib/styles/index.css'
+import App from './App.vue';
+
+Vue.use(Button)
+Vue.use(Row)
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+});
+```
+### 3.部分组件按需加载
+或者你也可以直接引用单独组件的 js 和 css：
+```js
+import Vue from 'vue';
+import Button from 'air-ui/lib/button';
+import Row from 'air-ui/lib/row';
+import 'air-ui/lib/styles/button.css';
+import 'air-ui/lib/styles/row.css';
+import App from './App.vue';
+
+Vue.use(Button);
+Vue.use(Row);
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+});
+```
+第二种和第一种其实没啥差别，都是全部加载 `air-ui.common.js`, 不会省打包体积。只能算第一种的另一种语法糖的变种。为啥跟 `element-ui` 的按需加载不一样，具体可以看 {% post_link air-ui-8 %}
+
+第三种才是真正可以省打包体积的方式。
+
 ## 暂不开源
 目前 `air-ui` 是放在公司搭建私有的 gitlab 代码库的，并没有开源，一方面是因为新加的一些组件和新的定制主题都含有公司产品的特点，对其他人来说，并没有太多可借鉴的东西，另一方面也是大部分的组件都是从 `element ui` 那边挪过来的，对于其他人来说，直接用 `element ui` 效果更好。
 
