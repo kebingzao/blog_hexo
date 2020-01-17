@@ -248,7 +248,7 @@ biz.scss
 biz:{"$--color-primary":"#7ca37a !default","$--color-danger":"#d009f5 !default","$--border-radius-base":"8px !default"}
 personal.scss
 personal:{"$--color-primary":"#18a0a3 !default","$--color-danger":"#f5e727 !default","$--msgbox-width":"620px !default"}
-[11:21:37] Using gulpfile F:\airdroid_code\air-ui\gulpfile.js
+[11:21:37] Using gulpfile F:\code\air-ui\gulpfile.js
 [11:21:37] Starting 'theme'...
 [11:21:37] Starting 'del-old-theme'...
 [11:21:37] Finished 'del-old-theme' after 39 ms

@@ -528,7 +528,7 @@ output: {
 ## 使用一下
 接下来我们试着装一下这个第三方库：
 ```javascript
-F:\code\vue-airdroid-comps>npm install element-ui
+npm install element-ui
 ```
 
 ![1](15.png)
