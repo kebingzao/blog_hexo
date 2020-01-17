@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (16) -- 打包构建 pub 任务
-date: 2020-01-15 18:05:17
+date: 2020-01-13 18:05:17
 tags: js
 categories: 
 - 前端相关
@@ -605,6 +605,24 @@ fi
 
 下一节我们讲一下在做 `air-ui` 的组件的过程中，遇到的一些奇葩的情况，以及怎么爬坑的。
 
-
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}
 
 

@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (11) -- vuepress 写文档 (爬坑版)
-date: 2020-01-13 16:20:24
+date: 2020-01-02 16:20:24
 tags: js
 categories: 
 - 前端相关
@@ -204,4 +204,22 @@ if (!Vue.prototype.$isServer && !fecha.format) {
 ## 总结
 到这一节结束，关于 `air-ui` 用 `vuepress` 写文档遇到的问题和需要注意的问题，基本上都描述清楚了。接下来我们讲一下 `air-ui` 的多语言机制，以及跟 `element-ui` 的多语言机制有啥不同。
 
-
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}

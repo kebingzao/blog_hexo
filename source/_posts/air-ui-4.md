@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (4) -- air-ui 环境搭建和目录结构
-date: 2020-01-03 18:13:54
+date: 2019-12-07 18:13:54
 tags: js
 categories: 
 - 前端相关
@@ -236,3 +236,22 @@ export default {
 ## 总结
 本节主要是讲怎么基于 `vue-cli` 来搭建 `air-ui` 的项目雏形。并成功运行起来。下一节讲怎么在 `air-ui` 怎么创建第一个属于自己的组件。
 
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}

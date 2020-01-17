@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (2) -- 先分析一下 element ui 项目
-date: 2019-12-31 15:04:43
+date: 2019-12-03 15:04:43
 tags: js
 categories: 
 - 前端相关
@@ -702,7 +702,25 @@ alert
 ## 总结
 通过对构建的分析，大概就可以知道 `element-ui` 的大致脉络，当然，如果说完全的了解，那肯定是不够，事实上我也没有把所有的代码全部啃一遍，一方面是时间上不允许，另一方面，我在得到我想要的思路和流程之后，很多东西我都是按照自己的方式和习惯写的，不一定要跟 `element-ui` 一样。我看源码只是为了一个思路而已，接下来讲一下我们怎么基于 `element-ui` 来做 `air-ui` 的。
 
-
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}
 
 
 

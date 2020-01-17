@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (10) -- vuepress 写文档 (进阶版)
-date: 2020-01-10 13:46:21
+date: 2019-12-26 13:46:21
 tags: js
 categories: 
 - 前端相关
@@ -1236,5 +1236,23 @@ gulp.task('homeVue', cb => {
 ## 总结
 这一节主要是针对 `vuepress` 这个文档框架的写文档的时候加入了很多更高级的东西，并且为了更省事，还加入了一些 gulp 任务，让开发者可以更方便的写 demo，并且引入 demo 例子。 不过难道你以为 `vuepress` 就再也没有问题了， no，no，no，还没有讲入坑和爬坑呢，下一节我们讲 vuepress 的爬坑经验。
 
-
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}
 

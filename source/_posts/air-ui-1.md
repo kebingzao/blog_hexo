@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (1) -- 为啥我要自建一个类 element ui 的组件 
-date: 2019-12-31 13:28:19
+date: 2019-12-01 13:28:19
 tags: js
 categories: 
 - 前端相关
@@ -125,6 +125,25 @@ new Vue({
 
 而写这个系列文章的原因，也是因为我觉得一旦项目到了一个规模，单独的第三方 ui 组件绝对是满足不了的，为了更好的维护和扩展，很多时候往往需要自己再建一套更符合自己项目风格和规范的 ui 组件。 那时候希望这些文章能对这群人达到一些帮助，少走点弯路， 奥利给~~~。
 
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}
 
 
 

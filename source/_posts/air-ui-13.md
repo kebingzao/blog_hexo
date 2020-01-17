@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (13) -- 国际化机制(进阶版)
-date: 2020-01-14 17:16:08
+date: 2020-01-06 17:16:08
 tags: js
 categories: 
 - 前端相关
@@ -249,7 +249,25 @@ Vue.component(Option.name, Option)
 ## 总结
 本节主要讲打包的时候，多语言文件的抽离和处理。包括打 common 文件和打单独组件包的时候是怎么做的，以及跟 `element-ui` 的差别在哪里。 本节已经涉及到打包构建的一些情况了。下一节我们来详细讲一下 `air-ui` 的打包构建，尤其是打 dist 包是怎么处理的。
 
-
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}
 
 
 

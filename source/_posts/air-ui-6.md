@@ -1,6 +1,6 @@
 ---
 title: 自建vue组件 air-ui (6) -- 创建内置服务组件
-date: 2020-01-08 14:53:56
+date: 2019-12-12 14:53:56
 tags: js
 categories: 
 - 前端相关
@@ -440,4 +440,22 @@ Vue.use(Notification)
 ## 总结
 内置服务组件的创建，大概就这样。下节我们讲怎么创建一个指令组件。
 
-
+---
+系列文章:
+{% post_link air-ui-1 %}
+{% post_link air-ui-2 %}
+{% post_link air-ui-3 %}
+{% post_link air-ui-4 %}
+{% post_link air-ui-5 %}
+{% post_link air-ui-6 %}
+{% post_link air-ui-7 %}
+{% post_link air-ui-8 %}
+{% post_link air-ui-9 %}
+{% post_link air-ui-10 %}
+{% post_link air-ui-11 %}
+{% post_link air-ui-12 %}
+{% post_link air-ui-13 %}
+{% post_link air-ui-14 %}
+{% post_link air-ui-15 %}
+{% post_link air-ui-16 %}
+{% post_link air-ui-17 %}
