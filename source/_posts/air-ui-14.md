@@ -211,7 +211,7 @@ module.exports = {
   ]
 };
 ```
-其实逻辑很简单，就是将 `components/index.js` 通过打包成 `ES Module`的加载方式，将其打包成 `air-ui.common.js` 这个文件，并放入 `lib` 目录。 所以要完整加载 `air-ui` 这个组件库，其实就是加载 `air-ui.common.js`，为了保证以下这种方式能索引到这个文件:
+其实逻辑很简单，就是将 `components/index.js` 通过打包成 `ES6 Module`的加载方式，将其打包成 `air-ui.common.js` 这个文件，并放入 `lib` 目录。 所以要完整加载 `air-ui` 这个组件库，其实就是加载 `air-ui.common.js`，为了保证以下这种方式能索引到这个文件:
 ```javascript
 import AirUI from 'air-ui'
 ```

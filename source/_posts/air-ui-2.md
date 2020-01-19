@@ -21,13 +21,14 @@ C:\Program Files\nodejs\yarnpkg -> C:\Program Files\nodejs\node_modules\yarn\bin
 + yarn@1.19.1
 added 1 package in 7.777s
 ```
-安装成功，试一下指令是否正常： 当前版本是 `2.12.0` (我在写这个文章的时候，其实已经更新到 `2.13.0`，但是差别不大，都是一些细节的调整)
+安装成功，试一下指令是否正常： 
 ```text
 F:\code\github\element>yarn --version
 1.19.1
 ```
 <!--more-->
 ## 本地环境跑起来
+`element-ui` 的当前版本是 `2.12.0` (我在写这个文章的时候，其实已经更新到 `2.13.0`，但是差别不大，都是一些细节的调整)
 ```text
 F:\code\github\element>npm run dev
 
@@ -290,7 +291,7 @@ node build/bin/template.js
 },
 ```
 ### dev 打包总结
-最后总结一下：通过打包 dev 模式，我们可以知道，根目录是`examples/index.tpl` ， 入口 js 文件是 `examples/entry.js` （这个其实就是vue 的入口文件）, 然后通过 `webpack-dev-server` 启动一个热更新服务 （打包的文件都是放在内存里面的）。事实上，以上这些都没有涉及到 `element-ui` 是怎么编写 ui 组件库的。只是将其 api 站点运行起来而已。
+最后总结一下：通过打包 dev 模式，我们可以知道，首页文件是`examples/index.tpl` ， 入口 js 文件是 `examples/entry.js` （这个其实就是vue 的入口文件）, 然后通过 `webpack-dev-server` 启动一个热更新服务 （打包的文件都是放在内存里面的）。事实上，以上这些都没有涉及到 `element-ui` 是怎么编写 ui 组件库的。只是将其 api 站点运行起来而已。
 
 ## 2.文档站点的 build 版本
 ```text
@@ -354,7 +355,7 @@ npm run build:file
 ```text
 webpack --config build/webpack.conf.js
 ```
-用 `webpack` 打包，他是把整个 webpack 的打包任务分成了好几块，这个是第一块，这一块的处理其实很简单, 就是将 `src/index.js` 这个入口文件进行打包：
+用 `webpack` 打包，他是把整个 webpack 的打包任务分成了好几块，这个是第一块，这一块的处理其实很简单, 就是将 `src/index.js` 这个入口文件进行打包，然后生成 `umd` 通用加载模式的文件：
 ```javascript
 mode: 'production',
 entry: {
@@ -393,7 +394,7 @@ output: {
   libraryTarget: 'commonjs2'
 },
 ```
-这个是另外一种模块化方式的打包， 这个也是将入口文件`src/index.js` 打包成 `element-ui.common.js` 这个文件。
+这个是另外一种模块化方式的打包， 这个是将入口文件`src/index.js` 打包成 `element-ui.common.js` 这个文件。
 
 ![1](12.png)
 
@@ -480,7 +481,7 @@ output: {
 
 ![1](13.png)
 
-生成的这些文件其实就是单独组件的`es6 Module` 的模块化加载方式，也就是说，如果我们要单独用 `element-ui` 的哪一个组件和样式的话，那么是可以单独引用。不需要引用那个 `element-ui.common.js` 文件，那个太大了。
+生成的这些文件其实就是单独组件的`es6 Module` 的模块化加载方式，是可以被单独引用的。
 
 ### step 3.7
 ```javascript
@@ -562,6 +563,9 @@ Vue.component(Button.name, Button)
 "name": "element-ui",
 ```
 这两个配置，也就是实际引用的是 `element-ui.common.js` 这个 js，我们看下这个 js 打包后是什么样子的，应该是可以导出各种组件的, 看了一下，他的入口还是原来的 `src/index.js` 这个文件：
+
+> ps: 事实上我后面又重新试了一下，其实引入的并不是 `element-ui.common.js` 这个文件，而是 `lib/index.js` 这个文件，所以还是通过用 `umd` 的模块化加载方式去实现组件的按需加载功能。
+
 ```javascript
   version: '2.12.0',
   locale: lib_locale_default.a.use,

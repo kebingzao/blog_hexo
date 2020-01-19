@@ -186,7 +186,7 @@ import Vue from 'vue';
 import Button from './components/button'
 Vue.use(Button);
 ```
-这两个效果其实是一样的。反正最后都实现了用 `component` 方法注册成全局组件。
+这两个效果其实是一样的。最后都实现了用 `component` 方法注册成全局组件。
 
 ## 测试 button 组件
 既然逻辑代码写好了，接下来是测试了。 所以修改首页 `hoome.vue` 改成这样子
