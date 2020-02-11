@@ -1,5 +1,5 @@
 ---
-title: 浏览器 extension 插件开发系列(2) -- 各浏览器（chrome）的启动以及调试
+title: 浏览器 extension 插件开发系列(02) -- Chrome 插件的启动以及调试
 date: 2020-02-11 11:38:06
 tags: 
 - js
