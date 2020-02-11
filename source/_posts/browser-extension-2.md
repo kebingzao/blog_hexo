@@ -130,7 +130,7 @@ categories:
 
 ![png](3.png)
 
-可以看到背景页这个页面是 `chrome` 自己生成的。里面就是引入一堆的js文件 (事实上在第二版的改版中， 背景页 `background.js` 也是可以自己定制的，当然第一版的 `chrome extension` 的背景页目前是没有的，是 `chrome` 浏览器生成的)。
+可以看到背景页这个页面是 `chrome` 自己生成的。里面就是引入一堆的js文件。
 
 而这些背景页的js文件。就是上述`manifest` 的 `background -> scripts` 里面的东西。接下来就可以正常调试了。
 
