@@ -137,7 +137,7 @@ chrome.extension.getBackgroundPage()
 ```
 方法来获取`background`对象的。在`Firefox`中，前端页面和背景页的通信， 全部是通过触发事件来进行传输的。也就是说，无论是前端给背景页通信，还是背景页给前端通信。其实都是通过观察者模式来触发的。也就是说，假设前端要取得背景页的一个对象，那么要先`emit`一个事件给后端，让他知道前端要数据。然后在`on`监听一个事件。让背景页`emit`这个事件，把想要的这个数据传过来。
 
-后续有完整的一个消息通信流程来讲述这个。
+后续有完整的一个消息通信流程来讲述这个， 具体看 {% post_link browser-extension-10 %}
 
 ## 3. Safari
 `Safari` 的背景页其实就是`global页面`。
@@ -182,7 +182,7 @@ if (safari.extension.globalPage) {
 }, false);
 safari.self.tab.dispatchMessage('page_init');
 ```
-
+对于这种方式，具体看这个： {% post_link browser-extension-10 %}
 
 
 
