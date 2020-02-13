@@ -98,7 +98,9 @@ categories:
 
 其中自动登录，就是把本地存储的`cookie值`带过去服务端进行登录验证。 如果登录成功触发登录事件，并保存登录后的`cookie值`。登录失败就触发登出事件，并删除`cookie值`。
 
-这边要注意一点的是， 因为`safari`不支持`global页面的cookie传递`，所以这边将`cookie值`传过来，然后保存在本地。同时自动登录的时候也要把`cookie值`当做参数传过去。
+这边要注意一点的是， 因为`Safari`不支持`global页面的cookie传递`，所以这边将`cookie值`传过来，然后保存在本地。同时自动登录的时候也要把`cookie值`当做参数传过去。
+
+ps： `Safari` 这边原则上是不支持 `session cookie` 的传递，对于 `parameter cookie` 类型的 `cookie` 是可以传递的。 具体看 {% post_link browser-extension-17 %}
 
 ## 实现登录持久化
 其实以上就实现了登录持久化了，就是在背景页启动的时候，去检查自动登录的情况。

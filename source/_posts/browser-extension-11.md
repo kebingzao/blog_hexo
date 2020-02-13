@@ -156,6 +156,8 @@ w.addEventListener("close", function(){
 
 ps: 但是这个有个问题，因为`Safari`的`popup`页面在请求接口的时候，不能把`cookie`带过去，所以当第三方登录成功之后，前端也不知道，所以这个问题，后面要想办法解决??? 所以就会这么一个问题，就是明明第三方登录授权成功，服务端也写入 `cookie`, 但是前端就是没办法取到，导致哪怕第三方登录成功，但请求还是失败
 
+ps： `Safari` 这边原则上是不支持 `session cookie` 的传递，对于 `parameter cookie` 类型的 `cookie` 是可以传递的。 具体看 {% post_link browser-extension-17 %}, 本例之所以不支持是因为第三方登录服务端写入的 cookie 是属于 `session cookie`， 所以才会取不到。
+
 ### 3. Firefox
 `Firefox`的做法，就是到中间页面触发一个`new_window_open`方法，并监听一个`new_window_close`方法。 在 `main.js` 中:
 ```javascript
