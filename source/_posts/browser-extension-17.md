@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(17) -- Safari 遇到的问题
-date: 2020-02-13 14:00:37
+date: 2019-11-25 13:28:17
 tags: 
 - js
 - 浏览器插件
@@ -56,6 +56,25 @@ xar -xf 'TheExtensionName.safariextz'
 
 所以总结一下， 不是不能带 cookie，而是只有 `parameter cookie` 类型的 cookie 才能带，就是要有明确的过期时间的 cookie，才能带过去。 而像`session cookie` 这种会话 cookie 是带不过去的。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 
 
 

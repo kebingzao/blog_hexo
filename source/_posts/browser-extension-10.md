@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(10) -- 事件驱动模型
-date: 2020-02-11 17:29:30
+date: 2019-11-25 13:28:10
 tags: 
 - js
 - 浏览器插件
@@ -2043,6 +2043,25 @@ addEventListener: function(eventName, listener, isOnce) {
 ## 总结
 通过三个需求点，我们主要梳理了这三个浏览器的事件驱动模式，尤其是 `Firefox` 复杂了很多，而且我们抽象成统一的写法，这样子在做业务的时候，我们就不需要考虑不同浏览器的不同写法了，因为对外暴露的方法都是统一的，我们不需要在这个层面去考虑浏览器兼容性。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 
 
 

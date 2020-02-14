@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(03) -- Firefox 插件的启动以及调试
-date: 2020-02-11 13:56:54
+date: 2019-11-25 13:28:03
 tags: 
 - js
 - 浏览器插件
@@ -125,6 +125,25 @@ C:\Users\admin\AppData\Roaming\Mozilla\Firefox\Profiles\0p5aekfy.default\extensi
 ## 总结
 这样子就完成了 `Firefox` 插件的安装和调试问题了。但是很明显，都没有 `Chrome` 来的方便。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 
 
 

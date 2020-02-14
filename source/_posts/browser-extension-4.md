@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(04) -- Safari 插件的添加以及调试
-date: 2020-02-11 14:41:09
+date: 2019-11-25 13:28:04
 tags: 
 - js
 - 浏览器插件
@@ -228,3 +228,22 @@ categories:
 ## 总结
 这样子`Safari`插件的添加和调试就差不多这样了。接下来我们就要开始接入具体的业务了。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}

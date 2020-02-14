@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(06) -- 各浏览器导航栏按钮的配置的点击出现的panel
-date: 2020-02-11 15:54:41
+date: 2019-11-25 13:28:06
 tags: 
 - js
 - 浏览器插件
@@ -196,6 +196,25 @@ require('sdk/addon/runner').startup(reason, {
 </array>
 ```
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(16) -- Firefox 遇到的问题
-date: 2020-02-13 13:12:38
+date: 2019-11-25 13:28:16
 tags: 
 - js
 - 浏览器插件
@@ -229,4 +229,23 @@ page.port.on("request_get", function(data){
 ```
 通过最后回调 uid 来回到背景页的回调。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 

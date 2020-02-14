@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(15) -- chrome多文件上传（拖拽上传或者点击上传）
-date: 2020-02-13 11:27:16
+date: 2019-11-25 13:28:15
 tags: 
 - js
 - 浏览器插件
@@ -196,6 +196,25 @@ fileDragLeaveHandle: function(){
 ## 总结
 到现在基本上一个比较完整的包含 `Chrome`， `Firefox`， `Safari`, 并且包含不少功能的浏览器扩展程序就完成了。当然当初在做这个的时候，遇到的问题比写在文章的肯定还要多。所以后面会针对各个浏览器遇到的问题，再做一些总结和收集。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 
 
 

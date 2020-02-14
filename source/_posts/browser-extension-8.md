@@ -1,6 +1,6 @@
 ---
 title: 浏览器 extension 插件开发系列(08) -- 背景页启动和登录持久化
-date: 2020-02-11 16:30:06
+date: 2019-11-25 13:28:08
 tags: 
 - js
 - 浏览器插件
@@ -109,6 +109,25 @@ ps： `Safari` 这边原则上是不支持 `session cookie` 的传递，对于 `
 2. 如果有的话。就调用登录接口，把mail和保存在内存中的cookie传过来，进行登录。
 3. 如果登录成功，就说明自动登录成功。
 
+---
+系列文章:
+{% post_link browser-extension-1 %}
+{% post_link browser-extension-2 %}
+{% post_link browser-extension-3 %}
+{% post_link browser-extension-4 %}
+{% post_link browser-extension-5 %}
+{% post_link browser-extension-6 %}
+{% post_link browser-extension-7 %}
+{% post_link browser-extension-8 %}
+{% post_link browser-extension-9 %}
+{% post_link browser-extension-10 %}
+{% post_link browser-extension-11 %}
+{% post_link browser-extension-12 %}
+{% post_link browser-extension-13 %}
+{% post_link browser-extension-14 %}
+{% post_link browser-extension-15 %}
+{% post_link browser-extension-16 %}
+{% post_link browser-extension-17 %}
 
 
 
