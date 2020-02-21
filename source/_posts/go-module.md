@@ -1,7 +1,9 @@
 ---
 title: 初试 Go Module
 date: 2020-02-20 13:54:12
-tags: golang
+tags: 
+- golang
+- docker
 categories: golang相关
 ---
 ## 前言
@@ -377,6 +379,6 @@ github.com/kebingzao/goworker v0.1.2 // indirect
 可以看到这种方式是可行的。 而且编译是没问题的。不过要注意一点的是，我们只去掉了 `go.mod` 里面的 `replace` ， 但是 `go.sum` 里面还保留这个 `github.com/kebingzao/goworker v0.1.2` 这个版本的校验， 所以我们还要再执行一下 `go mod tidy` 来清掉这些信息。
 
 ## 总结
-基本上关于 `Go Module` 的使用就这样了。不过我后面还遇到一个新的情况，就是在 docker 里面使用 Go Module 下载内部库遇到的问题。这个后面会说。
+基本上关于 `Go Module` 的使用就这样了。不过我后面还遇到一个新的情况，就是在 docker 里面使用 Go Module 下载内部库遇到的问题。具体看: {% post_link docker-git-ssh %}
 
 
