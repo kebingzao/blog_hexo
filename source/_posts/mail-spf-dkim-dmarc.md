@@ -151,6 +151,8 @@ DKIM 是利用加密签名和验证的原理, 在发件人发送邮件时候, �
 其中 p 字段后面就是一大段的公钥。 这一大串也是自动生成的，就在 gmail 后台：
 1. 去`admin.google.com`用你的`Google App`账号登陆进入后台，选择`Google App`→`Gmail`→`Authenticate email`。选择你的域名生成公钥。如下图
 
+![png](23.jpeg)
+
 2. 按照生成的信息，去你的 DNS 添加一条 TXT 记录。
 3. 回到`admin.google.com`上次的页面点击 “Start Authentication”。
 
