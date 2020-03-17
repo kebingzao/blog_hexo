@@ -148,7 +148,13 @@ DKIM 是利用加密签名和验证的原理, 在发件人发送邮件时候, �
 
 ![png](10.png)
 
-其中 p 字段后面就是一大段的私钥。
+其中 p 字段后面就是一大段的公钥。 这一大串也是自动生成的，就在 gmail 后台：
+1. 去`admin.google.com`用你的`Google App`账号登陆进入后台，选择`Google App`→`Gmail`→`Authenticate email`。选择你的域名生成公钥。如下图
+
+2. 按照生成的信息，去你的 DNS 添加一条 TXT 记录。
+3. 回到`admin.google.com`上次的页面点击 “Start Authentication”。
+
+这样就生成了公钥，并且生效了。
 
 ### 测试 DKIM 是否生效
 一样发送一封正常的邮件到我的邮箱，如果 DKIM 有设置，并且成功的话，再邮箱详情中就会出现 PASS
@@ -276,6 +282,7 @@ nslookup -type=TXT _dmarc.xxx.com
 ## 总结
 通过 SPF + DKIM + DMARC, 我们的站点可以很好的解决电子邮件欺诈的问题了。
 
+最后感谢树礼的测试和对应的测试数据。
 
 ## 参考资料
 - [在 Amazon SES 中使用 SPF 对电子邮件进行身份验证](https://docs.aws.amazon.com/zh_cn/ses/latest/DeveloperGuide/send-email-authentication-spf.html)
@@ -285,6 +292,8 @@ nslookup -type=TXT _dmarc.xxx.com
 - [基于DANE的电子邮件安全研究](http://www.c-s-a.org.cn/html/2018/7/6427.html)
 - [DMARC指引](https://service.mail.qq.com/cgi-bin/help?subtype=1&&no=1001508&&id=16)
 - [启用 DMARC](https://support.google.com/a/answer/2466563?hl=zh-Hans)
+- [rfc6376](https://tools.ietf.org/html/rfc6376)
+- [http://www.dkim.org/](http://www.dkim.org/)
 
 ### SPF 的测试工具
 - http://tools.wordtothewise.com/spf (将显示所有能使用域名发送的ip的概述)
