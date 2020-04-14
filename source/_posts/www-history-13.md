@@ -134,6 +134,18 @@ The 'Access-Control-Allow-Origin' header has a value 'https://*.xxx.com' that is
 而且这边要注意一点的是，这个 ip 地址，有效期很短的，所以测完之后，没问题之后，就可以把这个host 指向从 hosts 文件去掉了。下一次要测的话，再ping一个新的ip就行了。
 <font color=red>因为之前我就有遇到这个一个情况，就是这个host没有删掉，结果等了一段时间之后，重新访问官网，结果全部出现 403 forbidden 提示，原来是这个ip地址 校验已经过期了。</font>
 
+## 腾讯云出问题了 -- 2020-04-14
+时隔一年多，发现腾讯云该资源又报了这个跨域的问题。之前处理的时候还好好的，而且 cos 的配置也没有变啊。 试了一下 s3 的，发现 s3 是没有问题的，不会报这个错。
+
+为啥呢? 后面查了一下，发现腾讯云也变得跟 aws 一样，不仅要处理 bucket (cos), 还要处理 cdn 的转发 (之前只处理 cos 的 bucket)。 就是对应 aws 的 s3 的配置和 cloudfront 的配置。 所以我们还要补上 cdn 那边的转发配置。具体文档: [自定义响应头配置](https://cloud.tencent.com/document/product/228/41737)，修改配置:
+```text
+登录 CDN 控制台，在菜单栏里选择【域名管理】，单击域名右侧【管理】，即可进入域名配置页面，在【高级配置】中可看到 HTTP Header 配置
+```
+
+![1](www-history-13/14.png)
+
+这样子就可以了。
+
 ---
 系列文章
 {% post_link www-history-1 %}
