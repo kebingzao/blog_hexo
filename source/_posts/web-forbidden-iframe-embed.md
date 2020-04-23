@@ -56,6 +56,29 @@ add_header X-Frame-Options SAMEORIGIN;
 * SAMEORIGIN：frame页面的地址只能为同源域名下的页面
 * ALLOW-FROM：允许frame加载的页面地址
 
+
+注意这边有个细节: `ALLOW-FROM` 这个参数其实新版的浏览器已经不再支持了。所以就不要用了:
+- [X-Frame-Options: ALLOW-FROM in firefox and chrome](https://stackoverflow.com/questions/10658435/x-frame-options-allow-from-in-firefox-and-chrome)
+- [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)
+
+{% blockquote mozilla https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options %}
+ALLOW-FROM uri (obsolete)
+This is an obsolete directive that no longer works in modern browsers. Don't use it. In supporting legacy browsers, a page can only be displayed in a frame on the specified origin uri. Note that in the legacy Firefox implementation this still suffered from the same problem as SAMEORIGIN did — it doesn't check the frame ancestors to see if they are in the same origin. The Content-Security-Policy HTTP header has a frame-ancestors directive which you can use instead.
+{% endblockquote %}
+
+也就是说，如果需要用到 `allow-from` 来指定固定的域名的话，可以用 [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 这个头部的 `frame-ancestors` 来代替。 
+
+而且如果已经存在 `frame-ancestors` 这个值了，那么`X-Frame-Options` 这个头部将会被忽略:
+
+- https://www.w3.org/TR/CSP2/#frame-ancestors-and-frame-options
+
+{% blockquote mozilla https://www.w3.org/TR/CSP2/#frame-ancestors-and-frame-options %}
+7.7.1. Relation to X-Frame-Options
+This directive is similar to the X-Frame-Options header that several user agents have implemented. The 'none' source expression is roughly equivalent to that header’s DENY, 'self' to SAMEORIGIN, and so on. The major difference is that many user agents implement SAMEORIGIN such that it only matches against the top-level document’s location. This directive checks each ancestor. If any ancestor doesn’t match, the load is cancelled. [RFC7034]
+
+The frame-ancestors directive obsoletes the X-Frame-Options header. If a resource has both policies, the frame-ancestors policy SHOULD be enforced and the X-Frame-Options policy SHOULD be ignored.
+{% endblockquote %}
+
 ---
 
 #### 除了X-Frame-Options之外，Firefox的"Content Security Policy"以及Firefox的NoScript扩展也能够有效防御ClickJacking，这些方案为我们提供了更多的选择
