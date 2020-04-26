@@ -2,7 +2,7 @@
 title: web 页面防iframe嵌入（防止点击劫持Clickjacking）
 date: 2018-05-05 23:14:34
 tags: security
-categories: 前端相关
+categories: web安全
 ---
 之前我们项目的官网有反馈一个问题，就是用户将我们的官网的页面嵌入到他自己的站点。
 
