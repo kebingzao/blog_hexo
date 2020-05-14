@@ -281,6 +281,17 @@ nslookup -type=TXT _dmarc.xxx.com
 
 ![png](20.png)
 
+## 完整性测试
+这边提供一个站点，可以完整性的检测到你的邮箱的安全配置是否都有配置正确，并且可以评分:  [mail-tester.com](https://www.mail-tester.com/), 刚进去的时候，它会让你用要检测的邮件域名所在的邮箱去发送一封邮件到一个指定的邮箱中:
+
+![png](23.png)
+
+然后当你发送完之后，过了一会儿点击 `Then check your score`, 他就会给你分析数据了，并且会给一个评分，其中在下面的分析中，会有关于 spf，dkim，dmarc 的检测:
+
+![png](24.png)
+
+以上就说明这三个配置都正常的。
+
 ## 总结
 通过 SPF + DKIM + DMARC, 我们的站点可以很好的解决电子邮件欺诈的问题了。
 
@@ -310,6 +321,9 @@ nslookup -type=TXT _dmarc.xxx.com
 ### DMARC 的测试工具
 - http://www.kitterman.com/dmarc/assistant.html (帮助你更好的配置 DMARC)
 - https://dmarcian.com/dmarc-inspector/google.com (显示你的所有DMARC信息域)
+
+### 完整性测试
+- https://www.mail-tester.com/
 
 ### 伪造邮件发送测试站点
 - https://emkei.cz/ (发送各种各样的冒牌邮件)
