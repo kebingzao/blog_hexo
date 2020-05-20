@@ -64,20 +64,40 @@ if (in_array($state, ["Cancelled", "Suspended"])) {
 ```
 然后后面再做一个计划任务，等用户的 vip 快过期了，再把他的订阅重新激活:
 ```php
-$agreementStateDescriptor = new AgreementStateDescriptor();
-$agreementStateDescriptor->setNote("Reactivating the agreement");
-
-try {
-    $suspendedAgreement->reActivate($agreementStateDescriptor, $apiContext);
-    $agreement = Agreement::get($suspendedAgreement->getId(), $apiContext);
-} catch (Exception $ex) {
-    $this->logger->error("Reactivate the Agreement", "Agreement", $agreement->getId(), $suspendedAgreement, $ex);
-    exit(1);
+public function handle()
+{
+    $id = $this->argument('id');
+    try {
+        $agreement = Agreement::get($id, $this->apiContext);
+        $this->info("old agreement " . $agreement->toJSON());
+    } catch (Exception $ex) {
+        $this->error($ex->getMessage());
+        return null;
+    }
+    //Create an Agreement State Descriptor, explaining the reason to suspend.
+    $agreementStateDescriptor = new AgreementStateDescriptor();
+    $agreementStateDescriptor->setNote("Reactivating the agreement");
+    $isOk = true;
+    try {
+        $agreement->reActivate($agreementStateDescriptor, $this->apiContext);
+    } catch (Exception $ex) {
+        $isOk = false;
+        $this->error($ex->getMessage());
+    }
+    if($isOk){
+        try {
+            $agreement = Agreement::get($id, $this->apiContext);
+            $this->info("new agreement " . $agreement->toJSON());
+            $this->info("status: {$agreement->getState()}");
+        } catch (Exception $ex) {
+            $this->error($ex->getMessage());
+        }
+    }
 }
-$this->logger->info("Reactivate the Agreement", "Agreement", $agreement->getId(), $suspendedAgreement, $agreement);
-return $agreement;
 ```
 这样就可以了，不过这样子会有一个问题: PayPal 因为暂停循环，也就是 suspend 操作，会导致 PayPal 平台会给用户发送 suspend 提醒邮件。 而且由于后面还要启用这个循环，导致可能再次扣款，所以需要运营要跟用户沟通一下。同时在个人中心页面，也会变成没有循环了。只有当激活之后，重新扣款的时候，才会重新变成有循环。
+
+而且这边要注意一个细节，后面激活循环的时候，状态就会从 `Suspended` 变成 `Active`, 而且一定要在原计划的下个周期之前激活，不然这个周期就会跳过。 举个例子， 比如原计划是 `05-18` 这一天重新续费，那么就要在这天之前就要激活循环了， 如果在这之后激活，就会到下一个周期，比如 `06-18` 才会续费。
 
 ## 针对 Stripe 循环的处理 -- 暂停或者延长试用期
 Stripe 会比 Paypal 灵活很多，他提供了两种方式:
@@ -116,7 +136,9 @@ $this->logger->info("$accountId stripe update" . json_encode($update));
     ...
     "status": "active",
 ```
-有这个暂停的消息，并且循环的状态还是 active 状态的。说明暂停循环，并不会改变当前循环的状态 (paypal 会改变)
+有这个暂停的消息，并且循环的状态还是 active 状态的。说明暂停循环，并不会改变当前循环的状态 (paypal 会改变)。
+
+如果后面成功自动恢复正常续费的时候，`pause_collection` 这个参数就会变成 null。
 
 ## 针对 google iap 循环的处理 -- 延迟结算
 google 循环暂停，程序没有 api，只能用户自己手动去暂停 (也可以恢复，但是也要用户自己手动恢复)， 所以只能延迟扣款:
