@@ -1,5 +1,5 @@
 ---
-title: 使用 CVSS V3.0 来判断安全漏洞的严重性
+title: web 安全之 - 使用 CVSS V3.0 来判断安全漏洞的严重性
 date: 2020-05-25 15:48:37
 tags: security
 categories: web安全
@@ -119,7 +119,7 @@ A missing HSTS Header vulnerability in HPE Matrix Operating Environment version 
 
 上面三个都认为是 low， 所以我们评分的时候，危险级就是 low
 
-以 `Missing HTTP Strict Transport Security Policy` 也可以在这个两个站点找到对应的 CVSS 3.0 的评分
+以 `Missing HTTP Strict Transport Security Policy` 也可以在这两个站点找到对应的 CVSS 3.0 的评分
 - [netsparker](https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/http-strict-transport-security-hsts-policy-not-enabled/) -> medium
 - [tenable](https://www.tenable.com/plugins/was/98056) -> medium
 

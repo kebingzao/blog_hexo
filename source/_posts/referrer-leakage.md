@@ -1,5 +1,5 @@
 ---
-title: 页面禁用 referer - 第三方站点的 referer 头部泄露重置密码链接
+title: web 安全之 - 页面禁用 referer(第三方站点的 referer 头部泄露重置密码链接)
 date: 2020-05-07 19:33:41
 tags: security
 categories: web安全

@@ -1,5 +1,5 @@
 ---
-title: cloudfront 添加 x-frame-options 防止 Clickjacking
+title: web 安全之 - cloudfront 添加 x-frame-options 防止 Clickjacking
 date: 2020-04-26 09:59:25
 tags: cloudfront
 categories: web安全

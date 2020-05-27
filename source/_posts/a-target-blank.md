@@ -1,5 +1,5 @@
 ---
-title: A 标签target=”_blank”的安全问题及解决办法
+title: web 安全之 - A 标签target=”_blank”的安全问题及解决办法
 date: 2020-05-14 19:16:41
 tags: security
 categories: web安全

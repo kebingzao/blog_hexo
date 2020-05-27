@@ -1,5 +1,5 @@
 ---
-title: 浅谈 - 关于重置密码链接的几个安全问题
+title: web 安全之 - 关于重置密码链接的几个安全问题
 date: 2020-04-29 11:33:17
 tags: security
 categories: web安全
