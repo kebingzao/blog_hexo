@@ -303,3 +303,10 @@ Kurento 是用 docker 安装的，但是可以通过 docker logs 将日志输出
 
 ## 总结
 总的来说， Kerento 这个 SFU 的框架确实可以实现多方 webrtc 的情况，当然更深层次的问题还是有很多(包括性能优化和性能瓶颈)， 不过从本次体验来看，无论是安装，配置还是开发应该都是比较容易的，不会有太多的理解成本。 接下来就再试试其他几个 SFU 的框架。
+
+---
+
+参考资料:
+- [基于Kurento搭建WebRTC服务器](https://blog.gmem.cc/webrtc-server-basedon-kurento)
+- [www.kurento.org](http://www.kurento.org/)
+- [User Documentation](https://doc-kurento.readthedocs.io/en/6.14.0/#user-docs)
