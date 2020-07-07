@@ -36,6 +36,11 @@ categories: 杂文
 ## [电子邮件欺诈防护之 SPF+DKIM+DMARC](https://kebingzao.com/2020/03/17/mail-spf-dkim-dmarc/)
 推荐理由: 目前看过关于电子邮件欺诈防护文章最好的。 (啥，这是我自己写的文章，自己写的文章就不是文章吗，只要是好文章就值得收藏)
 
+## [后端架构师技术图谱](https://github.com/xingshaocheng/architect-awesome)
+推荐理由: 目前看过最全的后端架构师图谱，全弄懂了，阿里 P9 不是梦， 当然也可能会看到头秃
+
+
+
 
 
 
