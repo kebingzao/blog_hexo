@@ -39,7 +39,8 @@ categories: 杂文
 ## [后端架构师技术图谱](https://github.com/xingshaocheng/architect-awesome)
 推荐理由: 目前看过最全的后端架构师图谱，全弄懂了，阿里 P9 不是梦， 当然也可能会看到头秃
 
-
+## [电子书下载网站大全](https://tyi45di4ct.jiandaoyun.com/dash/5e7d915c6c56d8000674a8b8)
+推荐理由: 之前网上冲浪的时候，不知道在哪里看到的，上面收集了很多电子书下载的网站，尤其是其中的 [鸠摩搜索](https://www.jiumodiary.com/) 更是非常强大。
 
 
 
