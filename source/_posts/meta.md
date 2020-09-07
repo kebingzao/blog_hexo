@@ -7,25 +7,28 @@ categories:
 - 前端浅谈系列
 ---
 ## 前言
-meta 标签是 html 标记 head 区的一个关键标签，它位于HTML文档的 <head> 和 <title> 之间（有些也不是在<head>和<title>之间）。它提供的信息虽然用户不可见，但却是文档的最基本的元信息。meta标签用来描述一个HTML网页文档的属性，例如作者、日期和时间、网页描述、关键词、页面刷新等。
+meta 标签是 html 标记 head 区的一个关键标签，它位于HTML文档的 `<head>` 和 `<title>` 之间（有些也不是在`<head>`和`<title>`之间）。它提供的信息虽然用户不可见，但却是文档的最基本的元信息。meta 标签用来描述一个 HTML 网页文档的属性，例如作者、日期和时间、网页描述、关键词、页面刷新等。
 
 ## meta 标签结构
 从官方文档来看 [<meta>: The Document-level Metadata element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta), 这个标签有四个属性:
-### charset
-charset 属性规定 HTML 文档的字符编码。
+- charset
+- content
+- http-equiv
+- name
 
-charset 属性是 HTML5 中的新属性，且替换了
-```text
+### charset
+charset 属性规定 HTML 文档的字符编码。 它是 HTML5 中的新属性，且替换了
+```html
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 ```
-仍然允许使用 http-equiv 属性来规定字符集，但是使用新方法可以减少代码量。
+虽然仍然允许使用 http-equiv 属性来规定字符集，但是使用新方法可以减少代码量。
 
 常用的值有:
 - `UTF-8` - Unicode 字符编码
 - `ISO-8859-1` - 拉丁字母表的字符编码
 
 在理论上，可以使用任何字符编码，但并不是所有浏览器都能够理解它们。某种字符编码使用的范围越广，浏览器就越有可能理解它。 如需查看所有可用的字符编码，请访问 [IANA 字符集](http://www.iana.org/assignments/character-sets/character-sets.xhtml)。
-
+<!--more-->
 ### content
 content 属性的内容是 htp-equiv 或 name 属性的值，具体取决于你用哪一个。(无法单独使用)
 
@@ -36,7 +39,6 @@ content 属性的内容是 htp-equiv 或 name 属性的值，具体取决于你�
 name 属性的定义是属于 document-level metadata，不能和以下属性同时设置： http-equiv 或 charset。 该元数据名称与 content 属性包含的值相关联。
 
 接下来我们详细介绍一下 http-equiv 和 name 属性的值。都有很多值，不同的值表示不同的意思。
-
 
 ## http-equiv 的属性值
 因为整个浏览器的历史跨度很大，有很多旧的 http-equiv 的值到了现代浏览器，其实已经废弃了， 我们先讲一下剩余的还有效的 http-equiv 的值。 具体文档可以看: [mozilla http-equiv](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta), 我们先来介绍文档中明确标有的属性:
@@ -50,8 +52,7 @@ CSP 大大增强了网页的安全性。攻击者即使发现了漏洞，也没�
 
 两种方法可以启用 CSP。一种是通过 HTTP 头信息的Content-Security-Policy的字段。 即:
 ```text
-Content-Security-Policy: script-src 'self'; object-src 'none';
-style-src cdn.example.org third-party.org; child-src https:
+Content-Security-Policy: script-src 'self'; object-src 'none';style-src cdn.example.org third-party.org; child-src https:
 ```
 ![网络用图](1.jpg)
 
@@ -68,7 +69,7 @@ style-src cdn.example.org third-party.org; child-src https:
 
 启用后，不符合 CSP 的外部资源就会被阻止加载, 浏览器的控制台就会报错。 
 
-![网络用图](2.jpg)
+![网络用图](2.png)
 
 具体更多关于 CSP 安全策略的，可以看 [Content Security Policy 入门教程](http://www.ruanyifeng.com/blog/2016/09/csp.html)
 
@@ -88,7 +89,7 @@ style-src cdn.example.org third-party.org; child-src https:
 
 ### 4.x-ua-compatible
 用于告知浏览器以何种版本来渲染页面。`X-UA-Compatible` 是针对 IE8 版本的一个特殊文件头标记，用于为 IE8 指定不同的页面渲染模式。 不过现在基本上 IE 系列的浏览器基本上都凉了，所以现在基本上都是这样子配的:
-```text
+```html
 <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
 ```
 这个意思就是如果 IE 有安装 Google Chrome Frame，那么就走安装的组件，如果没有就使用最高版本的 IE。
@@ -100,12 +101,12 @@ ps2: 而且这东西主要是用于设置 IE 兼容性，现在只支持 "IE=edg
 ### 5.refresh
 该指令指定：
 1. 如果content属性只包含一个正整数，则表示该页面重新加载的秒数。
-```text
+```html
 <meta http-equiv="refresh" content="300">
 ```
 
-2. 如果content属性包含一个正整数，后跟字符串'; url ='，那么表示当前页面XX秒后重定向到另一个有效的URL。
-```text
+2. 如果content属性包含一个正整数，后跟字符串 `; url =`，那么表示当前页面XX秒后重定向到另一个有效的URL。
+```html
 <meta http-equiv='refresh' content='2;URL=http://www.github.com/'> //意思是2秒后跳转到github
 ```
 
@@ -119,7 +120,7 @@ ps2: 而且这东西主要是用于设置 IE 兼容性，现在只支持 "IE=edg
 ```
 #### 2.Expires (已过时)
 可以用于设定网页的到期时间。一旦网页过期，必须到服务器上重新传输。
-```text
+```html
 <meta http-equiv="Expires" content="0" />
 ```
 #### 3.Cache-Control (已过时)
@@ -132,7 +133,7 @@ ps2: 而且这东西主要是用于设置 IE 兼容性，现在只支持 "IE=edg
 
 关于 cache-control 的字段设置值，可以看 [浅谈之-浏览器缓存](https://kebingzao.com/2018/07/05/browser-cache/#Cache-Control)
 
-```text
+```html
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 ```
 
@@ -141,7 +142,7 @@ ps2: 而且这东西主要是用于设置 IE 兼容性，现在只支持 "IE=edg
 而且这个是 IE 时代的私有属性，在 IE9 以前支持的，而现在主流的 Chrome / Firefox / Safari，包括 IE9 ~ IE11 都不支持。 这个东西是 HTTP/1.0 时代的产物，因为 HTTP/1.0 里关于缓存的可设定太少了，而 HTTP/1.1 刚出来的时候还不是所有浏览器都支持，所以把这个玩意儿放到了 HTML 页面里了。如果你的页面需要兼容 IE 低版本，那么可以加上。
 
 现在上哪找还只支持 HTTP/1.0 的 Web 服务器去啊，全都是 HTTP/1.1 了。而且随着 HTTPS 的普及，估计很快就该全面 HTTP/2 了。 所以现代浏览器几乎已经不再支持这种方式，如果是 IE9 更早的浏览器的页面要设置为不缓存的话，那么倒是可以这样子设置:
-```text
+```html
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -152,10 +153,11 @@ ps2: 而且这东西主要是用于设置 IE 兼容性，现在只支持 "IE=edg
 
 #### 5.Window-target (已过时)
 强制页面在当前窗口以独立页面显示:
-```text
+```html
 <meta http-equiv="Window-target"content="_top">
 ```
 这个也是过时了，现代浏览器根本不支持了。具体看 [Does Window-target meta tag work for busting frames?](https://stackoverflow.com/questions/1521195/does-window-target-meta-tag-work-for-busting-frames)
+
 
 ## name 的属性值
 接下来我们介绍一下 name 的属性值，还是一样，先从 W3C 的官方文档先看: [Standard metadata names](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name), 根据 W3C 的规范来看， name 属性其实分为三大类:
@@ -198,18 +200,26 @@ referrer 控制 document 发起的 Request 请求中附加的 [Referer HTTP head
 |`strict-origin-when-cross-origin`| 同源的链接和引用，会发送 referrer。安全级别下降时不发送 referrer。其它情况下发送源信息。(注意：这个是新加的标准，有些浏览器可能还不支持。)
 |`unsafe-URL`| 无论是否发生协议降级，无论是本站链接还是站外链接，统统都发送 Referrer 信息。正如其名，这是最宽松而最不安全的策略。|
 
-其实这个属性还跟 web 安全有关系，甚至很多跟盗链相关的策略也跟他有关系， 这也是为啥它的 value 有那么多细致的安全的区别了，关于 referrer 跟安全的关系， 具体可以看 [web 安全之 - 页面禁用 referer(第三方站点的 referer 头部泄露重置密码链接)](https://kebingzao.com/2020/05/07/referrer-leakage/)
+其实这个属性还跟 web 安全有关系，甚至很多跟盗链相关的策略也跟它有关系， 这也是为啥它的 value 有那么多细致的安全方面的区别了，关于 referrer 跟安全的关系， 具体可以看 [web 安全之 - 页面禁用 referer(第三方站点的 referer 头部泄露重置密码链接)](https://kebingzao.com/2020/05/07/referrer-leakage/)
 
 #### 1.7 theme-color
 可以设置浏览器的地址栏或者是手机端的选项卡的颜色:
-```text
+```html
 <meta name="theme-color" content="#91D4DA">
 ```
+如果在 IOS 下，那么就会变成选项卡的颜色。
+
+#### 1.8 revisit-after (已过时)
+如果页面不是经常更新，为了减轻搜索引擎爬虫对服务器带来的压力，可以设置一个爬虫的重访时间。如果重访时间过短，爬虫将按它们定义的默认时间来访问。 这个属性已经过时了，不建议用了(这个已经不在官方文档上了)，具体看 [Meta Tag Revisit-After expire](https://www.metatags.org/all-meta-tags-overview/the-expired-metatags/meta-name-revisit-after/)
+```html
+<meta name='revisit-after' content='7 days' >
+```
+
 
 ### 2. 其他规范的值
 #### 2.1 color-scheme
 比如 css 色彩规范就有这个值，用于指定文档的配色方案， 最经常见就是网页的暗黑模式:
-```text
+```html
 <meta name="color-scheme" content="light dark">
 ```
 不过这个是需要浏览器支持的，是属于还在完善中的标准。
@@ -231,12 +241,12 @@ css 设备适配规范就有这个值，这个也是做手机端页面必须要�
 | `viewport-fit` | 控制文档是如何填充满屏幕的, 有三个值， `auto` 表示 此值不影响初始布局视图端口，并且整个web页面都是可查看的。 `contain` 表示视图端口按比例缩放，以适合显示内嵌的最大矩形。 `cover` 表示视图端口被缩放以填充设备显示。这个属性目前大部分的浏览器还没有兼容，具体看 [viewport-fit](https://developer.mozilla.org/zh-CN/docs/Web/CSS/@viewport/viewport-fit)|
 
 最常见的情况就是设置为:
-```text
+```html
 <meta name="viewport" content="width=device-width, initial-scale=1">
 ```
 这样子的意思就是 要把当前的 viewport 宽度设为 ideal viewport 的宽度。
 
-### 3. 其他合理的值
+### 3. 其他官方属性值
 接下来介绍其他的官方属性值。
 #### 3.1 creator
 文档的创建者，可以是组织或者是机构，如果有多个，就写多个 meta 标签
@@ -271,59 +281,143 @@ css 设备适配规范就有这个值，这个也是做手机端页面必须要�
 #### 4.1 google 规范的值
 具体文档可以看这个 [Google 可以识别的特殊标记](https://support.google.com/webmasters/answer/79812?hl=zh-Hans), 除了上面列到的官方属性之外，这些的 name 大部分都是 google， 还有以下:
 1. nositelinkssearchbox
-```text
+当用户搜索您的网站时，Google 搜索结果有时会显示一个供您网站专用的搜索框，以及其他直接指向您网站的链接。此标记用于告知 Google 不要显示站点链接搜索框。
+```html
 <meta name="google" content="nositelinkssearchbox" />
 ```
-当用户搜索您的网站时，Google 搜索结果有时会显示一个供您网站专用的搜索框，以及其他直接指向您网站的链接。此标记用于告知 Google 不要显示站点链接搜索框。
 
 2. notranslate
-```text
+如果 Google 发现网页内容所用的语言很可能不是用户想阅读的语言，则往往会在搜索结果中提供翻译链接。这样通常会让您有机会将独特而富有吸引力的内容提供给更多用户。不过，在某些情况中，您可能并不希望我们这样做。此元标记用于告知 Google 您不希望我们提供该网页的翻译。
+```html
 <meta name="google" content="notranslate" />
 ```
-如果 Google 发现网页内容所用的语言很可能不是用户想阅读的语言，则往往会在搜索结果中提供翻译链接。这样通常会让您有机会将独特而富有吸引力的内容提供给更多用户。不过，在某些情况中，您可能并不希望我们这样做。此元标记用于告知 Google 您不希望我们提供该网页的翻译。
 
 3. nopagereadaloud
-```text
+禁止网络浏览器使用 Google 助理语音指令“阅读此页”和“阅读”来朗读已标记的网页。
+```html
 <meta name="google" content="nopagereadaloud" />
 ```
-禁止网络浏览器使用 Google 助理语音指令“阅读此页”和“阅读”来朗读已标记的网页。
 
 4. google-site-verification
-```text
+您可以在网站的顶级网页上使用此标记，以向 Search Console 验证您对该网站的所有权。请注意，虽然“name”和“content”属性的值必须与提供给您的值完全匹配（包括大小写），但是否将标记从 XHTML 更改为 HTML，或者标记的格式是否与网页的格式相符，这些都无关紧要。
+```html
 <meta name="google-site-verification" content="..." />
 ```
-您可以在网站的顶级网页上使用此标记，以向 Search Console 验证您对该网站的所有权。请注意，虽然“name”和“content”属性的值必须与提供给您的值完全匹配（包括大小写），但是否将标记从 XHTML 更改为 HTML，或者标记的格式是否与网页的格式相符，这些都无关紧要。
 
 5. rating
-```text
+将网页标记为包含成人内容，以表明网页应被安全搜索结果滤除。
+```html
 <meta name="rating" content="adult" />
 ```
-将网页标记为包含成人内容，以表明网页应被安全搜索结果滤除。
 
 #### 4.2 apple 规范的值
 具体文档可以看: [Supported Meta Tags](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html), 具有以下值, 都是只有 IOS 下才有用:
 
 1. apple-mobile-web-app-capable
-```text
+是否启用 WebApp 全屏模式， content 值为 yes 时会隐藏工具栏和菜单栏
+```html
 <meta name="apple-mobile-web-app-capable" content="yes">
 ```
-是否启用 WebApp 全屏模式
 
 2. apple-mobile-web-app-status-bar-style
-```text
+是在 webapp 模式下，改变顶部状态条的颜色。默认值为default（白色），可以定为black（黑色）和 black-translucent（灰色半透明）, 只有在 `“apple-mobile-web-app-capable” content=”yes”` 时生效
+```html
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 ```
-设置状态栏的背景颜色,只有在 “apple-mobile-web-app-capable” content=”yes” 时生效
 
 3. format-detection
-```text
+禁止自动探测并格式化手机号码, 如果是 `telephone=no` 就是忽略电话号码识别，如果是 `email=no`, 忽略邮箱格式识别。
+```html
 <meta name="format-detection" content="telephone=no">
 ```
-禁止自动探测并格式化手机号码
 
-#### 4.3 其他浏览器规范
+4. apple-touch-fullscreen (已过时)
+这个是早期的属性，现在官方文档已经没有了， 推荐用这个属性 `apple-mobile-web-app-capable`
+```html
+<meta name="apple-touch-fullscreen" content="yes">
+```
+
+5. apple-itunes-app
+这个标签是告诉 iphone 的 safari 浏览器，这个网站对应的 app 是什么，然后在页面上面显示一个下载 banner 。
+```html
+<meta name="apple-itunes-app" content="app-id=432274380" />
+```
+
+#### 4.3 其他浏览器和大厂规范规范
+1. 百度相关
+```html
+<!-- 禁止百度转码 -->
+<meta http-equiv=“Cache-Control” content=“no-siteapp” />
+<meta http-equiv=“Cache-Control” content=“no-transform” />
+
+<!-- 禁止百度快照缓存 -->
+<meta name=“Baiduspider” content=“noarchive”>
+```
+
+2. UC 手机浏览器
+```html
+<!-- 将屏幕锁定在特定的方向 -->
+<meta name="screen-orientation" content="landscape/portrait">
+<!-- 全屏显示页面 -->
+<meta name="full-screen" content="yes">
+<!-- 强制图片显示，即使是"text mode" -->
+<meta name="imagemode" content="force">
+<!-- 应用模式，默认将全屏，禁止长按菜单，禁止手势，标准排版，强制图片显示。 -->
+<meta name="browsermode" content="application">
+<!-- 禁止夜间模式显示 -->
+<meta name="nightmode" content="disable">
+<!-- 使用适屏模式显示 -->
+<meta name="layoutmode" content="fitscreen">
+<!-- 当页面有太多文字时禁止缩放 -->
+<meta name="wap-font-scale" content="no">
+```
+
+3. QQ手机浏览器
+```html
+<!-- 锁定屏幕在特定方向 -->
+<meta name="x5-orientation" content="landscape/portrait">
+<!-- 全屏显示 -->
+<meta name="x5-fullscreen" content="true">
+<!-- 页面将以应用模式显示 -->
+<meta name="x5-page-mode" content="app">
+```
+
+4. 360 浏览器
+```html
+<!-- 选择使用的浏览器解析内核 -->
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+```
+
+5. App Links
+这个可以在进行 SNS 分享的时候，可以定位到 app 上，以便将用户引导到下载上，具体可以看 [内容元数据参考](https://developers.facebook.com/docs/applinks/metadata-reference/)
+```html
+<!-- iOS -->
+<meta property="al:ios:url" content="applinks://docs" />
+<meta property="al:ios:app_store_id" content="12345" />
+<meta property="al:ios:app_name" content="App Links" />
+<!-- Android -->
+<meta property="al:android:url" content="applinks://docs">
+<meta property="al:android:app_name" content="App Links">
+<meta property="al:android:package" content="org.applinks">
+<!-- Web Fallback -->
+<meta property="al:web:url" content="http://applinks.org/documentation" />
+<!-- More info: http://applinks.org/documentation/ -->
+```
+
+ps: 这个其实不是 name 属性的，而是 property 属性，不过这边就统一放非标准的。
+
+6. facebook sns 分享
+比如点击 facebook like 按钮， 设置包含下面要讲的 og 标签的应用，也都是为了 SNS 的分享， 具体看: [网站管理员分享指南](https://developers.facebook.com/docs/sharing/webmasters/)
+```html
+<meta property="fb:admins" content="USER_ID"/>
+<meta property="fb:app_id" content="APPID"/>
+```
+
+ps: 这个其实不是 name 属性的，而是 property 属性，不过这边就统一放非标准的。
 
 ## og 标签
+> og 标签虽然也不是官方标准的 meta 标签用法，但是它确实是 SNS 分享的标准取值，所以这边额外拉出来提一下
+
 og 是一种新的HTTP头部标记，（即Open Graph Protocol：开放内容协议）, 先看一下背景:
 ### og 背景
 2010年F8会议上Facebook公布了Open Graph，把这种种不同的Graph连结起来，将形成Open Graph。
@@ -363,17 +457,20 @@ og 标签虽然是 meta 标签，但是他不用 name， 而是用另一个非 W
 ### og 标签的好处
 og 标签最大的好处就是对 SEO 的优化，都知道搜索引擎机器人爬取的是我们的页面，即html代码，meta 信息尤为关注，所以我们增加的 og meta 标签是可以别搜索引擎发现并评估权重的，也就是说你将原有 meta 信息优化手段同时使用到 og:title 这种属性值当中，加强 meta 信息优化内容；对于权重提升和排名还是很有利的。
 
+而且目前大部分的 SNS 的分享都是通过读取页面的 og 标签来获取分享的内容的，比如分享的标题，分享的关键字，分享的图片，都是预先在 html 页面用 og 标签设置好的。
+
 ### og 标签的兼容性
 有些 seo 检测工具会检测到 Meta Property=og 报错，这个不管他。 
-
-
 
 ---
 
 ## 参考资料
-- [<meta>: The Document-level Metadata element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta)
+- [meta: The Document-level Metadata element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta)
 - [HTML <meta> charset 属性](https://www.runoob.com/tags/att-meta-charset.html)
 - [Content Security Policy 入门教程](http://www.ruanyifeng.com/blog/2016/09/csp.html)
 - [Disable browser caching with meta HTML tags](http://cristian.sulea.net/blog/disable-browser-caching-with-meta-html-tags/)
 - [移动前端开发之viewport的深入理解](https://www.cnblogs.com/2050/p/3877280.html)
 - [【SEO技术】网站meta标签og属性优化教程](http://www.link356.com/seojishu/20.html)
+- [meta 有哪些常见的值？](https://www.jianshu.com/p/205db1cbf43a)
+- [网站管理员分享指南](https://developers.facebook.com/docs/sharing/webmasters/)
+- [FACEBOOK Content Metadata Reference](https://developers.facebook.com/docs/applinks/metadata-reference/)
