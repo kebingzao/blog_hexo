@@ -251,10 +251,27 @@ Sep 10 18:07:14 VM_156_200_centos systemd[1]: nginx.service: control process exi
 [root@VM_156_200_centos system]# sudo systemctl restart nginx.service
 [root@VM_156_200_centos system]# sudo systemctl reload nginx.service
 ```
-这样子 nginx 就安装了。
+这样子 nginx 就安装好了，接下来就是修改配置文件并测试一些其他的请求。
+
+### 14. 修改配置文件并测试
+这边简单一点， 默认的配置文件是 `/usr/local/nginx/conf/nginx.conf`, 在这个文件的下面添加一行:
+```text
+location = /hello {
+    return 200 'hello zach';
+}
+```
+然后重启并刷新一下配置:
+```text
+[root@VM_156_200_centos conf]# sudo systemctl reload nginx.service
+[root@VM_156_200_centos conf]# curl 127.0.0.1/hello
+hello zach
+```
+可以看到已经生效了。
 
 ## 重载问题
-不过在 CentOS 7 下，如果用 `systemctl reload nginx.service` 来重载的话，这时候会有问题，因为它并不会检查 nginx.conf 文件。 具体可以看 {% post_link centos7-systemctl-reload-nginx %}
+不过在 CentOS 7 下，如果用 `systemctl reload nginx.service` 来重载的话，这时候会有问题，因为它并不会校验 nginx.conf 文件。 也就是说如果 nginx.conf 文件的配置没有问题，那么没有差， 但是一旦有问题， 用这个指令的话，就会重载失败， 更坑的是， 他并没有报失败的错，其表现跟正常成功一样。
+
+这个坑可以解决的，具体可以看 {% post_link centos7-systemctl-reload-nginx %}
 
 ---
 
