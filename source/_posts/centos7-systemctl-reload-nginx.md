@@ -173,7 +173,11 @@ PrivateTmp=true
 WantedBy=multi-user.target
 ```
 
+---
 
+参考资料:
+- [how to reload nginx - systemctl or nginx -s?](https://superuser.com/questions/710986/how-to-reload-nginx-systemctl-or-nginx-s) 
+- [Nginx 源代码笔记 - URI 匹配](https://ialloc.org/blog/ngx-notes-http-location/)
 
 
 
