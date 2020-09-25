@@ -334,6 +334,46 @@ URL    : http://www.cip.cc/119.xx.xx.79
 ```
 这样就开成功了。 所以如果要关掉代理也很简单，直接将配置文件的 proxy 注释掉，source 生效一下，然后重开一个新的 terminal 就行了， privoxy 和 shadowsocks 都不要关。
 
+
+## 后记
+后面有一次当我要重新开启代理的时候， 发现报错了:
+```text
+[root@VM_156_200_centos ~]# vim /etc/profile
+[root@VM_156_200_centos ~]# cat /etc/profile | grep proxy
+# ss http proxy
+export http_proxy=http://127.0.0.1:8118
+export https_proxy=http://127.0.0.1:8118
+export ftp_proxy=http://127.0.0.1:8118
+[root@VM_156_200_centos ~]# source /etc/profile
+[root@VM_156_200_centos ~]# curl cip.cc
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+  <title>502 - No server or forwarder data received (Privoxy@localhost)</title>
+  ...
+```
+发现 privoxy 竟然报错了。 后面查了一下，发现是因为我的 ss 又失效了，所以后面又换了一个，然后重启了一下 ss， 这时候又正常了。
+```text
+[root@VM_156_200_centos ~]# vim /etc/shadowsocks/sslocal.json
+[root@VM_156_200_centos ~]# sslocal -c /etc/shadowsocks/sslocal.json -d restart
+INFO: loading config from /etc/shadowsocks/sslocal.json
+2020-09-25 14:55:13 INFO     loading libcrypto from libcrypto.so.10
+stopped
+started
+[root@VM_156_200_centos ~]# curl cip.cc
+IP	: 52.xx.13.xxx
+地址	: 日本  东京都  东京
+运营商	: amazon.com
+
+数据二	: 美国 | 华盛顿州西雅图市亚马逊(Amazon)公司数据中心
+
+数据三	: 日本东京都东京 | 亚马逊
+
+URL	: http://www.cip.cc/52.xx.13.xxx
+```
+当然，代理这种事情，肯定是要科学上网的。
+
 ---
 
 参考资料：  [linux 配置shadowsocks代理全局代理](https://www.jianshu.com/p/41378f4e14bc)
