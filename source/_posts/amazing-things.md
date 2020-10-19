@@ -56,3 +56,13 @@ categories: 杂文
 
 ## [冴羽的博客](https://github.com/mqyqingfeng/Blog)
 推荐理由: 很不错的前端进阶文章，面经必备。
+
+## [小姐姐养的狗](https://mp.weixin.qq.com/s/rZFbIubcmsbLvBz2x-2BGg)
+推荐理由: 也是属于技术文章，好喜欢它的标题党， 是否好看不重要，骚就行了
+
+## [2020年最新总结，阿里，腾讯，百度，美团，头条等技术面试题目，以及答案，专家出题人分析汇总](https://github.com/0voice/interview_internal_reference)
+推荐理由: 刷大厂面经必备，学不动系列
+
+## [关于移动端适配，你必须要知道的](https://juejin.im/post/6844903845617729549)
+推荐理由: 本文将从移动端适配的基础概念出发，探究移动端适配各种问题的解决方案和实现原理。建议新手写 h5 页面之前，先看这篇文章。
+
