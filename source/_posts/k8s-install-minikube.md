@@ -7,8 +7,8 @@ categories: kubernetes
 ## 前言
 前段时间正在学习 kubernetes， 一般在刚开始学习的时候，都会先本地安装一下，然后逐渐学习。 而安装的话，也分三个过程，由简到难:
 1. 本地单机安装 -- Minikube
-2. 集群安装    -- Kubeadm
-3. 二进制包安装
+2. 集群安装    -- Kubeadm -- 请看 {% post_link k8s-install-kubeadm %}
+3. 二进制包安装 -- 请看 {% post_link k8s-install-binary %}
 
 本文主要讲本地单机安装 Minikube 的安装过程和简单的使用过程。
 
