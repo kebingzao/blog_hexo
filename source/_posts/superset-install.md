@@ -2,7 +2,7 @@
 title: 在windows下安装Superset
 date: 2018-08-14 13:58:43
 tags: superset
-categories: Superset相关
+categories: 实用工具集
 ---
 ## 前言
 最近想用一下Superset，这个是一个开源项目，可以直接通过写sql来生成图表，有时候对一些图表需求比较多的时候，可以用的上。
