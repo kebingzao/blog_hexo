@@ -372,6 +372,17 @@ IP	: 52.xx.13.xxx
 
 URL	: http://www.cip.cc/52.xx.13.xxx
 ```
+这样子就可以了，如果有出现这个错误的话:
+```text
+[root@VM_156_200_centos ~]# curl cip.cc
+curl: (7) Failed connect to 127.0.0.1:8118; Connection refused
+```
+那么就是 privoxy  服务挂了，重启一下就行了
+```text
+[root@VM_156_200_centos ~]# service privoxy start
+Starting Privoxy, OK.
+```
+
 当然，代理这种事情，肯定是要科学上网的。
 
 ---
