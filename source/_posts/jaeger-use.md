@@ -82,7 +82,19 @@ tracer 与 span 的时间轴关系
 ## [jaeger](https://www.jaegertracing.io/)
 市面上的 AMP 工具很多，最早就是 google 的 Dapper，Dapper是Google生产环境下的分布式跟踪系统，自从Dapper发展成为一流的监控系统之后，给google的开发者和运维团队帮了大忙，所以谷歌公开论文分享了Dapper。
 
-市面上关于 AMP 的产品很多，除了 Uber 的 jaeger 和 Twitter 的 zipkin, 国内也有类似的产品, 比如阿里的鹰眼或者是京东的 hydra。 而我们团队之所以选择 jaeger，一方面是因为它有 CNCF 支持，又是 golang 语言开发的， 而 golang 语言又是我们的主要开发语言。 上手也比较快。
+市面上关于 AMP 的产品很多，除了 Uber 的 jaeger 和 Twitter 的 zipkin, 国内也有类似的产品, 比如阿里的鹰眼或者是京东的 hydra。 可以对比一下:
+
+| 能力项 | 鹰眼（EagleEye）| zipkin | jaeger |
+|---|---|---|---|
+|开发团队|阿里巴巴|由Twitter公司开源目前由spring社区维护|Uber工程团队|
+|是否开源|否|是|是
+|OpenTracing|是|是|是
+|语言支持|java|Go，Java，Ruby，C++，Python（progress）|Python，go，Node，java，C++，C#，PHP，Ruby
+|存储|HDFSHbase|内存，Cassandra，Elasticsearch|内存，Cassandra，Elasticsearch
+|Span 传输|HTTP，UDP|HTTP，kafka|utp，http
+|易用性|简单易接入，主要是java语言|少数语言支持差，如：Python|接入简单，各种语言sdk丰富
+
+而我们团队之所以选择 jaeger，一方面是因为它有 CNCF 支持，又是 golang 语言开发的， 而 golang 语言又是我们的主要开发语言。 上手也比较快。
 
 主要流程图:
 
@@ -956,3 +968,4 @@ serviceA done
 - [jaeger 使用初探](https://www.cnblogs.com/chopper-poet/p/10743141.html)
 - [OpenTracing Tutorials](https://github.com/yurishkuro/opentracing-tutorial)
 - [10分钟完成分布式追踪](https://wu-sheng.gitbooks.io/opentracing-io/content/pages/quick-start.html)
+- [基于jaeger微服务调用链实现方案](https://cloud.tencent.com/developer/article/1494063)
