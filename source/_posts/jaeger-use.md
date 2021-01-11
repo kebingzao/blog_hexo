@@ -960,6 +960,7 @@ serviceA done
 
 ---
 参考资料:
+- [jaeger Architecture](https://www.jaegertracing.io/docs/1.21/architecture/)
 - [jaeger getting started](https://www.jaegertracing.io/docs/1.21/getting-started/)
 - [Go微服务全链路跟踪详解](https://zhuanlan.zhihu.com/p/79419529)
 - [为什么需要Tracing？](https://wu-sheng.gitbooks.io/opentracing-io/content/)
