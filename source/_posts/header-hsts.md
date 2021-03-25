@@ -1,7 +1,10 @@
 ---
 title: web 安全之 - 开启HSTS让浏览器强制跳转HTTPS访问
 date: 2020-05-25 10:55:57
-tags: security
+tags: 
+- security
+- cloudfront
+- aws
 categories: web安全
 ---
 ## 前言

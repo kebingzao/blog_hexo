@@ -1,7 +1,9 @@
 ---
 title: AWS S3/CloudFront 规则支持重定向
 date: 2018-08-31 16:13:50
-tags: aws
+tags: 
+- cloudfront
+- aws
 categories: aws 相关
 ---
 ## 前言

@@ -1,7 +1,9 @@
 ---
 title: AWS S3 bucket policy 设置问题
 date: 2018-08-31 17:44:52
-tags: aws
+tags: 
+- cloudfront
+- aws
 categories: aws 相关
 ---
 ## 前言
