@@ -55,7 +55,7 @@ no time limit，不设置超时时间（根据实际情况使用）
 我将其抽成一个异步返回的函数， 最后的代码就是:
 ```php
 // 异步的成功返回函数
-public function returnSuccessJsonDataAsync($otherReturnData = [], $timeout = 60){
+public function returnSuccessJsonDataAsync($otherReturnData = [], $timeout = 60, $allowCors = true){
     $msgData = ['code' => 1, 'msg' => 'Success'];
     if(empty($otherReturnData)){
         $data = $msgData;
@@ -71,6 +71,17 @@ public function returnSuccessJsonDataAsync($otherReturnData = [], $timeout = 60)
     $str = json_encode($data);
     header('Content-type: application/json');
     header('Content-Length: ' . strlen($str));
+    
+    // 如果允许跨域，那么就设置跨域头
+    if($allowCors){
+        $origin = Yii::$app->request->getHeaders()->get('Origin');
+        header("Access-Control-Allow-Origin: {$allowCors}");
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+        header('Access-Control-Allow-Headers: origin, content-type');
+        header('Access-Control-Max-Age: 86400');
+    }
+    
     echo $str;
 
     ob_end_flush();
@@ -94,6 +105,7 @@ public function returnSuccessJsonDataAsync($otherReturnData = [], $timeout = 60)
 这个方法注意几个细节:
 1. `set_time_limit` 并没有设置为 0 (不限超时), 而是设置一个比较合理的值，比如 60s， 因为我认为 60s 之内还没办法执行完成的话， 要么逻辑有问题，要么直接放到消息队列去消费，反正不适合当前场景。 而且一旦设置为 0 的话，一旦代码有问题，进程就会迟迟无法释放，而 fpm 能分配的进程是有限的，就会导致 php-cgi 的进程数用满了， 新的请求过来，因为没有新的进程来处理了，所以 nginx 就会返回 502 Bad Gateway。
 2. 这边输出给前端，用的是 `echo` 来输出，从而保证接下来的逻辑会在请求返回之后可以继续执行。 接下来不能用的 `die;`  或者 `Yii::$app->end();` 这种语法，不然整个请求进程都会被结束，也就无法继续后台执行了。
+
 
 调用的方式也非常简单， 当之前的操作得到数据之后， 就先将这些数据返回给前端:
 ```php
