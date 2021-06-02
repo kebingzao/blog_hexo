@@ -266,6 +266,21 @@ gocv version: 0.27.0
 opencv lib version: 4.5.2
 ```
 
+而这个 脚本 其实就是简单的打印出 gocv 和 opencv 库的版本:
+```javascript
+package main
+
+import (
+	"fmt"
+	"gocv.io/x/gocv"
+)
+
+func main() {
+	fmt.Printf("gocv version: %s\n", gocv.Version())
+	fmt.Printf("opencv lib version: %s\n", gocv.OpenCVVersion())
+}
+```
+
 这下子终于成功了。
 
 ## 总结
