@@ -75,7 +75,7 @@ public function returnSuccessJsonDataAsync($otherReturnData = [], $timeout = 60,
     // 如果允许跨域，那么就设置跨域头
     if($allowCors){
         $origin = Yii::$app->request->getHeaders()->get('Origin');
-        header("Access-Control-Allow-Origin: {$allowCors}");
+        header("Access-Control-Allow-Origin: {$origin}");
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
         header('Access-Control-Allow-Headers: origin, content-type');
