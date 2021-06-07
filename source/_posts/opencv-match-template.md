@@ -62,8 +62,8 @@ func main() {
 	tcols  := imgTemplate.Cols()
 
 	r := image.Rectangle{
-		maxLoc,
-		image.Pt(int(maxLoc.X + tcols) , int(maxLoc.Y) + trows),
+		Min: maxLoc,
+		Max: image.Pt(int(maxLoc.X + tcols) , int(maxLoc.Y) + trows),
 	}
 	// 用 2px 的红色框框 画出来
 	gocv.Rectangle(&imgScene, r, color.RGBA{255, 0, 0, 1},2)
