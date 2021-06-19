@@ -29,3 +29,37 @@ header('Access-Control-Max-Age: 86400');
 {% endcodeblock %}
 
 这样就会缓存预检头部了，可以减少http的连接时间。
+
+---
+
+### 再次更新 -- options 缓存失效的情况 -- 2021-06-19
+前段时间在跟进一个服务器性能并发问题的时候，发现这个项目每次在 get 请求的时候， 都会带上 options 的预请求， 导致原本只需要请求一次， 结果每次因为 options 的预请求， 导致每次都要变成请求两次了。 因此也导致服务器那边的并发数就上来了， 刚开始以为是 response 没有带上 `access-control-max-age` 头部， 后面发现是有的:
+```text
+access-control-max-age: 86400
+```
+有设置 options 的预请求缓存时间是一天。  那么为啥这个缓存会失效呢？
+
+查看了一下完整的 get 请求:
+```text
+https://foo.com/user/getinfos?account_id=xxx&_t=2021-06-19T01:54:03.192Z
+```
+原来每次请求的时候， url 都会带上一个随机值 `_t`, 而这个 `_t` 的随机值就是导致 options 缓存失效的原因。
+
+因为 <font color=red> Access-Control-Max-Age 的设置针对完全一样的url，如果 url 加上路径参数，其中一个url的 Access-Control-Max-Age 设置对另一个url没有效果的 </font>， 必须 url 是一样的， options 请求才会执行缓存效果， 而因为有 `_t` 的随机值存在，导致每次 get 的请求的 url 都是不一样，所以也就导致 options 缓存失效了。
+
+回想了一下，之前之所以在 get 请求加上 `_t` 的随机值，是因为在某些 ie 浏览器上， get 请求如果 url 没有变的话， 会被浏览器本地缓存， 导致结果错误。 所以才在 get 请求后面加上 `_t` 随机值，但是这样子又会导致像 Chrome 或者 Firefox 的 options 缓存失效。
+
+所以后面就修改为，只在 ie 浏览器上的 get 请求才加上 `_t` 随机值，其他浏览器就不加。 果然这样子修改完之后， options 请求就可以被正常的缓存处理了， 相当于并发减少了一半了。
+
+
+
+
+
+
+
+
+
+
+
+
+
