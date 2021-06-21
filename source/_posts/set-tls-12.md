@@ -1,8 +1,10 @@
 ---
 title: 将 tls 加密级别调整到 tls 1.2 版本
 date: 2021-06-21 13:39:46
-tags: nginx
-categories: nginx相关
+tags: 
+- nginx
+- security
+categories: web安全
 ---
 ## 前言
 之前有 researcher 给我们发邮件说我们的一些站点的 tls 加密还支持 tls 1.0 和 tls 1.1 的协议。 这个是很不安全的。 
