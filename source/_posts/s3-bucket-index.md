@@ -116,7 +116,7 @@ An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Acces
 ![1](3.png)
 
 ## 总结
-所以即使是设置为 公开桶的时候， 访问权限也要设置好。 而且不用的 bucket 最好就删掉， 如果这个 bucket 有对应的域名和 dns 解析的话，也要把对应的 dns 解析删掉掉， 不然就会出现子域名接管的安全问题，这个也是我之前踩过的一个坑，就是 s3 bucket 所对应的子域名被接管了。
+所以即使是设置为 公开桶的时候， 访问权限也要设置好。 而且不用的 bucket 最好就删掉， 如果这个 bucket 有对应的域名和 dns 解析的话，也要把对应的 dns 解析删掉掉， 不然就会出现子域名接管的安全问题，这个也是我之前踩过的一个坑，就是 s3 bucket 所对应的子域名被接管了，具体看 {% post_link s3-subdomain-takeover %}。
 
 
 
