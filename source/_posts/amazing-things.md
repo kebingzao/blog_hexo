@@ -68,3 +68,8 @@ categories: 杂文
 
 ## [生动形象的动图讲解技术](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1703494881072955395)
 推荐理由: 很有意思的技术动图讲解系列，循循渐进，尤其是里面的 tcp 和 线程池，讲的非常好，根本不够看啊
+
+## [深度剖析：Redis 分布式锁到底安全吗](https://mp.weixin.qq.com/s/7CyLIxVe6QkqscdxA7UE1A)
+推荐理由: 我看过最有深度的关于 redis 分布式锁的分析文章。尤其是在安全方面的思考，更是写的非常好。非常值得一看
+
+
