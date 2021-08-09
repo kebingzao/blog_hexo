@@ -42,6 +42,12 @@ turn/user/<username>/allocation/<id>/status
 timeout 0
 tcp-keepalive 60
 ```
+
+而且为了保证 redis 统计的准确性， 还得再装一个依赖 `hiredis-devel`:
+```text
+yum install gcc gcc-c++ openssl-devel libevent2 libevent2-devel  hiredis-devel
+```
+
 ## 分析
 假设我们已经在使用webrtc的应用上连接上turn server了，并且已经在转发了。那我们就可以看下这个redis跑的统计数据都是什么样的？
 接下来先在redis 先sub一下：
