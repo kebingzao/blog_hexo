@@ -81,4 +81,7 @@ The frame-ancestors directive obsoletes the X-Frame-Options header. If a resourc
 
 ---
 
+#### 站点测试
+可以通过 https://clickjacker.io/  来检测你的站点是否有 Clickjacking 的安全缺陷。
+
 #### 除了X-Frame-Options之外，Firefox的"Content Security Policy"以及Firefox的NoScript扩展也能够有效防御ClickJacking，这些方案为我们提供了更多的选择
