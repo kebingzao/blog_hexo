@@ -273,10 +273,157 @@ hello zach
 
 这个坑可以解决的，具体可以看 {% post_link centos7-systemctl-reload-nginx %}
 
+## 配置 tls 的问题
+虽然 nginx 装完了， 但是我发现在配置 https 的时候, 运行会被报错:
+```text
+ # HTTPS server
+    server {
+        listen       443 ssl;
+        server_name  localhost;
+
+        ssl_certificate      ssl/server.crt;
+        ssl_certificate_key  ssl/server.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        ssl_ciphers  HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers  on;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+    }
+```
+这时候 reload 就会报错:
+```text
+[root@VM-0-13-centos conf]# sudo systemctl reload nginx.service
+Job for nginx.service failed because the control process exited with error code. See "systemctl status nginx.service" and "journalctl -xe" for details.
+[root@VM-0-13-centos conf]# systemctl status nginx.service
+● nginx.service - nginx - high performance web server
+   Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; vendor preset: disabled)
+   Active: active (running) (Result: exit-code) since Thu 2021-10-21 16:30:39 CST; 43min ago
+     Docs: http://nginx.org/en/docs/
+  Process: 31476 ExecReload=/usr/local/nginx/sbin/nginx -s reload (code=exited, status=1/FAILURE)
+Main PID: 13905 (nginx)
+    Tasks: 2
+   Memory: 1.0M
+   CGroup: /system.slice/nginx.service
+           ├─13905 nginx: master process /usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+           └─16998 nginx: worker process
+
+Oct 21 16:30:39 VM-0-13-centos nginx[13900]: nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
+Oct 21 16:30:39 VM-0-13-centos systemd[1]: Started nginx - high performance web server.
+Oct 21 16:33:24 VM-0-13-centos systemd[1]: Reloading nginx - high performance web server.
+Oct 21 16:33:24 VM-0-13-centos systemd[1]: Reloaded nginx - high performance web server.
+Oct 21 16:38:02 VM-0-13-centos systemd[1]: Reloading nginx - high performance web server.
+Oct 21 16:38:02 VM-0-13-centos systemd[1]: Reloaded nginx - high performance web server.
+Oct 21 17:14:20 VM-0-13-centos systemd[1]: Reloading nginx - high performance web server.
+Oct 21 17:14:20 VM-0-13-centos nginx[31476]: nginx: [emerg] the "ssl" parameter requires ngx_http_ssl_module in /usr/local/nginx/conf/nginx.conf:42
+Oct 21 17:14:20 VM-0-13-centos systemd[1]: nginx.service: control process exited, code=exited status=1
+Oct 21 17:14:20 VM-0-13-centos systemd[1]: Reload failed for nginx - high performance web server.
+```
+原来如果要配置 ssl 模块的时候， 是要开启 `ngx_http_ssl_module` 模块的，我看了一下当前的配置:
+
+```text
+[root@VM-0-13-centos conf]# /usr/local/nginx/sbin/nginx -V
+nginx version: nginx/1.18.0
+built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC)
+configure arguments:
+```
+
+发现是没有额外配置这个模块的， 因为这个模块不是系统默认的内建模块， 参见上面安装的 `./configure` 步骤，并没有加这个模块。 这时候有两种方式可以添加
+1. 一种是直接卸载后再重装， 然后在 `./configure` 步骤，换成这个 `./configure --with-http_ssl_module` 这样子就会将这个模块编译进去
+2. 还有一种就是不需要卸载， 直接在原来的 nginx 补上这个模块
+
+### 现有的 nginx 程序添加 http_ssl_module 模块
+主要有几个步骤:
+#### 1. 首先切换到源码包目录
+```text
+[root@VM-0-13-centos ~]# cd nginx-1.18.0/
+```
+
+#### 2. configure 配置加上这个模块
+```text
+[root@VM-0-13-centos nginx-1.18.0]# ./configure --prefix=/usr/local/nginx  --with-http_ssl_module
+checking for OS
++ Linux 3.10.0-1160.31.1.el7.x86_64 x86_64
+checking for C compiler ... found
+```
+这样子配置就完成了， 就可以 make 编译了
+
+#### 3. make 编译
+```text
+[root@VM-0-13-centos nginx-1.18.0]# make
+make -f objs/Makefile
+make[1]: Entering directory `/root/nginx-1.18.0'
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g  -I src/core -I src/event -I src/event/modules -I src/os/unix -I objs \
+    -o objs/src/core/nginx.o \
+```
+
+这里接下来不要进行 `make install`，否则就是覆盖安装,原来的 nginx 还有一堆的配置文件，不能被覆盖。我们应该只覆盖编译出来的 nginx 可执行程序：
+
+#### 4. 停掉原来的 nginx 并且覆盖原来的 nginx 可执行程序
+```text
+[root@VM-0-13-centos nginx-1.18.0]# sudo systemctl stop nginx.service
+[root@VM-0-13-centos nginx-1.18.0]# curl 127.0.0.1
+curl: (7) Failed connect to 127.0.0.1:80; Connection refused
+```
+覆盖之前，先把原来的先 cp 一份出来
+```text
+[root@VM-0-13-centos nginx-1.18.0]# cp /usr/local/nginx/sbin/nginx /usr/local/nginx/sbin/nginx.bak
+```
+最后将新编译的 nginx 可执行程序覆盖原来的程序:
+```text
+[root@VM-0-13-centos nginx-1.18.0]# cp ./objs/nginx /usr/local/nginx/sbin/
+```
+
+#### 5. 重启 nginx
+这样子就好了， 然后重新启动 nginx
+```text
+[root@VM-0-13-centos nginx-1.18.0]# sudo systemctl start  nginx.service
+```
+查看模块是否有开启
+```text
+[root@VM-0-13-centos nginx-1.18.0]# /usr/local/nginx/sbin/nginx -V
+nginx version: nginx/1.18.0
+built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC)
+built with OpenSSL 1.0.2k-fips  26 Jan 2017
+TLS SNI support enabled
+configure arguments: --prefix=/usr/local/nginx --with-http_ssl_module
+```
+测试一下 https 有没有问题:
+```text
+[root@VM-0-13-centos nginx-1.18.0]# curl https://127.0.0.1
+curl: (60) Peer's certificate issuer has been marked as not trusted by the user.
+More details here: http://curl.haxx.se/docs/sslcerts.html
+
+curl performs SSL certificate verification by default, using a "bundle"
+of Certificate Authority (CA) public keys (CA certs). If the default
+bundle file isn't adequate, you can specify an alternate file
+using the --cacert option.
+If this HTTPS server uses a certificate signed by a CA represented in
+the bundle, the certificate verification probably failed due to a
+problem with the certificate (it might be expired, or the name might
+not match the domain name in the URL).
+If you'd like to turn off curl's verification of the certificate, use
+the -k (or --insecure) option.
+```
+报了一个证书的安全问题, 因为证书是自制的， 这个是正常的，就好像 浏览器上访问的不安全提示一下。 我们加 `--insecure` 参数就可以忽略到这个参数
+```text
+[root@VM-0-13-centos nginx-1.18.0]# curl https://127.0.0.1 --insecure
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+...
+```
+
 ---
 
 参考资料:
 - [CentOS 7 systemd添加自定义系统服务](https://my.oschina.net/liucao/blog/470458)
 - [CentOS 7 下安装 Nginx](https://www.cnblogs.com/liujuncm5/p/6713784.html)
-
+- [开启 Nginx 的SSL模块](https://www.cnblogs.com/ghjbk/p/6744131.html)
   
