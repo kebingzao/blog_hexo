@@ -10,6 +10,23 @@ categories: nginx相关
 ## 前言
 前段时间有用户反馈我们的一个服务有问题， 查了一下，发现我们的一个 wss 的长连接服务被挡掉， 后面原因是因为这个 wss 的长连接服务的端口因为不是常见端口，导致被有些公司内网的路由策略屏蔽掉了。 而如果是常见的 443 的 tls 端口的话， 大部分都是跟 80 一样默认开放的，也就不会有这些问题。
 
+```text
+C:\Users\Marco\Downloads\paping_1.5.5_x86_windows\paping_1.5.5_x86_windows>paping.exe 192.xx.xx.162 -p 9088 -c 4
+paping v1.5.5 - Copyright (c) 2011 Mike Lovell
+
+Connecting to 192.xx.xx.162 on TCP 9088:
+
+Connection timed out
+Connection timed out
+Connection timed out
+Connection timed out
+
+Connection statistics:
+        Attempted = 4, Connected = 0, Failed = 4 (100.00%)
+Approximate connection times:
+        Minimum = 0.00ms, Maximum = 0.00ms, Average = 0.00ms
+```
+
 但是问题来了，因为我们的这种 wss 的长连接服务比较多，有时候一个服务器就要部署好几个， 而一台服务器的 443 端口只能被一个程序接管， 如果这个 wss 程序接管了， 那么同一台服务器的另一个 wss 程序就无法接管了。
 
 然后就想到我们的一台服务器同时部署多个 https API 服务， 然后统一由 nginx 这个程序来托管并代理 443 端口。 这样子就大家都可以用 443 端口的 https 服务了。 因此 wss 应该也是类似的。
@@ -21,7 +38,7 @@ categories: nginx相关
 也就是本地的服务都不走 tls 加密的， 但是流量入口的 nginx 又是走 tls 加密， 然后请求进来，就会通过这个 nginx 的加密通道，转发到本地服务的不加密通道上。
 <!--more-->
 ## 1. 本地的 demo
-这个 demo 其实就是事先本地的一个简单的 http 服务和一个 ws 服务。 用 golang 写的话，一个文件就搞定了 `server.go`
+这个 demo 其实就是实现本地的一个简单的 http 服务和一个 ws 服务。 用 golang 写的话，一个文件就搞定了 `server.go`
 ```text
 package main
 
@@ -95,7 +112,7 @@ ws 服务的话，我这边懒得再写客户端程序了，直接用线上的 t
 
 ![](1.png)
 
-也是没问题的，不过要注意的是， 因为是外网访问，所以 8007 端口要对外网开发 (因为我是腾讯云服务器，所以直接在安全组开发这个端口，然后是 tcp 协议的)
+也是没问题的，不过要注意的是， 因为是外网访问，所以 8007 端口要对外网开放 (因为我是腾讯云服务器，所以直接在安全组开放这个端口，然后是 tcp 协议的)
 
 这样子 demo 就完成了。 
 
