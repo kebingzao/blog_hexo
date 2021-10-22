@@ -35,8 +35,12 @@ Approximate connection times:
 1. 本地服务跑 http 服务， 然后 nginx 起 https 服务，代理并且转发到 本地的 http 服务
 2. 本地服务跑 ws 服务， 然后 nginx 起 wss 服务，代理并且转发到 本地的 ws 服务
 
-也就是本地的服务都不走 tls 加密的， 但是流量入口的 nginx 又是走 tls 加密， 然后请求进来，就会通过这个 nginx 的加密通道，转发到本地服务的不加密通道上。
 <!--more-->
+如图所示:
+
+![](3.png)
+
+也就是本地的服务都不走 tls 加密的， 但是流量入口的 nginx 又是走 tls 加密， 然后请求进来，就会通过这个 nginx 的加密通道，转发到本地服务的不加密通道上。
 ## 1. 本地的 demo
 这个 demo 其实就是实现本地的一个简单的 http 服务和一个 ws 服务。 用 golang 写的话，一个文件就搞定了 `server.go`
 ```text
@@ -334,6 +338,11 @@ server {
 ## 5. nginx 配置转发 wss 请求
 接下来试下用 wss 代理 本机服务的 ws， 修改配置文件
 ```text
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
 server {
         listen       443 ssl;
         server_name  localhost;
@@ -357,17 +366,70 @@ server {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
+        
         location = /ws {
             proxy_pass http://localhost:8007;
+            
+            proxy_read_timeout 300s;
+            proxy_send_timeout 300s;
+            
+            proxy_set_header Host $host;
+            proxy_set_header X-real-ip $remote_addr;
+            proxy_set_header X-Forwarded-For $remote_addr;
+            
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
-            proxy_set_header X-real-ip $remote_addr;
-            proxy_set_header X-Forwarded-For $remote_addr;
         }
     }
 ```
-也是补了最下面的 `/ws` 这个路由，注意该路由要跟本地服务的 ws 服务的路由一致， 然后重启 nginx， 看下效果
+也是补了最下面的 `/ws` 这个路由，注意该路由要跟本地服务的 ws 服务的路由一致， 同时了为了更优雅，用 map 指令组合成新的变量。
+ 
+然后解释一下关键配置, 最重要的就是在反向代理的配置中增加了如下两行，其它的部分和普通的HTTP反向代理没有任何差别。
+
+```text
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection $connection_upgrade;
+```
+ 
+这里面的关键部分在于HTTP的请求中多了如下头部：
+```text
+Upgrade: websocket
+Connection: Upgrade
+```
+ 
+这两个字段表示请求服务器升级协议为WebSocket。这时候状态码是 101， 表示协议升级， 服务器处理完请求后，响应如下报文：
+```text
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: upgrade
+```
+ 
+告诉客户端已成功切换协议，升级为 Websocket协议。握手成功之后，服务器端和客户端便角色对等，就像普通的Socket一样，能够双向通信。 不再进行HTTP的交互，而是开始WebSocket的数据帧协议实现数据交换。
+
+这里使用map指令可以将变量组合成为新的变量，会根据客户端传来的连接中是否带有Upgrade头来决定是否给源站传递Connection头， 这样做的方法比直接全部传递upgrade更加优雅。
+
+默认情况下，连接将会在无数据传输60秒后关闭，`proxy_read_timeout` 参数可以延长这个时间。 源站通过定期发送 ping 帧以保持连接并确认连接是否还在使用。 所以我们可以根据实际场景来设置默认关闭事件.
+
+### proxy_read_timeout
+语法 `proxy_read_timeout`:
+1. time ->  默认值 60s
+2. 上下文 ->  http server location 
+3. 说明 -> 该指令设置与代理服务器的读超时时间。
+
+它决定了nginx会等待多长时间来获得请求的响应。 这个时间不是获得整个 response 的时间，而是两次 reading 操作的时间。
+
+### proxy_send_timeout
+语法 `proxy_send_timeout`:
+1. time -> 默认值 60s
+2. 上下文 -> http server location 
+3. 说明 -> 这个指定设置了发送请求给upstream服务器 (源程序)的超时时间。
+
+超时设置不是为了整个发送期间，而是在两次 write 操作期间。 如果超时后，upstream 没有收到新的数据，nginx 会关闭连接
+
+>ps: 如果你的源程序已经有对 读超时 和 写超时 做了判断逻辑， 原则上 nginx 这边可以设置的大一点，比如 1800s， 让其全部由源程序来判断。 当然这个得根据具体场景来设置。
+
+最后重启 nginx， 看下效果
 
 ![](2.png)
 
@@ -383,6 +445,7 @@ nginx 确实可以转发代理 wss 服务。 而且转发本地的服务都不�
 不过需要注意一点的是， 因为是用 nginx 代理， 而 nginx 关于 ssl 模块也有一些配置项， 这个就涉及到高并发下的性能优化了。
 
 不仅仅原程序下的并发性能优化要做好，  nginx 下的并发也要处理好。 尤其是这几个参数:
+
 ```text
 ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 ssl_ciphers ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!eNULL:!NULL:!DH:!EDH:!AESGCM;
@@ -397,7 +460,7 @@ ssl_session_timeout 10m;
 - [Nginx配置WebSocket 【支持wss与ws连接】](https://blog.csdn.net/qq_35808136/article/details/89677749)
 - [nginx反向代理wss，实现不修改服务器端websocket代码加密通讯请求](https://blog.csdn.net/sajiazaici/article/details/81871466)
 - [WebSocket使用Nginx反向代理解决Wss服务问题](https://qq52o.me/2713.html)
-
+- [nginx反向代理WebSocket](https://www.xncoding.com/2018/03/12/fullstack/nginx-websocket.html)
 
 
 
