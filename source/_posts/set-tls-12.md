@@ -132,6 +132,71 @@ no-tlsv1
 no-tlsv1_1
 ```
 
+## tcp tls 的方式
+tcp 的接口的话， 也是可以走 tls 加密通道的。 以 golang 为例，之前是没有 tls 加密的，代码如下:
+```text
+// start phone listen
+func phoneServe() {
+	pln, err := net.Listen("tcp", config.PhonePort)
+	if err != nil {
+		log.Error("phone tcp err,", err)
+		log.Flush()
+		os.Exit(1)
+	}
+	for {
+		conn, err := pln.Accept()
+		if err != nil {
+			log.Error("tcp accept err:", err)
+			log.Flush()
+			os.Exit(1)
+		}
+		go phoneHandler(conn)
+	}
+}
+```
+如果是要加上 tls 加密通道，并且要支持 tls 1.2 的加密级别，那么就是:
+```text
+// start phone listen with ssl
+func phoneSSLServe() {
+  // 这边换成有 tls 加密的 tcp 连接
+  crt, err := tls.LoadX509KeyPair(config.SslCrt, config.SslKey)
+  if err != nil {
+    log.Error("phone load tls key pair err,", err)
+    log.Flush()
+    os.Exit(1)
+  }
+  tlsConfig := &tls.Config{}
+  tlsConfig.MinVersion = tls.VersionTLS12
+  tlsConfig.MaxVersion = tls.VersionTLS12
+  tlsConfig.Certificates = []tls.Certificate{crt}
+  // Time returns the current time as the number of seconds since the epoch.
+  // If Time is nil, TLS uses time.Now.
+  tlsConfig.Time = time.Now
+  // Rand provides the source of entropy for nonces and RSA blinding.
+  // If Rand is nil, TLS uses the cryptographic random reader in package
+  // crypto/rand.
+  // The Reader must be safe for use by multiple goroutines.
+  tlsConfig.Rand = rand.Reader
+  pln, err := tls.Listen("tcp", config.SslPhonePort, tlsConfig)
+  
+  if err != nil {
+    log.Error("phone tcp err,", err)
+    log.Flush()
+    os.Exit(1)
+  }
+  for {
+    conn, err := pln.Accept()
+    if err != nil {
+      log.Error("tcp accept err:", err)
+      log.Flush()
+      os.Exit(1)
+    }
+    go phoneHandler(conn)
+  }
+}
+```
+这样子就可以了。
+
 ## 验证
 当我们配置完了， 接下来最主要的就是验证我们配置的对不对， 有两种方式可以验证。
 
@@ -224,7 +289,7 @@ accept-ranges: bytes
 - [SSL Ciphers](https://curl.se/docs/ssl-ciphers.html)
 - [cipherlist](https://syslink.pl/cipherlist/)
 - [Strong SSL Security on nginx](https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html#toc_1)
-
+- [golang简单实现一个基于TLS/SSL的 TCP服务器和客户端](https://blog.csdn.net/yue7603835/article/details/73526835)
 
 
 
