@@ -321,6 +321,7 @@ server {
         location = /stat {
             proxy_pass http://localhost:8006;
             proxy_set_header Host $host;
+            proxy_set_header X-real-ip $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
@@ -364,6 +365,7 @@ server {
         location = /stat {
             proxy_pass http://localhost:8006;
             proxy_set_header Host $host;
+            proxy_set_header X-real-ip $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
         
@@ -375,7 +377,7 @@ server {
             
             proxy_set_header Host $host;
             proxy_set_header X-real-ip $remote_addr;
-            proxy_set_header X-Forwarded-For $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -433,7 +435,12 @@ Connection: upgrade
 
 ![](2.png)
 
-可以看到有转发到本地服务的 ws 服务了。
+可以看到有转发到本地服务的 ws 服务了。 而且用 nginx 来代理转发 wss 也有一个好处，就是可以在请求的 access log 和 error log 看 request， 就不需要每次看 access request 的时候，都要去查源程序的业务日志了:
+```text
+access_log /var/log/nginx/example.com.access.log main;
+access_log /var/log/nginx/example.com.4xx5xx.log combined if=$loggable;
+error_log /var/log/nginx/example.com.error.log warn;
+```
 
 ## 总结
 nginx 确实可以转发代理 wss 服务。 而且转发本地的服务都不需要用到 tls 加密了。 nginx 那边加密就行了。
