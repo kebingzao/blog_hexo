@@ -461,6 +461,48 @@ ssl_session_cache shared:SSL:10m;
 ssl_session_timeout 10m;
 ```
 
+接下来我们结合一下他的官网，来讲一下这几个参数:  [Module ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
+### ssl_protocols
+```text
+Syntax:	ssl_protocols [SSLv2] [SSLv3] [TLSv1] [TLSv1.1] [TLSv1.2] [TLSv1.3];
+Default:	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+Context:	http, server
+```
+所支持的 tls 的版本, 如果要用 tlsv1.1 和 tlsv1.2 的话，那么 openssl 要 1.0.1 版本或者更好， 如果要使用 tlsv1.3, 那么 openssl 就要 1.1.1 或者更高。
+
+### ssl_ciphers
+```text
+Syntax:	ssl_ciphers ciphers;
+Default:	ssl_ciphers HIGH:!aNULL:!MD5;
+Context:	http, server
+```
+所支持的 tls 的加密套件,以 OpenSSL 库理解的格式指定。可以使用 `openssl ciphers` 命令查看完整列表
+
+### ssl_prefer_server_ciphers
+```text
+Syntax:	ssl_prefer_server_ciphers on | off;
+Default:	ssl_prefer_server_ciphers off;
+Context:	http, server
+```
+是否由服务器决定采用哪种加密算法, 默认是 off， 但是如果ssl协议支持 `tlsv1` `tls1.1` 这种老协议，设置为 on ，并配合 `ssl_ciphers` 使用, 如果ssl协议只支持 `tlsv1.2` `tlsv1.3` 新协议，设置为 off （nginx 默认为off），因为新协议不再采纳此参数
+
+### ssl_session_timeout
+```text
+Syntax:	ssl_session_timeout time;
+Default:	ssl_session_timeout 5m;
+Context:	http, server
+```
+指定客户端可以重用会话参数的时间（超时之后不可使用）, 默认是 5 分钟 (`5m`)，
+
+### ssl_session_cache
+```text
+Syntax:	ssl_session_cache off | none | [builtin[:size]] [shared:name:size];
+Default:	ssl_session_cache none;
+Context:	http, server
+```
+可以开启会话缓存复用，默认是 none，也就是不开启。 如果开启的话，相当于保存握手的 session id，然后下次重连的时候， 如果这个 session id 在缓存中，就直接建立连接， 可以用来提升性能 (`shared:SSL:10m;`)， 他的缓存时间由`ssl_session_timeout` 决定，默认是5分钟。
+
+
 ---
 
 参考资料:
@@ -468,9 +510,9 @@ ssl_session_timeout 10m;
 - [nginx反向代理wss，实现不修改服务器端websocket代码加密通讯请求](https://blog.csdn.net/sajiazaici/article/details/81871466)
 - [WebSocket使用Nginx反向代理解决Wss服务问题](https://qq52o.me/2713.html)
 - [nginx反向代理WebSocket](https://www.xncoding.com/2018/03/12/fullstack/nginx-websocket.html)
-
-
-
+- [Nginx开启ssl会话复用，能提升多少性能？](https://cloud.tencent.com/developer/article/1819517)
+- [增强 nginx 的 SSL 安全性](https://linux.cn/article-5374-1.html)
+- [Nginx SSL性能优化参数](https://wangxingcs.com/2015/0510/1240/)
 
 
 
