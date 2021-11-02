@@ -504,7 +504,39 @@ Syntax:	ssl_session_cache off | none | [builtin[:size]] [shared:name:size];
 Default:	ssl_session_cache none;
 Context:	http, server
 ```
-可以开启会话缓存复用，默认是 none，也就是不开启。 如果开启的话，相当于保存握手的 session id，然后下次重连的时候， 如果这个 session id 在缓存中，就直接建立连接， 可以用来提升性能 (`shared:SSL:10m;`)， 他的缓存时间由`ssl_session_timeout` 决定，默认是5分钟。
+可以开启会话缓存复用，默认是 none，也就是轻度禁止使用会话缓存：nginx 告诉客户端会话可以重用，但实际上并不会将会话参数存储在缓存中。
+
+启用 SSL Session 缓存可以大大减少 TLS 的反复验证，减少 TLS 握手的 roundtrip。虽然 session 缓存会占用一定内存，但是用 1M 的内存就可以缓存 4000 个连接，可以说是非常非常划算的。
+
+他的缓存时间由`ssl_session_timeout` 决定，默认是5分钟，即客户端可以重用会话参数的时间。
+
+```text
+ssl_session_cache   shared:SSL:50m;
+ssl_session_timeout 4h;
+```
+比如：共享50M内存，建议使用shared，而不是builtin。shared：所有 worker 进程之间共享的缓存。缓存大小以字节为单位指定，1M可以存储大约 4000 个会话。每个共享缓存都应有一个任意的名称。可以在多个虚拟服务器中使用有相同名称的缓存。
+
+### 开启 https
+开启http2，比起http1.1快了66%
+```text
+listen 443 ssl http2;
+```
+
+### nginx 转发的端口是有上限 (针对长连接的转发)
+之前有针对 配置 nginx 转发之后的服务器进行压测， 发现加入了 nginx 之后， 虽然可以通过上述的 tls 优化，让其同一时刻的并发数比原先更高， 但是还有两个缺点:
+1. nginx 也要吃内存，本来原先的内存都是给程序吃的，但是现在加入了 nginx 转发之后， 在内存分配上，至少有 30% 要给 nginx
+2. 在测试长连接的最大可连接数的时候， nginx 是有可转发长连接上限的，是因为 nginx 作为反向代理时，为了支持长连接，nginx 也扮演了 websocket 服务的客户端角色，nginx 需要从本地申请新的端口发起连接到 websocket 服务，而系统分配从 local 发起请求的端口是有限制的，通常是 32768 到 60999，也就是 28232 个，所以这种 nginx local 转发代理的，最多只能保持 28232 个长连接，再多就会报 `Cannot assign requested address` 这个错误
+
+当然这个 `ip_local_port_range` 范围是可以在配置文件改的，默认是:
+```text
+[root@VM-0-14-centos supervisor]# cat /proc/sys/net/ipv4/ip_local_port_range
+32768    60999
+```
+我们可以调整为:
+```text
+echo 10000 60999 > /proc/sys/net/ipv4/ip_local_port_range
+```
+将其调整到 5w 个可分配端口。
 
 
 ---
