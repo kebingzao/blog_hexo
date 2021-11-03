@@ -385,11 +385,15 @@ server {
             
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
+            proxy_set_header Connection $connection_upgrade;
         }
     }
 ```
-也是补了最下面的 `/ws` 这个路由，注意该路由要跟本地服务的 ws 服务的路由一致， 同时了为了更优雅，用 map 指令组合成新的变量。
+也是补了最下面的 `/ws` 这个路由，注意该路由要跟本地服务的 ws 服务的路由一致， 同时了为了更优雅，用 map 指令组合成新的变量。 
+
+而这个 map 的作用主要是根据客户端请求中 `$http_upgrade` 的值，来构造改变 `$connection_upgrade` 的值，即根据变量 `$http_upgrade` 的值创建新的变量 `$connection_upgrade`，创建的规则就是 `{}` 里面的东西，所以规则就是:
+1. 如果 `$http_upgrade` 没有匹配，那 "Connection" 头字段的值会是upgrade。
+2. 如果 `$http_upgrade` 为空字符串的话，那 "Connection" 头字段的值会是 close。
  
 然后解释一下关键配置, 最重要的就是在反向代理的配置中增加了如下两行，其它的部分和普通的HTTP反向代理没有任何差别。
 
@@ -549,6 +553,6 @@ echo 10000 60999 > /proc/sys/net/ipv4/ip_local_port_range
 - [Nginx开启ssl会话复用，能提升多少性能？](https://cloud.tencent.com/developer/article/1819517)
 - [增强 nginx 的 SSL 安全性](https://linux.cn/article-5374-1.html)
 - [Nginx SSL性能优化参数](https://wangxingcs.com/2015/0510/1240/)
-
+- [nginx反向代理时保持长连接](https://www.cnblogs.com/liufarui/p/11075630.html)
 
 
