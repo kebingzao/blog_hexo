@@ -27,7 +27,7 @@ b508f7f517b255feef5381fea307ce6fb5426727e018b089363563: exit status 128:
 ```text
 replace github.com/qiniu/bytes => gitlab.example.com/qiniu/bytes v0.0.0-20191012100200-92558a444c07
 ```
-
+<!--more-->
 但是问题就出现在这里， 如果作为第三方被引用的包 igong 里面还有 replace 语法去对一些已失效的包的下载地址进行替换的话， 那么在这个第三方 igong 被其他程序导入的时候， 这时候 go module 进行下载的时候， 好像不会再去 参照 igong 的 go.mod 的 replace 语法。 而是只按照 igong go.mod 的依赖去进行下载， 所以就会导致下载失败的情况。 我不知道 golang 更高一点的版本有没有修复， 但是在我使用的 `1.13` 版本，确实存在这个 bug， 所以解决方法就是将 igong 的 go.mod 的这个 replace 语句，也一样拷贝一份到我们的当前程序，这样子就可以了。 当然最好的解决方式，就是内部公共包最好不要使用 replace 语句
 
 举个例子:
@@ -40,8 +40,24 @@ C ->replace-> D
 也要添加到 A 的 go.mod， 这样子 A 引用 B 的时候，才能正常更新 B 的版本
 ```
 
+## 后续
+后续的这个公共包 B，终于将七牛的版本升级到 `7.0` 版本了，并打了 tag `v1.8.8`,所以 B 的 go.mod 就没有 replace 子句了。接下来就是在 A 项目中升级 B 的版本，并且将 A 的 replace 子句去掉， 但是我在移除 A 项目的 replace 子句的时候， 遇到了问题，因为我如果只是将 B 的版本升级到最新版是没问题的， 但是 replace 子句还是在，并不会移除。 如果直接在 go.mod 文件中移除， 那么执行 `go mod verify` 会报错。
 
+所以我后面的做法是:
+1. 在 A 的 go.mod 中，先将 B 的公共包依赖移除掉:
+```text
+go mod edit -droprequire=gitlab.example.com/example-utils/iGong
+```
+这时候之前依赖他的两个 replace 子句就没有用了。
+2. 然后在 A 的 go.mod 将这两个 replace 子句删除掉
+3. 同时重新装上 B 的最新版本:
+```text
+go get gitlab.example.com/example-utils/iGong
+```
+4. 执行 `go mod tidy` 移除掉不需要的依赖 (其实就是 replace 子句的那两个依赖)
+5. 执行 `go mod verify` 进行包校验
 
+这样子就可以成功的将 B 版本升级上来的同时将 replace 子句移除掉。
 
 
 
