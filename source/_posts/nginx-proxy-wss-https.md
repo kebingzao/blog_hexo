@@ -525,6 +525,7 @@ ssl_session_timeout 4h;
 ```text
 listen 443 ssl http2;
 ```
+不过要开启 https, openssl 的版本必须在`1.0.2e` 及以上，在 Chrome 51 后，谷歌去掉了对 NPN 的支持，HTTP2 不能用了会证书错误，而`openssl1.0.2e` 之后的版本修复了此问题, 同时 nginx 还要加载一个额外的模块 `--with-http_v2_module`
 
 ### nginx 转发的端口是有上限 (针对长连接的转发)
 之前有针对 配置 nginx 转发之后的服务器进行压测， 发现加入了 nginx 之后， 虽然可以通过上述的 tls 优化，让其同一时刻的并发数比原先更高， 但是还有两个缺点:
@@ -554,5 +555,5 @@ echo 10000 60999 > /proc/sys/net/ipv4/ip_local_port_range
 - [增强 nginx 的 SSL 安全性](https://linux.cn/article-5374-1.html)
 - [Nginx SSL性能优化参数](https://wangxingcs.com/2015/0510/1240/)
 - [nginx反向代理时保持长连接](https://www.cnblogs.com/liufarui/p/11075630.html)
-
+- [[tls][https][nginx] https的client session cache与session ticket机制分析](https://www.cnblogs.com/hugetong/p/12192587.html)
 
