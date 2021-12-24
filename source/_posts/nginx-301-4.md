@@ -168,7 +168,7 @@ Location: https://www.foo.com/zh-cn/download/foo-personal/?name=1
 ```
 就会发现 `&` 后面的参数丢了。
 
-这个是因为在使用 `curl` 的时候，参数的连接符 `&` 是要进行转义的， 所以加上转义符号就可以:
+这个是因为在使用 `curl` 的时候，参数的连接符 `&` 是要进行转义的， 所以加上转义符号就可以 (当然也可以不用转义， 直接将 url 用双引号括起来就行了):
 ```text
 [root@VM-156-200-centos ~]# curl -I https://www.foo.com/zh-cn/get.html?name=1\&age=2
 HTTP/1.1 301 Moved Permanently
@@ -177,7 +177,7 @@ Location: https://www.foo.com/zh-cn/download/foo-personal/?name=1&age=2
 ...
 ```
 
-
+> 如果 nginx 针对某个路由设置 301 跳转，并且排除某一个符合条件的路由，单单上面那种操作是不够的， 具体看: {% post_link nginx-301-5 %}
 
 
 
