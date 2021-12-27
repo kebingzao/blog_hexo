@@ -215,6 +215,58 @@ this is page A with zh-cn lang
 </html>
 ```
 
+如果是 https 的，也是可以的:
+```text
+[root@VM-0-13-centos ~]# cat /usr/local/nginx/conf/nginx.conf
+
+worker_processes  1;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+    root         /data/server/wwwroot;    
+    index        index.html index.htm index.php;
+    
+    split_clients "${remote_addr}AAA" $ver {
+        50%               mobile-device-management-free-trial-old/index.html;
+        *                 mobile-device-management-free-trial-new/index.html;
+    }
+
+    server {
+        listen       80;
+        listen       443 ssl;
+        server_name  localhost;
+        server_name  test.example.com;
+        ssl_certificate             ssl/now/example.com.crt;
+        ssl_certificate_key         ssl/now/example.com.key;
+        ssl_protocols               TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+        ssl_ciphers                 HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers   on;
+        location ~* mobile-device-management-free-trial/index.html {
+            if ($uri ~* /([A-Za-z0-9_-]+)/mobile-device-management-free-trial/index.html) {
+              set $lang $1;
+            }
+            # resolver 8.8.8.8;
+            proxy_pass https://test.example.com/$lang/$ver; 
+        }
+        
+        location / {
+           if (!-e $request_filename) {
+              rewrite ^/([A-Za-z0-9_-]+)/(.*) /$2 permanent;
+           }
+        }
+    }
+}
+```
+
 ---
 
 参考资料:
