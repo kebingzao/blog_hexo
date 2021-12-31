@@ -724,14 +724,40 @@ Extension: server_name (len=34)
 所以需要 android 6 那边的程序，在进行 握手的时候， 添加 `server_name` 的这个扩展字段就可以了。 而且如果是 SNI 导致的握手问题的话，其实是不会返回具体错误的，nginx 那边会直接返回 `FIN ACK`, 刚好符合 android 那边的错误日志，因为除了握手失败之外，没有其他的信息。 而如果是 加密套件 失败的话，是会有更具体的错误信息的。
 
 ## 几种优化措施
-### 1. 使用 reuseport 来复用端口
-我们可以在分流的时候， 加上 reuseport
+### 1. 使用 reuseport 来允许多个 socket 来监听同一个端口
+我们可以在分流的时候， 加上 reuseport, 这个可以提高性能。 
+
+reuseport 是一种套接字复用机制，它允许你将多个套接字 bind 在同一个IP地址/端口对上，这样一来，就可以建立多个服务来接受到同一个端口的连接。 reuseport 是支持多个进程或者线程绑定到同一端口，提高服务器程序的吞吐性能，其优点体现在如下几个方面:
+1. 允许多个套接字 bind()/listen() 同一个TCP/UDP端口
+2. 每一个线程拥有自己的服务器套接字
+3. 在服务器套接字上没有了锁的竞争，因为每个进程一个服务器套接字
+4. 内核层面实现负载均衡
+5. 安全层面，监听同一个端口的套接字只能位于同一个用户下面
+
+可以写在 stream 块 或者 http 块:
 ```text
 server {  
         listen 172.16.0.13:443 reuseport;
         proxy_pass $stream_map;
         ssl_preread on;
     }  
+```
+
+### 2. 启用 http2 模块
+这个上面已经说了，开启 http2 模块，不仅可以做到多路复用，它的 header 还会压缩，减少体积。
+
+这个是在 http 块开启的:
+```text
+server {
+        listen 127.0.0.1:443 ssl http2;
+```
+
+### 3. 设置超时
+如果我们需要在 tcp 上传一些资料的话，尤其是大文件二进制的话，那么也是要在 stream 那边设置超时的:
+```text
+stream {  
+    proxy_timeout 3600s;
+    proxy_connect_timeout 3600s;
 ```
 
 
@@ -745,3 +771,4 @@ server {
 - [Nginx代理后服务端使用remote_addr获取真实IP](https://blog.csdn.net/u014756827/article/details/105733018)
 - [nginx的port_in_redirect配置](https://cloud.tencent.com/developer/article/1340233)
 - [TCP and UDP Load Balancing](https://docs.nginx.com/nginx/admin-guide/load-balancer/tcp-udp-load-balancer/)
+- [高性能 -Nginx 多进程高并发问题](https://zhuanlan.zhihu.com/p/336424544)
