@@ -551,7 +551,7 @@ http {
 
 这边 https 的时候，有启用了 http2 优化，这个模块 `http_v2_module` 也是要额外载入的。 而且他要求 openssl 的版本必须在1.0.2e及以上。 在 configure 的时候，补上 `--with-http_v2_module` 就可以了。
 
-同时 设置分流的时候， 这边用内网 ip `172.16.0.13` 来指定。
+同时 设置分流的时候， 这边用内网 ip `172.16.0.13` 来指定， 如果不指定(直接 `listen 443`)或者指定为 `listen [::]:443` 都不行
 
 接下来我们测试一下 分流的情况:
 
@@ -588,8 +588,8 @@ suc conn=&{0xc00000e048 false 0 {0 0} <nil> 0 false 0xc000001500 0 false 0 [] []
 
 ### 1. 远程地址全部变成 127.0.0.1
 ```text
-原端口访问 -->  connected: 125.xx.xx.xxx:63034
-443 端口访问 -->  connected: 127.0.0.1:10291
+原端口访问 -->  客户端ip=125.xx.xx.xxx:63034
+443 端口访问 -->  客户端ip=127.0.0.1:10291
 ```
 
 后面可以启用 realip 模块
@@ -597,7 +597,7 @@ suc conn=&{0xc00000e048 false 0 {0 0} <nil> 0 false 0xc000001500 0 false 0 [] []
 ### 2. 跟其他的 nginx wss 的服务一起配置会有问题
 因为 SNI 要配置 nginx.conf 文件，但是其他的 nginx 代理转发 wss， 是可以配置在 site-avaliable 目录下的。如果要共存的话是会有问题的。
 
-假设我们还有一个 nginx wss 的代理，域名是 `test-cn-2-data.airdroid.com`, 那么他也是要走分流的
+假设我们还有一个 nginx wss 的代理，域名是 `test-cn-2-data.airdroid.com`, 那么他也是要走分流的， 那么 nginx.conf 的配置如下:
 
 ```text
 [root@VM-0-13-centos conf]# cat nginx.conf
@@ -613,7 +613,7 @@ stream {
     map $ssl_preread_server_name $stream_map {
         test-web-proxy.airdroid.com web;
         test-tcp-proxy.airdroid.com bd;
-        test-cn-2-data.airdroid.com data
+        test-cn-2-data.airdroid.com data;
     }
 
     upstream bd {
@@ -627,9 +627,9 @@ stream {
     upstream data {
         server 127.0.0.1:9443;
     }
-  
+
     server {  
-        listen 172.16.0.13:443 reuseport;
+        listen 172.16.0.13:443;
         proxy_pass $stream_map;
         ssl_preread on;
     }  
@@ -639,54 +639,67 @@ stream {
 http {
     server {
         listen 127.0.0.1:443 ssl http2;
-        ssl_certificate      ssl_airdroid.com/airdroid.com.crt;
-        ssl_certificate_key  ssl_airdroid.com/airdroid.com.key;
+        ssl_certificate      ssl/now/airdroid.com.crt;
+        ssl_certificate_key  ssl/now/airdroid.com.key;
         ssl_protocols        SSLv3 TLSv1 TLSv1.1 TLSv1.2;
         ssl_ciphers  HIGH:!aNULL:!MD5;
         ssl_prefer_server_ciphers  on;
         port_in_redirect off;
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
     }
-    include /usr/local/nginx/conf/sites-enabled/data.conf;	
+    include /usr/local/nginx/conf/site-avaliable/wss.conf;	
 }
 ```
-然后 `/usr/local/nginx/conf/sites-enabled/data.conf` 就是:
+然后 `/usr/local/nginx/conf/site-avaliable/wss.conf` 就是:
 ```text
-[root@VM-0-13-centos conf]# cat /usr/local/nginx/conf/sites-enabled/test-cn-2-data.airdroid.com.conf
+[root@VM-0-13-centos site-avaliable]# cat wss.conf 
 map $http_upgrade $connection_upgrade {
     default upgrade;
     '' close;
 }
 upstream data{
-
-        server 127.0.0.1:8088 fail_timeout=0;
+        server 127.0.0.1:8007 fail_timeout=0;
 }
 
 server {
     server_name  test-cn-2-data.airdroid.com;
     listen       9443 ssl http2;
-    #include     ssl/ssl_airdroid.com.conf;
-    include      ssl/ssl_id_airdroid.com.conf;
-    access_log /var/log/nginx/test-cn-2-data.airdroid.com.access.log main;
-    access_log /var/log/nginx/test-cn-2-data.airdroid.com.4xx5xx.log combined if=$loggable;
-    error_log /var/log/nginx/test-cn-2-data.airdroid.com.error.log warn;
+    ssl_certificate      ssl/now/airdroid.com.crt;
+    ssl_certificate_key  ssl/now/airdroid.com.key;
+    ssl_protocols        SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers  HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers  on;
     port_in_redirect off;
-    location / {
-       proxy_pass http://data;
-        proxy_read_timeout 1800s;
-        proxy_send_timeout 1800s;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
+    location = /ws {
+            proxy_pass http://data;
+            
+            proxy_read_timeout 300s;
+            proxy_send_timeout 300s;
+            
+            proxy_set_header Host $host;
+            proxy_set_header X-real-ip $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+   }
 }
 ```
+就跟我们在 {% post_link nginx-proxy-wss-https %} nginx.conf 的配置差不多，只不过是挪到了 site-avaliable 中
+
+具体效果:
+
+![](1.png)
 
 其实就是将 https 的 443 再转发到 9443。 通过  port_in_redirect 这个配置。 他默认是 on 的， 也就是当前 listen 是多少端口，那么就反代什么端口。
 
-但是对于本例来说，我们要反代的端口是不一样的，从 443 -> 9443, 所以我们要将其关掉。 不过 data 程序就会变成 二级代理的方式了。
+但是对于本例来说，我们要反代的端口是不一样的，从 443 -> 9443, 所以我们要将其关掉。 同时 wss 的 data 程序就会变成 二级代理的方式了。
+
+这样子就可以在原来 SNI 分流的基础上，再接入之前的 wss 转发代理服务了。缺点就是因为变成了二级代理的方式，每次都要多设置一个代理端口，本例就是 9443 端口。
 
 ### 3. 关于 android 6.0 及以下的握手问题
 之前用 SNI 的时候，还有出现一个问题，就是在我们的 app 上， android 7.0 及以上的设备都可以成功连接上。 但是 android 6.0 及以下的设备却是会握手失败。
