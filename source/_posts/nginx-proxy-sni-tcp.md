@@ -8,7 +8,7 @@ tags:
 categories: nginx相关
 ---
 ## 前言
-之前有处理过 {% post_link nginx-proxy-wss-https %}, 后面发现我们的服务还有一些是 tcp 长连接，而且还支持 tls 的 tcp 长连接。 这个也是非 80 和 443 端口的。 后面也需要用 nginx 转发代理一下。
+之前有处理过 {% post_link nginx-proxy-wss-https %}, 后面发现我们的服务还有一些是 tcp 长连接，而且还是支持 tls 的 tcp 长连接。 这个也是非 80 和 443 端口的。 后面也需要用 nginx 转发代理一下。
 
 ## nginx 支持 tcp 层的转发
 nginx 1.9 开始支持 tcp 层的转发，通过 stream 实现的，而 socket 也是基于 tcp 通信，跟 ws 和 wss 不一样， 本质上 ws 虽然也是长连接， 但是他是基于 http 的协议上去进行协议升级的，所以可以写在 http 指令串里面。
@@ -148,7 +148,7 @@ stream {
 }
 ```
 
-逻辑很简单，如果是 tcp 请求，那么就将 8006 端口代理到上游服务器的 8008 端口中。
+逻辑很简单，如果是 tcp 请求，那么就将 8006 端口代理到上游服务的 8008 端口中。
 
 先启动 demo 的 server， 再启动 demo 的 client，然后两者进行交互， server log 如下:
 ```text
@@ -270,7 +270,7 @@ q
 
 可以看到转发没有问题。 而且也不一定要合法证书，用自建证书，然后 ip 地址连接，然后再配置跳过 ssl 校验的话，那么是可以的。
 
-这样子就可以将 入口的 tls tcp 转发到非 tls 的 tcp 后端程序。 跟之前用 nginx 代理 wss 一样， 后端程序不用改， 走 nginx 即可。
+这样子就可以将 入口的 tls tcp 转发到非 tls 的 tcp 后端程序。 跟之前用 nginx 代理 wss 一样， 后端程序不用改成 tls， 走 nginx 即可。
 
 ## 使用 SNI 来使得 https 和 tls tcp 复用 443 端口
 正常情况下， 在 同一个 nginx 配置中， http 块 和 stream 是没办法同时监听 443 端口的。 [How to combine nginx "stream" and "http" for the same servername?](https://stackoverflow.com/questions/65033538/how-to-combine-nginx-stream-and-http-for-the-same-servername)
@@ -339,7 +339,7 @@ suc conn=&{{0xc0000c4100}},客户端ip=127.0.0.1:35825
 ```text
 [root@VM-0-13-centos sbin]# curl https://127.0.0.1:443 --insecure
 ```
-发现没有走 http 块，还是走到 stream 块，所以直接转发到 上游服务器 8008 端口那边:
+发现没有走 http 块，还是走到 stream 块，所以直接转发到 上游服务 8008 端口那边:
 ```text
 suc conn=&{{0xc0000e4000}},客户端ip=127.0.0.1:36171
  等待客户端连接
@@ -586,18 +586,10 @@ suc conn=&{0xc00000e048 false 0 {0 0} <nil> 0 false 0xc000001500 0 false 0 [] []
 
 ## 后续遇到的问题
 
-### 1. 远程地址全部变成 127.0.0.1
-```text
-原端口访问 -->  客户端ip=125.xx.xx.xxx:63034
-443 端口访问 -->  客户端ip=127.0.0.1:10291
-```
+### 1. 跟其他的 nginx wss 的服务一起配置会有问题
+因为 SNI 要配置在 nginx.conf 文件，但是其他的 nginx 代理转发 wss， 是可以配置在 site-avaliable 目录下的。如果要共存的话是会有问题的。
 
-后面可以启用 realip 模块
-
-### 2. 跟其他的 nginx wss 的服务一起配置会有问题
-因为 SNI 要配置 nginx.conf 文件，但是其他的 nginx 代理转发 wss， 是可以配置在 site-avaliable 目录下的。如果要共存的话是会有问题的。
-
-假设我们还有一个 nginx wss 的代理，域名是 `test-wss-data.example.com`, 那么他也是要走分流的， 那么 nginx.conf 的配置如下:
+假设我们还有一个 nginx wss 的代理，域名是 `test-wss-data.example.com`, 那么他也是要走分流的 (流量被劫持了)， 那么 nginx.conf 的配置如下:
 
 ```text
 [root@VM-0-13-centos conf]# cat nginx.conf
@@ -695,13 +687,13 @@ server {
 
 ![](1.png)
 
-其实就是将 https 的 443 再转发到 9443。 通过  port_in_redirect 这个配置。 他默认是 on 的， 也就是当前 listen 是多少端口，那么就反代什么端口。
+其实就是将 443 再转发到 9443。 通过  port_in_redirect 这个配置。 他默认是 on 的， 也就是当前 listen 是多少端口，那么就反代什么端口。
 
 但是对于本例来说，我们要反代的端口是不一样的，从 443 -> 9443, 所以我们要将其关掉。 同时 wss 的 data 程序就会变成 二级代理的方式了。
 
 这样子就可以在原来 SNI 分流的基础上，再接入之前的 wss 转发代理服务了。缺点就是因为变成了二级代理的方式，每次都要多设置一个代理端口，本例就是 9443 端口。
 
-### 3. 关于 android 6.0 及以下的握手问题
+### 2. 关于 android 6.0 及以下的握手问题
 之前用 SNI 的时候，还有出现一个问题，就是在我们的 app 上， android 7.0 及以上的设备都可以成功连接上。 但是 android 6.0 及以下的设备却是会握手失败。
 
 后面通过对 android 6.0 和 android 7.0 的 443 端口的抓包:
