@@ -398,8 +398,8 @@ configure arguments: --prefix=/usr/local/nginx --with-http_ssl_module --with-str
 
 ### 前置准备工作 2: 设置域名和有效证书
 因为 SNI 是基于域名的，所以我们要准备两个域名，一个用于 tcp 转发，一个用于 http 转发
-- `test-tcp-proxy.airdroid.com`  这个是 tcp
-- `test-tcp-http.airdroid.com`  这个是 https
+- `test-tcp-proxy.example.com`  这个是 tcp
+- `test-tcp-http.example.com`  这个是 https
 
 ### 前置准备工作 3: 上游程序要支持 tls tcp 连接
 因为 SNI 是基于 tls 传输的，不仅客户端入口连接的时候，要走 tls 加密， 连上游服务器 upstream 在转发的时候也要走 tls 监听
@@ -413,7 +413,7 @@ suc conn=&{{0xc0000c2180}},客户端ip=127.0.0.1:29852
 服务器在等待客户端127.0.0.1:29852发送信息
 客户端发送的数据： ¸#△Έ©ԿL<:=枾^輁녆»¤ ׀'&¿¨8Ju{W°:L!:go2ేV%&ﾯﾰﾫﾬ̨̩ﾓ    ﾔ
 /5ﾒ
-est-tcp-proxy.airdroid.com
+est-tcp-proxy.example.com
                                                                                                                                                                                                                                                             
 ÿ+    3&$ L(¦²­
 LԼǹR껣 ¨َࠩ|·µX
@@ -454,7 +454,7 @@ func process(conn net.Conn) {
 }
 func main() {
 	fmt.Println("服务器开始监听端口")
-	crt, err := tls.LoadX509KeyPair("./airdroid.com.crt", "./airdroid.com.key")
+	crt, err := tls.LoadX509KeyPair("./example.com.crt", "./example.com.key")
 	if err != nil {
 		fmt.Println(fmt.Sprintf("phone load tls key pair err,%v", err.Error()))
 		os.Exit(1)
@@ -494,7 +494,7 @@ func main() {
 
 同时 客户端的那个 tls 的程序的连接地址也改成对应的地址:
 ```text
- conn, err := tls.Dial("tcp", "test-tcp-proxy.airdroid.com:443",  nil)
+ conn, err := tls.Dial("tcp", "test-tcp-proxy.example.com:443",  nil)
 ```
 这时候证书是合法的，不需要设置为不安全的选项
 
@@ -511,8 +511,8 @@ events {
 
 stream {  
     map $ssl_preread_server_name $stream_map {
-        test-web-proxy.airdroid.com web;
-        test-tcp-proxy.airdroid.com bd;
+        test-web-proxy.example.com web;
+        test-tcp-proxy.example.com bd;
 
     }
 
@@ -535,8 +535,8 @@ stream {
 http {
     server {
         listen 127.0.0.1:443 ssl http2;
-        ssl_certificate      ssl/now/airdroid.com.crt;
-        ssl_certificate_key  ssl/now/airdroid.com.key;
+        ssl_certificate      ssl/now/example.com.crt;
+        ssl_certificate_key  ssl/now/example.com.key;
         ssl_protocols        SSLv3 TLSv1 TLSv1.1 TLSv1.2;
         ssl_ciphers  HIGH:!aNULL:!MD5;
         ssl_prefer_server_ciphers  on;
@@ -574,7 +574,7 @@ suc conn=&{0xc00000e048 false 0 {0 0} <nil> 0 false 0xc000001500 0 false 0 [] []
 
 然后再用 curl 请求 https 试一下:
 ```text
-[root@VM-0-13-centos new-demo]# curl "https://test-web-proxy.airdroid.com"
+[root@VM-0-13-centos new-demo]# curl "https://test-web-proxy.example.com"
 <!DOCTYPE html>
 <html>
 <head>
@@ -597,7 +597,7 @@ suc conn=&{0xc00000e048 false 0 {0 0} <nil> 0 false 0xc000001500 0 false 0 [] []
 ### 2. 跟其他的 nginx wss 的服务一起配置会有问题
 因为 SNI 要配置 nginx.conf 文件，但是其他的 nginx 代理转发 wss， 是可以配置在 site-avaliable 目录下的。如果要共存的话是会有问题的。
 
-假设我们还有一个 nginx wss 的代理，域名是 `test-cn-2-data.airdroid.com`, 那么他也是要走分流的， 那么 nginx.conf 的配置如下:
+假设我们还有一个 nginx wss 的代理，域名是 `test-wss-data.example.com`, 那么他也是要走分流的， 那么 nginx.conf 的配置如下:
 
 ```text
 [root@VM-0-13-centos conf]# cat nginx.conf
@@ -611,9 +611,9 @@ events {
 
 stream {  
     map $ssl_preread_server_name $stream_map {
-        test-web-proxy.airdroid.com web;
-        test-tcp-proxy.airdroid.com bd;
-        test-cn-2-data.airdroid.com data;
+        test-web-proxy.example.com web;
+        test-tcp-proxy.example.com bd;
+        test-wss-data.example.com data;
     }
 
     upstream bd {
@@ -639,8 +639,8 @@ stream {
 http {
     server {
         listen 127.0.0.1:443 ssl http2;
-        ssl_certificate      ssl/now/airdroid.com.crt;
-        ssl_certificate_key  ssl/now/airdroid.com.key;
+        ssl_certificate      ssl/now/example.com.crt;
+        ssl_certificate_key  ssl/now/example.com.key;
         ssl_protocols        SSLv3 TLSv1 TLSv1.1 TLSv1.2;
         ssl_ciphers  HIGH:!aNULL:!MD5;
         ssl_prefer_server_ciphers  on;
@@ -665,10 +665,10 @@ upstream data{
 }
 
 server {
-    server_name  test-cn-2-data.airdroid.com;
+    server_name  test-wss-data.example.com;
     listen       9443 ssl http2;
-    ssl_certificate      ssl/now/airdroid.com.crt;
-    ssl_certificate_key  ssl/now/airdroid.com.key;
+    ssl_certificate      ssl/now/example.com.crt;
+    ssl_certificate_key  ssl/now/example.com.key;
     ssl_protocols        SSLv3 TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers  HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers  on;
