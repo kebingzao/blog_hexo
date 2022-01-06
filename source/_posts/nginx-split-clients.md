@@ -254,7 +254,8 @@ http {
             if ($uri ~* /([A-Za-z0-9_-]+)/mobile-device-management-free-trial/index.html) {
               set $lang $1;
             }
-            # resolver 8.8.8.8;
+            # 这个是用来进行域名解析
+            resolver 8.8.8.8;
             proxy_pass https://test.example.com/$lang/$ver; 
         }
         
