@@ -74,6 +74,9 @@ server {
 	}
 }
 ```
+
+> 注意这边有个多语言的 cookie 获取 : `$cookie_lang`, nginx 有 `$cookie_x` 变量，x 是 cookie 变量名， 所以 `$cookie_lang` 就是获取 key 为 lang 的 cookie 的值。
+
 然后在 action 这个页面的函数里面，加上域名的判断，如果是 foo.at 的域名，那么就得到后面的参数, 不管有没有多语言，最后一个路径就是参数
 ```html
 function init () {
