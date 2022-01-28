@@ -133,7 +133,7 @@ interval = setInterval(function() {
 参考资料:
 - [关于html的a标签的target="__blank "的安全漏洞问题](https://www.cnblogs.com/tugenhua0707/p/9709424.html)
 - [链接地址中的target=”_blank”属性，为钓鱼攻击打开了大门](https://www.freebuf.com/vuls/113634.html)
-- [使用<a>标签时，你可能会忽略的一个安全问题](https://juejin.im/post/5c36d52651882525e90dc800)
+- [使用 a 标签时，你可能会忽略的一个安全问题](https://juejin.im/post/5c36d52651882525e90dc800)
 - [Target="_blank" - the most underestimated vulnerability ever](https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/)
 - [About rel=noopener](https://mathiasbynens.github.io/rel-noopener/)
 
