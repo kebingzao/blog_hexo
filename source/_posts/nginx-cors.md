@@ -19,7 +19,7 @@ categories: nginx相关
 <!--more-->
 ```text
 set $origin 'https://www.example.com';
-if ($http_origin ~* ".example.com$") {
+if ($http_origin ~* ".example.com(:[\d]+)?$") {
     set $origin "$http_origin";
 }
 
@@ -34,7 +34,7 @@ if ($request_method = "OPTIONS") {
 ```
 
 同时这边注意几个细节:
-1. 对于请求的来源，只要是符合 `*.example.com` 的子域名，那么就可以允许跨域，通过 `$http_origin` 我们可以得到 request 请求的 `origin` 头部
+1. 对于请求的来源，只要是符合 `*.example.com` 的子域名(还允许最后面带 port 端口号)，那么就可以允许跨域，通过 `$http_origin` 我们可以得到 request 请求的 `origin` 头部
 2. 对于 Methods 的允许，我们这边只允许 `GET, POST, OPTIONS` 这 3 个方法，除非你明确有用到 `PUT` 或者 `DELETE`, 否则不要加上去，一切以最小化使用原则
 3. 对于 Headers 的允许，如果有自定义头部的话，也要补充到列表中，或者是有使用一些 auth 校验的，比如 http basic auth， 那么也要在这边加上 `Authorization` 这个头部，才能被允许
 4. 对于 `Credentials`, 如果默认允许携带 cookie 的话，就为 true， 如果不需要的话，可以设置为 false
