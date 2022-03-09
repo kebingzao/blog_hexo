@@ -27,6 +27,7 @@ add_header Access-Control-Allow-Origin $origin;
 add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';
 add_header Access-Control-Allow-Headers 'origin, content-type';
 add_header Access-Control-Allow-Credentials 'true';
+add_header Access-Control-Max-Age '86400';
 
 if ($request_method = "OPTIONS") {
     return 200;
@@ -40,7 +41,7 @@ if ($request_method = "OPTIONS") {
 4. 对于 `Credentials`, 如果默认允许携带 cookie 的话，就为 true， 如果不需要的话，可以设置为 false
 5. 对于是否要明确针对 options 请求进行捕获，并返回 200，我有用 chrome 试了一下， 好像没有加也是可以的， 不过为了完整性和更好理解，我这边还是手动将这个 options 的明确 200 返回加上去了。
 6. 上面的这个设置可以放到 location 路由外面，这样子可以全局生效，如果只想对某个路由生效，可以单独写在这个路由 location 的代码块里面。
-
+7. 可以加上 `Access-Control-Max-Age` 来对 `OPTIONS` 请求进行缓存，只要请求的 url 一致， 那么第二次浏览器就不会再发送预检请求了。具体可以看 {% post_link use-access-control-max-age %}
 
 
 

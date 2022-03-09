@@ -96,7 +96,15 @@ stderr_logfile = /var/log/supervisor/turnserver.error.log
 [2018-11-28 02:22:02] 0: IPv4. TCP listener opened on : 192.168.0.1:3479
 ```
 
+## 后记 -- 2022-03-09
+后面发现这样子好像也有其他问题导致， 刚好 coturn 的 `4.5.2` 的版本有优化了 log 输出的方式，允许定义 log 的输出格式: [4.5.2/ChangeLog](https://github.com/coturn/coturn/blob/upstream/4.5.2/ChangeLog)
+```text
+- merge PR #618 (by Paul Wayper)
+		* Print full date and time in logs
+		* Add new options: "new-log-timestamp" and "new-log-timestamp-format"
+```
 
+只要将版本升级上来，并且配置这两个参数，就可以了。
 
 
 
