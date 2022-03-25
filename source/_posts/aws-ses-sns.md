@@ -4,6 +4,7 @@ date: 2019-06-05 11:28:04
 tags: 
 - aws
 - ses
+- sns
 categories: aws 相关
 ---
 ## 前言
