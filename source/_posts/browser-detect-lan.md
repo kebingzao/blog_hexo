@@ -75,15 +75,9 @@ checkIpInLAN: function (ip) {
 所以这种方式也是没办法判断浏览器和客户端是在同一个局域网下的
 
 ## 3. 通过 webrtc 的 stun/turn 得到局域网 ip，然后扔给客户端，让客户端去 ping
-还有一种方式就是通过 webrtc 的 turn server 去获取当前浏览器的局域网 ip，然后将这个 ip 扔给客户端，让客户端去 ping，如果通，说明就在同一个局域网。
+还有一种方式就是通过 webrtc 的 stun/turn server 去获取当前浏览器的局域网 ip，然后将这个 ip 扔给客户端，让客户端去 ping，如果通，说明就在同一个局域网。
 
-但是我后面试了一下，发现这种方式会有问题， 正常的 webrtc 连接，在进行 sdp 和 ice 的交换完之后，成功连接的时候，如果这时候是在同一个局域网的话， ice 会返回 host 的凭证:
-```javascript
-{"candidate":"candidate:1316551156 1 udp 2122260223 192.168.40.51 56234 typ host generation 0 ufrag n4Ma network-id 1","sdpMid":"0","sdpMLineIndex":0}
-```
-这时候我们可以看到确实有出现过 host 信息，里面有浏览器的局域网 ip : `192.168.40.51`
-
-但是如果只是本地去连接 stun/turn server 的话，他返回的 host 信息是有问题的，变成这样子:
+但是我后面试了一下，发现这种方式会有问题， 他返回的 host 信息是有问题的，变成这样子:
 ```javascript
 {"candidate":"candidate:1316551156 1 udp 2113937151 493c5821-465b-41d5-9cfe-f0b703d3add6.local 57516 typ host generation 0 ufrag gjxD network-cost 999","sdpMid":"0","sdpMLineIndex":0}
 ```
@@ -91,11 +85,7 @@ checkIpInLAN: function (ip) {
 
 后面查了一下，原来 chrome 在 75 版本之后，使用了一种 mDNS 的技术，将 local ip 匿名了: [Google Chrome - Anonymize local IPs exposed by WebRTC prevents live view in cloud console](https://support.imperosoftware.com/support/solutions/articles/44001790065-google-chrome-anonymize-local-ips-exposed-by-webrtc-prevents-live-view-in-cloud-console)
 
-导致我们没办法看到这个局域网 ip。
-
-所以只是单纯的通过 stun/turn server 去检测的话， chrome 的 local ip 会被匿名， 我们也无从得知。
-
-这边附上操作代码:
+导致我们没办法看到这个局域网 ip。 这边附上操作代码:
 
 ```javascript
   const findIP = (onNewIP) => {      
@@ -103,11 +93,11 @@ checkIpInLAN: function (ip) {
       window.mozRTCPeerConnection ||
       window.webkitRTCPeerConnection
     const pc = new myPeerConnection({
-      iceServers: [{
-        urls: ["turn:turn.example.com:3478"],
-        credential: "8+aKeo7wxxxxGVkdwzqSs=",
-        username: "16486xxxxx9"
-      },] })
+      iceServers: [
+        {urls: 'stun:stun.l.google.com:19302'},
+        {urls: 'stun:stun.services.mozilla.com:3478'},
+        {urls: 'stun:stun.qq.com:3478'}
+      ] })
     const noop = () => {}
     const localIPs = {}
     const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g
@@ -136,18 +126,50 @@ checkIpInLAN: function (ip) {
   }
 
   const addIP = (ip) => {
-    console.log('got ip: ', ip)
+    document.body.append(`----get ip: ${ip}`)
   }
 
   findIP(addIP)
 ```
-
-值得说明一点的是，在连接 turn/stun server 的时候，我看到网上都是用 `stun:stun.services.mozilla.com` 这种公共的 stun 服务， 我试了一下得不到 host 信息， 换成自己搭的 turnserver， 后面就可以得到 host 信息，虽然被匿名了
-
-还有就是，这种方式虽然没办法得到局域网 ip， 但是却可以得到外网 ip， 以下就是我利用上述的程序得到的 外网 ip `125.xx.xx.250` :
+这种方式虽然没办法得到局域网 ip， 但是却可以得到外网 ip， 以下就是我利用上述的程序得到的 外网 ip `125.xx.xx.250` :
 ```javascript
  {"candidate":"candidate:842163049 1 udp 1677729535 125.xx.xx.250 55956 typ srflx raddr 0.0.0.0 rport 0 generation 0 ufrag 12LL network-cost 999","sdpMid":"0","sdpMLineIndex":0}
 ```
+
+这个在 chrome 是有配置项的: `chrome://flags/#enable-webrtc-hide-local-ips-with-mdns`, 默认是开启的。 如果将其设置为 disable 后， 那么是不会启用 mDNS 技术来隐藏真实的 local ip， 那么直接就是局域网 ip 了
+
+![1](5.png)
+
+```javascript
+{"candidate":"candidate:1316551156 1 udp 2122260223 192.168.40.51 56234 typ host generation 0 ufrag n4Ma network-id 1","sdpMid":"0","sdpMLineIndex":0}
+```
+
+### 有一种例外情况可以忽略 mDNS
+查阅了相关资料，发现有一种例外情况也可以显示原始的局域网 ip:
+
+{% blockquote WebRTC 公开的私有 IP 地址更改为 mDNS 主机名 https://groups.google.com/g/discuss-webrtc/c/6stQXi72BEU %}
+对应用程序的影响
+
+当该功能处于活动状态时，ICE 候选主机中的私有 IP 地址将被替换为 mDNS 主机名，例如1f4712db-ea17-4bcf-a596-105139dfd8bf.local 。
+目前，除具有 getUserMedia 权限的站点外，该功能对所有站点都有效，假定这些站点具有较高的用户信任度。 
+{% endblockquote %}
+
+那就是在有启用 `getUserMedia` 权限的站点 (要是 https 的站点)， 所以将上述的代码最后一行改为: 
+```javascript
+  navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then( stream => {
+    findIP(addIP)
+  }).catch(err => {
+    findIP(addIP)
+  })
+```
+
+这时候就会弹出授权框
+
+![1](6.png)
+
+点击允许之后，就会出现局域网 ip 了 (而且下一次不需要再授权了，只要有权限，那么就会有不匿名的局域网 ip)
+
+![1](7.png)
 
 ## 4. 跟客户端建立起 webrtc 连接，如果是在一个局域网的话，会有 localCandidate 信息
 目前最稳妥的方式，就是跟客户端建立起 webrtc 连接， 这时候如果真的是在同一个局域网下的话，就可以得到 localCandidate，那么就可以认为是在同一个局域网下了。
@@ -155,5 +177,9 @@ checkIpInLAN: function (ip) {
 ## 总结
 本文介绍了几种浏览器判断跟客户端是否在同一个局域网的方式， 前三种都有一定的问题， 只有第四种才能准确的判断是在同一个局域网下。
 
+---
 
+参考资料:
+- [WebRTC 公开的私有 IP 地址更改为 mDNS 主机名](https://groups.google.com/g/discuss-webrtc/c/6stQXi72BEU)
+- [Google Chrome - 匿名化 WebRTC 公开的本地 IP 可防止云控制台中的实时视图](https://support.imperosoftware.com/support/solutions/articles/44001790065-google-chrome-anonymize-local-ips-exposed-by-webrtc-prevents-live-view-in-cloud-console)
 
