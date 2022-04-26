@@ -174,8 +174,62 @@ checkIpInLAN: function (ip) {
 ## 4. 跟客户端建立起 webrtc 连接，如果是在一个局域网的话，会有 localCandidate 信息
 目前最稳妥的方式，就是跟客户端建立起 webrtc 连接， 这时候如果真的是在同一个局域网下的话，就可以得到 localCandidate，那么就可以认为是在同一个局域网下了。
 
+具体操作就是在 ice 连接成功的情况下， 这时候我们可以获取 webrtc 的统计数据(这个是一个异步)， 通过 RTCPeerConnection 对象的 getStats 方法:
+```javascript
+const report = await this.#pc.getStats()
+// 遍历report，按照 type 来分类
+/** @type {Record<string, any[]>} */
+const data = {};
+report.forEach((item) => {
+    if (data[item.type]) {
+        data[item.type].unshift(item)
+    } else {
+        data[item.type] = [item]
+    }
+});
+return data
+```
+然后这时候得到统计数据之后, 就可以去找到当前连接的通道 `transport`, 然后在 `candidate-pair` 找到这个通道,  然后接下来在 `local-candidate` 找到这个 id, 最后一步就是判断是不是 host 了
+
+具体的代码如下:
+```javascript
+/**
+ * 通过 webrtc 的 stat 数据来判断当前连接的通道是否是局域网
+ * @param stat
+ * @returns {boolean}
+ */
+checkIsLocalCandidateType(stat){
+  const originRaw = stat._raw
+  // 找到当前连接的通道
+  if(originRaw.transport?.length){
+    const selectedCandidatePairId = originRaw.transport[0].selectedCandidatePairId
+    // 然后在 candidate-pair 找到这个通道
+    if(originRaw["candidate-pair"]?.length){
+      let targetCandidate = originRaw["candidate-pair"].filter(item => item.id === selectedCandidatePairId)
+      if(targetCandidate.length){
+        let localCandidateId = targetCandidate[0]["localCandidateId"]
+        // 然后接下来在 local-candidate 找到这个 id
+        if(originRaw["local-candidate"]){
+          let targetLocalCandidate = originRaw["local-candidate"].filter(item => item.id === localCandidateId)
+          if(targetLocalCandidate.length){
+            let candidateType = targetLocalCandidate[0]["candidateType"]
+            // 最后一步就是判断是不是 host 了
+            logger.debug(`[WebRtcProcess] checkIsLocalCandidateIdFromWebRtcStats: ${candidateType}`)
+            return candidateType === "host"
+          }
+        }
+      }
+    }
+  }
+  return false
+}
+```
+这个是在 ice 连接之后， 第一次获取 getStats 方法的时候，就可以判断， 因为 ice 连接之后，说明当前的 webrtc 肯定是有连接的 transport 通道的， 只要当前的这一条通道的 `local-candidate` 的值是 host， 那么就肯定是在同一个局域网下。
+
+通过这种方式绝大部分情况下是可以判断浏览器和客户端是在同一个局域网下，但是有一种情况下会误判， 就是当前是局域网，但是网络连通不好，导致不是 host 先连上，而是穿透(srflx)或者转发(relay)先连上 transport, 这时候第一次的 getStats 就不会是 host 了，因为他当前的连接通道确实不是 host。
+
 ## 总结
-本文介绍了几种浏览器判断跟客户端是否在同一个局域网的方式， 前三种都有一定的问题， 只有第四种才能准确的判断是在同一个局域网下。
+本文介绍了几种浏览器判断跟客户端是否在同一个局域网的方式， 前三种都有一定的问题， 只有第四种才能比较准确的判断是在同一个局域网下，但也不是绝对准确。
 
 ---
 
