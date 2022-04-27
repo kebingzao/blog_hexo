@@ -228,6 +228,26 @@ checkIsLocalCandidateType(stat){
 
 通过这种方式绝大部分情况下是可以判断浏览器和客户端是在同一个局域网下，但是有一种情况下会误判， 就是当前是局域网，但是网络连通不好，导致不是 host 先连上，而是穿透(srflx)或者转发(relay)先连上 transport, 这时候第一次的 getStats 就不会是 host 了，因为他当前的连接通道确实不是 host。
 
+同时需要注意一点的是，正常情况下这个 host 的 `RTCIceCandidate` 也是不会显示 局域网 ip 的， 而且他不是用 mDNS 加密，而是直接为空:
+```javascript
+{
+		"id": "RTCIceCandidate_1wdP0rnA",
+		"timestamp": 1651027428646,
+		"type": "local-candidate",
+		"transportId": "RTCTransport_audio_1",
+		"isRemote": false,
+		"networkType": "unknown",
+		"ip": "",
+		"address": "",
+		"port": 63261,
+		"protocol": "udp",
+		"candidateType": "host",
+		"priority": 2113937151
+	}
+```
+
+也是只有在启用 `getUserMedia` 权限，才会显示局域网 ip 出来。
+
 ## 总结
 本文介绍了几种浏览器判断跟客户端是否在同一个局域网的方式， 前三种都有一定的问题， 只有第四种才能比较准确的判断是在同一个局域网下，但也不是绝对准确。
 
