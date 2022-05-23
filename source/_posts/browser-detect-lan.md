@@ -200,25 +200,46 @@ return data
  */
 checkIsLocalCandidateType(stat){
   const originRaw = stat._raw
-  // 找到当前连接的通道
+  // console.log(JSON.stringify(originRaw))
+  const throwErr = (msg) => {
+    throw { msg: `[checkIsLocalCandidateType]: ${msg}` }
+  }
+  const findLocalCandidate = (targetCandidate) => {
+    if(targetCandidate.length){
+      let localCandidateId = targetCandidate[0]["localCandidateId"]
+      // 然后接下来在 local-candidate 找到这个 id
+      if(originRaw["local-candidate"]){
+        let targetLocalCandidate = originRaw["local-candidate"].filter(item => item.id === localCandidateId)
+        if(targetLocalCandidate.length){
+          let candidateType = targetLocalCandidate[0]["candidateType"]
+          // 最后一步就是判断是不是 host 了
+          logger.debug(`[WebRtcProcess] => checkIsLocalCandidateIdFromWebRtcStats: ${candidateType}`)
+          return candidateType === "host"
+        }else{
+          throwErr("local-candidateType not found")
+        }
+      }else{
+        throwErr("local-candidate not found")
+      }
+    }else{
+      throwErr("targetCandidate not found")
+    }
+  }
+  // 找到当前连接的通道, 这个是 chrome 的流程
   if(originRaw.transport?.length){
     const selectedCandidatePairId = originRaw.transport[0].selectedCandidatePairId
     // 然后在 candidate-pair 找到这个通道
     if(originRaw["candidate-pair"]?.length){
       let targetCandidate = originRaw["candidate-pair"].filter(item => item.id === selectedCandidatePairId)
-      if(targetCandidate.length){
-        let localCandidateId = targetCandidate[0]["localCandidateId"]
-        // 然后接下来在 local-candidate 找到这个 id
-        if(originRaw["local-candidate"]){
-          let targetLocalCandidate = originRaw["local-candidate"].filter(item => item.id === localCandidateId)
-          if(targetLocalCandidate.length){
-            let candidateType = targetLocalCandidate[0]["candidateType"]
-            // 最后一步就是判断是不是 host 了
-            logger.debug(`[WebRtcProcess] checkIsLocalCandidateIdFromWebRtcStats: ${candidateType}`)
-            return candidateType === "host"
-          }
-        }
-      }
+      return findLocalCandidate(targetCandidate)
+    }else{
+      throwErr("candidate-pair not found")
+    }
+  }else{
+    // firefox 是没有 transport 参数的，要额外处理
+    if(originRaw["candidate-pair"]?.length){
+      let targetCandidate = originRaw["candidate-pair"].filter(item => item["selected"] === true && item["state"] === "succeeded")
+      return findLocalCandidate(targetCandidate)
     }
   }
   return false
