@@ -72,4 +72,10 @@ categories: 杂文
 ## [深度剖析：Redis 分布式锁到底安全吗](https://mp.weixin.qq.com/s/7CyLIxVe6QkqscdxA7UE1A)
 推荐理由: 我看过最有深度的关于 redis 分布式锁的分析文章。尤其是在安全方面的思考，更是写的非常好。非常值得一看
 
+## [代码安全指南](https://github.com/kebingzao/secguide)
+推荐理由: 面向开发人员梳理的代码安全指南，旨在梳理API层面的风险点并提供详实可行的安全编码方案。基于DevSecOps理念，我们希望用开发者更易懂的方式阐述安全编码方案，引导从源头规避漏洞。
+
+## [Golang 编程思维和工程实战](https://mp.weixin.qq.com/s/llmE9QpnrvA02AtvfHtqJQ)
+推荐理由: Golang 的一些编程思维和思想，以及总结一些常见的优雅编程实战技巧。 goer 必看
+
 
