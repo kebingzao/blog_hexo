@@ -169,7 +169,7 @@ categories: 前端工具集
         },
 
         xhrRequest: function (opts) {
-            var self, url, data, type, dataType, async, resp, defer, xhr, maxTime, withCredentials;
+            var self, url, data, type, dataType, async, resp, defer, xhr, maxTime, withCredentials, timeout;
 
             defer = opts.defer || Deferred();
             maxTime = opts.maxTime || 3;
@@ -182,6 +182,8 @@ categories: 前端工具集
             async = opts.async;
             dataType = opts.dataType;
             type = opts.type;
+            timeout = opts.timeout;
+            var _timer = null;
             // 是否允许跨域的时候，带上cookie
             // 如果是同步请求的话，必须要为false，不然会报错
             withCredentials = async ? !!opts.withCredentials : false;
@@ -195,6 +197,7 @@ categories: 前端工具集
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
                     defer.responseText = xhr.responseText;
+                    clearTimeout(_timer)
                     switch (xhr.status) {
                         case 200:
                             resp = self.decodeResponse(xhr.responseText, dataType);
@@ -205,8 +208,8 @@ categories: 前端工具集
                             if (opts.countTime < maxTime) {
                                 opts.request(opts);
                             } else {
-                                opts.fail && opts.fail();
-                                defer.reject();
+                                opts.fail && opts.fail(xhr);
+                                defer.reject(xhr);
                             }
                             break;
                     }
@@ -226,6 +229,12 @@ categories: 前端工具集
 
             if (!async) {
                 defer.responseText = xhr.responseText;
+            }else if(timeout) {
+              _timer = setTimeout(function () {
+                xhr.abort();
+                opts.fail && opts.fail(xhr);
+                defer.reject(xhr)
+              }, timeout)
             }
 
             return defer;
