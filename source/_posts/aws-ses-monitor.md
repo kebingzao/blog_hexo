@@ -262,6 +262,45 @@ server {
 }
 ```
 
+### 7. 为什么有些用户在打开邮件中链接地址时，报400错误
+首先我们需要了解 ses 什么时候才会生成跟踪链接:
+
+Amazon SES 需要电子邮件中的链接包含正确编码的 URL。具体来说，链接中的 URL 必须符合 RFC 3986 的要求。如果电子邮件中的链接编码不正确，收件人仍会在电子邮件中看到链接，但 Amazon SES 不会跟踪链接的单击事件。
+
+与不正确编码相关的问题通常出现在包含查询字符串的 URL 中。例如，如果电子邮件中的链接 URL 在查询字符串中包含非编码空格字符（例如以下示例中“John”和“Doe”之间的空格：`http://www.example.com/path/to/page?name=John Doe`），则 Amazon SES 不会跟踪此链接。然而，如果此 URL 改用编码空格字符（例如以下示例中的“%20”：`http://www.example.com/path/to/page?name=John%20Doe`），则 Amazon SES 将按预期跟踪它。
+
+比如，我们邮件服务生成验证邮件时，会生成类似的邮件验证地址：
+
+```
+https://id.example.com/signinverify?code=E68JJD9MV3&mail=jm-kkbbzz%40163.com&name=OPPO A33m
+```
+
+这里看到query string中mail的值做了url编码，而name的值并没有做url编码（不论什么语言，新的实现方式都要求使用rfc3986的标准，对于旧编码兼容旧标准），所以像以上的邮件验证地址，是不会被ses跟踪的。如果是下面这个的话
+
+```
+https://id.example.com/signinverify?code=E68JJD9MV3&mail=jm-kkbbzz%40163.com&name=OPPO
+```
+
+这个链接地址满足rfc3986的url串，是会被ses跟踪。
+
+那么为啥有些用户在打开邮件中的链接地址的时候，会报 400 错误? 我们了解到了什么时候ses才会生成跟踪链接，而大部分我们接收到用户报400错误的邮件跟踪地址都是因为邮件客户端url串解码的问题。
+
+比如139邮箱客户端，他会对url做了二次解码，导致我们ses生成的URL地址无法被ses统计服务正确解析URL，所以报了http 400 bad request，也就是请求格式不正确。
+
+以下就是在 139 邮箱客户端点击访问的最终的 url:
+```text
+GET https://mail-stat.example.com/CL0/https://id.example.com/signinverify?code=NZJUK4YMRJST&mail=kkbbzz1%40163.com&name=KOZ-AL00/1/010001816026a82e-ed8bf730-9218-4bda-b6f6-f4cee9b40211-000111/nVJFAfXMPlF3tMn_oOcfaMxq9lDgIr3xTGYzY=252 HTTP/1.1
+```
+
+但是正确的资源 url 应该是:
+```text
+GET https://mail-stat.example.com/CL0/https:%2F%2Fid.example.com%2Fsigninverify%3Fcode=NZJUK4YMRJST%26mail=kkbbzz1%2540163.com%26name=KOZ-AL00/1/010001816026a82e-ed8bf730-9218-4bda-b6f6-f4cee9b40211-000111/nVJFAfXMPlF3tMn_oOcfaMxq9lDgIr3xTGYzY=252 HTTP/1.1
+```
+
+从上面可以看出139邮箱在使用外部浏览器或内置浏览器访问url时，提前做了一次url解码，导致 mail-stat 读取到时没有找到正确的原始地址。
+
+所以建议用户使用浏览器或是其他邮箱客户端访问 (web、iOS邮箱客户端/网易邮箱大师、安卓电子邮件客户端/邮箱大师，都能正常打开)。
+
 ## 总结
 通过 SES + SNS 的邮件事件监控机制，我们可以了解到我们发出去的每一封邮件的具体用户行为结果，甚至是哪些投递是失败的情况， 更好的进行运营分析
 
