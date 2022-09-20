@@ -368,7 +368,7 @@ Info:	[label            ] scrambled 	:   131570
 - [Docker container does not inherit ulimit from host](https://stackoverflow.com/questions/36298913/docker-container-does-not-inherit-ulimit-from-host)
 - [Docker LNMP环境搭建](https://www.awaimai.com/2120.html)
 - [LNMP一键安装程序](https://github.com/kebingzao/dnmp)
-
+- [破解由 YAK Pro - Php Obfuscator 混淆PHP代码的手段](https://github.com/demonxian3/crack-yakpro-php)
 
 
 
