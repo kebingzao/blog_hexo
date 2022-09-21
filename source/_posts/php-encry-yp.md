@@ -354,11 +354,38 @@ Info:	[label            ] scrambled 	:   131570
 --no-obfuscate-constant-name           不混淆常量
 ```
 
-> 因为测试的周期时间关系，我并没有将上述那些混淆出问题的配置一个一个去测试和联调，不过如果是复杂度和代码量都比较高的项目， 大概率会出问题。 尤其是一些依赖的第三方库，可能也会改到
+因为测试的周期时间关系，我并没有将上述那些混淆出问题的配置一个一个去测试和联调，不过如果是复杂度和代码量都比较高的项目， 大概率会出问题。 尤其是一些依赖的第三方库，可能也会改到, 正常调整的话， 如果遇到不好改的，或者调整比较大的，可以配合他的 ignore 参数来忽略这些要加密的配置, 比如一些常量或者函数要调整，但是调用的地方太多了，不太好改，就可以通过这种配置将其忽略混淆:
+```text
+$conf->t_ignore_constants               = null;         // array where values are names to ignore.
+$conf->t_ignore_variables               = null;         // array where values are names to ignore.
+$conf->t_ignore_functions               = null;         // array where values are names to ignore.
+$conf->t_ignore_class_constants         = null;         // array where values are names to ignore.
+$conf->t_ignore_methods                 = null;         // array where values are names to ignore.
+$conf->t_ignore_properties              = null;         // array where values are names to ignore.
+$conf->t_ignore_classes                 = null;         // array where values are names to ignore.
+$conf->t_ignore_interfaces              = null;         // array where values are names to ignore.
+$conf->t_ignore_traits                  = null;         // array where values are names to ignore.
+$conf->t_ignore_namespaces              = null;         // array where values are names to ignore.
+$conf->t_ignore_labels                  = null;         // array where values are names to ignore.
+
+$conf->t_ignore_constants_prefix        = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_variables_prefix        = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_functions_prefix        = null;         // array where values are prefix of names to ignore.
+
+$conf->t_ignore_class_constants_prefix  = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_properties_prefix       = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_methods_prefix          = null;         // array where values are prefix of names to ignore.
+
+$conf->t_ignore_classes_prefix          = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_interfaces_prefix       = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_traits_prefix           = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_namespaces_prefix       = null;         // array where values are prefix of names to ignore.
+$conf->t_ignore_labels_prefix           = null;         // array where values are prefix of names to ignore.
+```
 
 > 而且因为 php 是边执行边解释，所以还会导致混淆的时候，不会报错，但是后面执行的时候，突然间就报错，这个是很不可控的，如果要避免这种情况，就会有完整的单元测试来覆盖所有的接口和逻辑以保证混淆后的代码没有异常，这个成本也是非常高的
 
-如果只是基于上述可以 work 的配置的话，结果就是混淆的程度太低了，跟单文件混淆加密没啥区别， 解密难度其实不高。 而如果再加上上述一些混淆程度比较高的配置的话，又会很容易导致代码执行出问题。所以这个要看场景吧，如果是代码规范比较好的，代码量不会太多的是，其实可以用的。
+**如果只是基于上述可以 work 的配置的话，结果就是混淆的程度太低了，跟单文件混淆加密没啥区别， 解密难度其实不高。 而如果再加上上述一些混淆程度比较高的配置的话，又会很容易导致代码执行出问题。所以这个要看场景吧，如果是代码规范比较好的，代码量不会太多的是，其实可以用的。**
 
 ---
 
