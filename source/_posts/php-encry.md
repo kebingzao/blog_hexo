@@ -245,6 +245,8 @@ Swoole Compiler 是识沃科技推出的 PHP 代码加密和客户端授权解�
 
 后面有使用了一下`yakpro-po`开源的混淆加密: {% post_link php-encry-yp %}
 
+还试了 `swoole compiler` 的扩展加密:  {% post_link php-encry-sc %}
+
 ---
 
 参考资料:
