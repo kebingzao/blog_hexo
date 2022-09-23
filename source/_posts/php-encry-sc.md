@@ -140,6 +140,24 @@ swoole_loader
 
 可以看到原先是加密的 php 文件可以正常解析了。 
 
+然后我们再试下将 swoole_loader 的扩展重新去掉(先修改 php.init，再重启容器)，看能不能正常
+```text
+[root@VM-16-223-centos ~]# docker restart php
+php
+[root@VM-16-223-centos ~]# docker exec -it php /bin/sh
+/www # cat /usr/local/etc/php/php.ini | grep swoo
+;extension=swoole_loader.so
+;[swoole_loader]                                                                           
+;swoole_loader.license_files=/www/localhost/sc/swoole-compiler.license
+/www # php -m | grep swo
+```
+这时候就没有安装扩展了， 重新请求一下加密的那个 php 文件，就可以看到:
+```text
+[root@VM-16-223-centos ~]# curl "http://localhost/sc/sc_origin.php"
+Swoole Loader ext not installed
+```
+会直接报 swoole loader 没有安装
+
 ## 总结
 从目前的试用来看，应该是没啥问题，如果还要进一步测试，而且考虑到源代码不上传，那么就要至少购买基础版才能继续了
 
