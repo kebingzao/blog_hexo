@@ -243,9 +243,12 @@ Swoole Compiler 是识沃科技推出的 PHP 代码加密和客户端授权解�
 
 混淆加密的好处就是免费的，有开源的程序可以直接用。 
 
-后面有使用了一下`yakpro-po`开源的混淆加密: {% post_link php-encry-yp %}
+以下是我针对上面几款的试用情况:
+- {% post_link php-encry-yp %}
+- {% post_link php-encry-sc %}
+- {% post_link php-encry-io %}
 
-还试了 `swoole compiler` 的扩展加密:  {% post_link php-encry-sc %}
+**最后觉得 ionCube 不管是易用性还是安全性，都会比较好**
 
 ---
 
