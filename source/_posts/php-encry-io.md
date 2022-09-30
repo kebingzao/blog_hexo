@@ -260,7 +260,16 @@ Device: fd01h/64769d    Inode: 792587      Links: 1
 
 所以我怀疑他这个加密过程是要绑定宿主机的某些参数的，在容器就会执行失败，报这个错误
 
-#### 4.4 关于加密器的各种指令内容和文档
+#### 4.4 加密文件头部的通用注释，在正式版本是不会有的
+用试用版本加密的文件头部都会有这一串, 并且不能用 `--add-comment` 指令的内容覆盖
+```text
+// IONCUBE ENCODER 12.0 EVALUATION
+// THIS LICENSE MESSAGE IS ONLY ADDED BY THE EVALUATION ENCODER AND
+// IS NOT PRESENT IN PRODUCTION ENCODED FILES
+```
+不过这一串在正式版本是不会有的，上面写的很清楚
+
+#### 4.5 关于加密器的各种指令内容和文档
 刚开始使用加密器加密的时候，一开始是通过 `-h` 查看使用文档，但是还是很不方便，去官网找了一圈，都没有找到对应的文档。
 
 后面发现加密指令文档，竟然是放在之前下载的 加密包文件夹的 docs 目录下的 `USER-GUIDE.pdf`, 这里面有完整的各种加密的指令的文档说明
