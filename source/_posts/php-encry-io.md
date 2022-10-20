@@ -369,6 +369,7 @@ if(extension_loaded('ionCube Loader')){die('The file '.__F
 因为是按照 license 买的，哪怕是最高级的 Cerberus 版本，一个 license 是 $399, 因为 license 是终身， 只要不换加密的机器，就可以一直用， 所以应该也不贵
 > 最高级的 Cerberus, 可以对加密的 php 文件做很多限制，包括并不限于，限制 php 的过期时间，限制 mac 地址，限制 ip 名单，添加许可证限制，添加允许linux的用户组限制
 
+> 后面真的去采购了Cerberus 版本，具体: {% post_link php-encry-io-2 %}
 
 ---
 
