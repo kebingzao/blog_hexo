@@ -184,23 +184,44 @@ error_reporting(E_ALL);
 --allowed-server 'www.foo.com@192.168.1.1{00:02:08:02:e0:c8}'
 ```
 
+接下来简单示例，假设我生成的时候，指定允许的 ip 是 `192.168.1.1`
+```text
+[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 test.php -o test-en.php  --add-comment="Encoded by Zachke" --allowed-server '192.168.1.1'
+```
+这时候我运行加密文件的时候，就会报这个错误:
+```text
+[Fri Oct 21 03:41:10 2022] PHP Fatal error:  <br>The encoded file <b>/root/enDir/test-en.php</b> is not permissioned for this server in Unknown on line 0
+[Fri Oct 21 03:41:10 2022] 127.0.0.1:50240 [500]: /test-en.php - <br>The encoded file <b>/root/enDir/test-en.php</b> is not permissioned for this server in Unknown on line 0
+```
+而我当前运行的局域网 ip 是 `192.168.40.72`, 所以我如果指定这个 ip 来生成的话:
+```text
+[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 test.php -o test-en-2.php  --add-comment="Encoded by Zachke" --allowed-server '192.168.40.72'
+```
+这时候就不会报这个错误:
+```text
+[root@localhost demo]# curl http://localhost:8011/test-en-2.php
+<h1 style="text-align: center;">welcome  test kbz DNMP !!
+```
+
+
 ### 10. 使用许可证 license 来加密
 我们还可以结合我们自己生成的 license 来进行加密。
 
 所以首先要先生成一份许可证文件，
 ```text
-make_license --pass <mypass> [options] -o <output-path>
+make_license --passphrase <mypass> [options] -o <output-path>
 ```
-可以指定一些限制条件，比如过期时间，限制 server 等等，ionCube 给的加密包中，其中就有包含生成许可证文件的程序，有两个，一个是 `make_license`, 一个是 64 位的 `make_license_64`
+可以指定一些限制条件，比如过期时间，限制 server 等等 (就跟 php 加密的指令一样)，ionCube 给的加密包中，其中就有包含生成许可证文件的程序，有两个，一个是 `make_license`, 一个是 64 位的 `make_license_64`
 
 生成许可证之后，就可以用这个指令进行加密了:
 ```text
 --with-license <path>
 ```
 
+#### 1. demo 1
 接下来举个例子，我先生成一个许可证, 这边有两个参数，一个是生成的密钥，一个是可以设置许可证的过期时间为 6 天
 ```text
-[root@localhost demo]# ../make_license_64 --pass abc123456 -o license_64.txt --expire-in 6d
+[root@localhost demo]# ../make_license_64 --passphrase abc123456 -o license_64.txt --expire-in 6d
 [root@localhost demo]# cat license_64.txt 
 ------ LICENSE FILE DATA -------
 TV4T0X720hezwwcBmG4bBrlg822dmi7R
@@ -216,9 +237,9 @@ NfNPCrRHyg9/BOk/JCqGpZyE
 ```
 有了许可证之后，我们就可以用这个许可证进行 php 代码的加密了:
 ```text
-[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 originDir -o enDir  --add-comment="Encoded by Zachke" --with-license license_64.txt --pass abc123456 --license-check auto
+[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 originDir -o enDir  --add-comment="Encoded by Zachke" --with-license license_64.txt --passphrase abc123456 --license-check auto
 ```
-这边注意两个细节， 一个是 `--with-license` 后面的许可证文件是相对路径， 一个是 `--pass` 是跟上面生成许可证的密钥一致。
+这边注意两个细节， 一个是 `--with-license` 后面的许可证文件是相对路径， 一个是 `--passphrase` 是跟上面生成许可证的密钥一致。
 
 这时候 enDir 里面的 php 文件就被加密了，不过因为 enDir 目录没有这个许可证，所以如果将 enDir 当做 php 的根目录启动的话:
 ```text
@@ -238,7 +259,79 @@ NfNPCrRHyg9/BOk/JCqGpZyE
 <h1 style="text-align: center;">welcome  test kbz DNMP !!</h1
 ```
 
-这时候就可以发现正常访问了，所以这个就是 license 的作用。
+这时候就可以发现正常访问了，但是这个还不算 license 的真正用途，license 的用途主要用于，我只需要加密一次 php 程序之后，就可以通过 license 来控制当前 php 文件能不能运行。
+
+比如说我交付一个服务到用户的服务器， 但是这个用户购买这个服务只购买了一年，一年到期了，如果他不续费的话， 那么 php 程序就不能再运行了(因为 license 过期了)， 但是他如果到期后续费的话， 那么我只需要再给他一个新的 license 文件，让他替换旧的 license 文件，这样子 php 程序又可以再跑一年。 
+
+所以 license 的价值就是在于可以自由控制加密后的 php 文件什么时候可以运行，什么时候不能运行，在 php 代码只加密一次的情况下， 可以用 license 来灵活控制， 而不需要频繁加密 php 程序。 下面给个 demo:
+
+#### 2. demo 2
+1. 首先先生成一个很快过期的 license， 比如 6 分钟过期:
+
+```text
+[root@localhost demo]# ../make_license_64 --passphrase abc123456 -o license_zach.txt --expire-in 6m
+[root@localhost demo]# cat license_zach.txt 
+------ LICENSE FILE DATA -------
+...
+```
+
+这时候得到了第一个 license -> `license_zach.txt`
+
+2. 接下来用这个 license 对 php 进行加密
+
+```text
+[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 originDir -o enDir  --add-comment="Encoded by Zachke" --with-license license_zach.txt --passphrase abc123456 --license-check auto
+```
+
+这时候就得到加密后的 php 目录
+
+3. 这时候将这个目录作为 php 的启动根目录:
+
+```text
+[root@localhost enDir]# php -S 0.0.0.0:8011 -t ./
+```
+
+然后运行里面的 php 加密文件，发现会报错:
+
+```text
+[Fri Oct 21 03:10:39 2022] 127.0.0.1:52654 [500]: /test.php - <br>The encoded file <b>/root/enDir/test.php</b> requires a license file <b>license_zach.txt</b>. in Unknown on line 0
+```
+
+因为根目录下找不到对应的license 文件 -> `license_zach.txt`
+
+4. 所以接下来我们将这个 license 文件放到了这个 php 的启动根目录下，这时候运行 php 文件就可以了:
+
+```text
+[root@localhost enDir]# curl http://localhost:8011/test.php
+<h1 style="text-align: center;">welcome  test kbz DNMP !!
+```
+
+5. 然后接下来等了 5 分钟后， 差不多原先的许可证过期了，再访问一下这个 php 文件，就会报这个错误:
+
+```text
+[Fri Oct 21 03:17:56 2022] PHP Fatal error:  <br>The encoded file <b>/root/enDir/test.php</b> requires a license file.<br>The license file <b>/root/enDir/license_zach.txt</b> has expired. in Unknown on line 0
+[Fri Oct 21 03:17:56 2022] 127.0.0.1:36428 [500]: /test.php - <br>The encoded file <b>/root/enDir/test.php</b> requires a license file.<br>The license file <b>/root/enDir/license_zach.txt</b> has expired. in Unknown on line 0
+```
+
+提示许可证已经过期了，无法运行
+
+6. 接下来再执行一下生成许可证的程序，注意密码 和 生成的文件名要一致:
+
+```text
+[root@localhost demo]# ../make_license_64 --passphrase abc123456 -o license_zach.txt --expire-in 1h
+```
+
+7. 然后将这个重新续费的许可证文件，直接覆盖原先的许可证文件就行了， 这时候重新运行 php 文件，就可以成功了。
+
+#### 3. 关于 passphrase 指令
+在之前的实践中，发现 passphrase 这个指令除了可以针对输入的密码当做密钥之外，还可以将某一个文件作为密钥，比如:
+```text
+[root@localhost demo]# cat zach.key 
+abc123456
+[root@localhost demo]# ../make_license_64 --passphrase zach.key  -o license_zach.txt --expire-in 1h
+[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 originDir -o enDir  --add-comment="Encoded by Zachke" --with-license license_zach.txt --passphrase zach.key --license-check auto
+```
+这样子也是可以的。
 
 ### 11. loader 没有装的运行提示和操作
 ```text
