@@ -190,3 +190,4 @@ total 68032
 - [线上bug追踪之Sentry初步尝试（一）](https://zhuanlan.zhihu.com/p/75385179)
 - [线上bug追踪之Sentry release+sourceMap（二）](https://zhuanlan.zhihu.com/p/75534743)
 - [线上bug追踪之Sentry 定制错误信息（三）](https://zhuanlan.zhihu.com/p/75534976)
+- [抓 Bug 神器的工作原理——聊聊 Sentry 的架构](https://baijiahao.baidu.com/s?id=1691152324720003928)
