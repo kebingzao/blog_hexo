@@ -445,6 +445,13 @@ document.body.addEventListener(
 ```
 
 ---
+相关 Sentry 系列文章:
+- {% post_link sentry-1 %}
+- {% post_link sentry-2 %}
+- {% post_link sentry-3 %}
+- {% post_link sentry-4 %}
+
+---
 参考资料:
 - [Sentry javascript platforms](https://docs.sentry.io/platforms/javascript/)
 

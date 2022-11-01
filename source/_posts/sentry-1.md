@@ -181,6 +181,13 @@ total 68032
 这样子最简单的安装就成功了。 接下来我们初始化用户并且配置邮件服务器.
 
 ---
+相关 Sentry 系列文章:
+- {% post_link sentry-1 %}
+- {% post_link sentry-2 %}
+- {% post_link sentry-3 %}
+- {% post_link sentry-4 %}
+
+---
 参考资料:
 - [Self-Hosted Sentry nightly](https://github.com/getsentry/self-hosted)
 - [Self-Hosted Sentry](https://develop.sentry.dev/self-hosted/)

@@ -116,6 +116,13 @@ docker-compose restart
 所以后面就统一修改 `sentry/config.yml` 配置就行了 (记得重启 compose )。
 
 ---
+相关 Sentry 系列文章:
+- {% post_link sentry-1 %}
+- {% post_link sentry-2 %}
+- {% post_link sentry-3 %}
+- {% post_link sentry-4 %}
+
+---
 参考资料:
 - [Self-Hosted Email](https://develop.sentry.dev/self-hosted/email/)
 - [如何使用IMAP服务？](https://service.mail.qq.com/cgi-bin/help?subtype=1&&id=28&&no=331)
