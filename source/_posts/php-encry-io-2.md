@@ -213,6 +213,8 @@ make_license --passphrase <mypass> [options] -o <output-path>
 ```
 可以指定一些限制条件，比如过期时间，限制 server 等等 (就跟 php 加密的指令一样)，ionCube 给的加密包中，其中就有包含生成许可证文件的程序，有两个，一个是 `make_license`, 一个是 64 位的 `make_license_64`
 
+`--passphrase` 这个就是要生成 license 的密钥，是一个字符串
+
 生成许可证之后，就可以用这个指令进行加密了:
 ```text
 --with-license <path>
@@ -322,16 +324,6 @@ NfNPCrRHyg9/BOk/JCqGpZyE
 ```
 
 7. 然后将这个重新续费的许可证文件，直接覆盖原先的许可证文件就行了， 这时候重新运行 php 文件，就可以成功了。
-
-#### 3. 关于 passphrase 指令
-在之前的实践中，发现 passphrase 这个指令除了可以针对输入的密码当做密钥之外，还可以将某一个文件作为密钥，比如:
-```text
-[root@localhost demo]# cat zach.key 
-abc123456
-[root@localhost demo]# ../make_license_64 --passphrase zach.key  -o license_zach.txt --expire-in 1h
-[root@localhost demo]# ../bin/ioncube_encoder56_12.0_64 originDir -o enDir  --add-comment="Encoded by Zachke" --with-license license_zach.txt --passphrase zach.key --license-check auto
-```
-这样子也是可以的。
 
 ### 11. loader 没有装的运行提示和操作
 ```text
