@@ -172,7 +172,7 @@ checkIpInLAN: function (ip) {
 ![1](7.png)
 
 ## 4. 跟客户端建立起 webrtc 连接，如果是在一个局域网的话，会有 localCandidate 信息
-目前最稳妥的方式，就是跟客户端建立起 webrtc 连接， 这时候如果真的是在同一个局域网下的话，就可以得到 localCandidate，那么就可以认为是在同一个局域网下了。
+目前最稳妥的方式，就是跟客户端建立起 webrtc 连接， 这时候如果真的是在同一个局域网下的话，就可以得到 localCandidate，同时他的值是 `host` 的话， 那么就可以认为是在同一个局域网下了。
 
 具体操作就是在 ice 连接成功的情况下， 这时候我们可以获取 webrtc 的统计数据(这个是一个异步)， 通过 RTCPeerConnection 对象的 getStats 方法:
 ```javascript
@@ -200,7 +200,6 @@ return data
  */
 checkIsLocalCandidateType(stat){
   const originRaw = stat._raw
-  // console.log(JSON.stringify(originRaw))
   const throwErr = (msg) => {
     throw { msg: `[checkIsLocalCandidateType]: ${msg}` }
   }
@@ -241,6 +240,7 @@ checkIsLocalCandidateType(stat){
       let targetCandidate = originRaw["candidate-pair"].filter(item => item["selected"] === true && item["state"] === "succeeded")
       return findLocalCandidate(targetCandidate)
     }
+    // 有些旧的浏览器比如 safari 11.1.2，就会出现找不到 local-candidate 参数的情况
   }
   return false
 }
@@ -252,25 +252,78 @@ checkIsLocalCandidateType(stat){
 同时需要注意一点的是，正常情况下这个 host 的 `RTCIceCandidate` 也是不会显示 局域网 ip 的， 而且他不是用 mDNS 加密，而是直接为空:
 ```javascript
 {
-		"id": "RTCIceCandidate_1wdP0rnA",
-		"timestamp": 1651027428646,
-		"type": "local-candidate",
-		"transportId": "RTCTransport_audio_1",
-		"isRemote": false,
-		"networkType": "unknown",
-		"ip": "",
-		"address": "",
-		"port": 63261,
-		"protocol": "udp",
-		"candidateType": "host",
-		"priority": 2113937151
-	}
+    "id": "RTCIceCandidate_1wdP0rnA",
+    "timestamp": 1651027428646,
+    "type": "local-candidate",
+    "transportId": "RTCTransport_audio_1",
+    "isRemote": false,
+    "networkType": "unknown",
+    "ip": "",
+    "address": "",
+    "port": 63261,
+    "protocol": "udp",
+    "candidateType": "host",
+    "priority": 2113937151
+  }
 ```
 
 也是只有在启用 `getUserMedia` 权限，才会显示局域网 ip 出来。
 
+## 5. 一样建立 webrtc 连接，但是双方只接受 host ice， 如果还能连上，那么肯定是在同一个局域网
+上述的情况是连接上 webrtc 之后，才去判断是不是走 host 的 transport 通道，再去判断当前是否是局域网连接。
+
+但是如果我们在传输交换 ice 的时候，只传和接收 局域网 ice 的话， 那么能连接上 webrtc 的情况下，肯定是局域网。 因为在只有 host 模式下 ice 可以连接上，说明两端肯定是在同一个局域网下
+
+所以就要改成双方在发送 ice 的时候，只发送 host 模式下的 ice, 类似于这样子
+```text
+{"sdpMLineIndex":0,"sdpMid":"0","candidate":"candidate:559267639 1 udp 2122202367 ::1 45061 typ host generation 0 ufrag yvH5 network-id 2"}
+{"sdpMLineIndex":0,"sdpMid":"0","candidate":"candidate:2065939615 1 udp 2122260223 192.168.197.13 47089 typ host generation 0 ufrag yvH5 network-id 3 network-cost 10"}
+```
+
+然后在 `this.#pc.addIceCandidate(new RTCIceCandidate(item), () => {` 添加的时候，就会只有 host 的 ice 了。
+
+这种情况下，对于一端浏览器端，一端其他端(windows，android， ios)，这个其他端因为有更详细的底层 sdk 的 api， 所以可以做到只发送 host 的 ice。 
+
+但是对于两端都是浏览器端的情况，因为预置的 `RTCIceTransportPolicy` 只有两个值， relay 和 all， 并没有类似于 `only-local` 的值，没办法控制只发送 host ice 的情况
+
+{% blockquote mozilla https://w3c.github.io/webrtc-pc/#rtcicetransportpolicy-enum %}
+enum RTCIceTransportPolicy {
+  "relay",
+  "all"
+};
+{% endblockquote %}
+
+但是我们可以在接收添加 ice 的时候，过滤掉非 host 的 ice，比如这样子:
+```text
+/**
+ * 添加ICE
+ * pc.addIceCandidate
+ */
+addIce = (data) => {
+    return new Promise((resolve) => {
+        const RTCIceCandidate = window.RTCIceCandidate || (window as any).mozRTCIceCandidate || (window as any).webkitRTCIceCandidate
+        data.forEach(item => {
+            // 只接收 host 的 ice
+            if(JSON.stringify(item).includes("typ host")){
+                this.#pc.addIceCandidate(new RTCIceCandidate(item), () => {
+                    logger.debug(`[PeerConnection]: add ice success: ${JSON.stringify(item)}`)
+                    this.#emitter.emit('addIceStatus', 'success')
+                }, (err) => {
+                    logger.error(`[PeerConnection]: add ice fail: ${err}`)
+                    this.#emitter.emit('addIceStatus', 'fail')
+                })
+            }
+        })
+        resolve(data)
+    });
+}
+```
+
+这样子，如果 ice 可以连接上，那么肯定两端是在同一个局域网中。
+
+
 ## 总结
-本文介绍了几种浏览器判断跟客户端是否在同一个局域网的方式， 前三种都有一定的问题， 只有第四种才能比较准确的判断是在同一个局域网下，但也不是绝对准确。
+本文介绍了几种浏览器判断跟客户端是否在同一个局域网的方式， 前三种都有一定的问题， 第四种一定情况下，在网络比较差的情况下，会有误判。 只有第五种是可以 100% 判断是在同一个局域网下的情况。
 
 ---
 
