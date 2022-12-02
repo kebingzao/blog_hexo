@@ -208,7 +208,9 @@ prometheus 警报有 4 种状态:
 - **firing** -> 结束态，警报已经触发，prometheus 将按照配置将报警信息发送给 alertmanager
 - **resolve** -> 恢复态，如果是 firing 状态，后面又恢复正常，警报又会重新变成 inactive。 这时候 prometheus 就会发送一个 resolve 的恢复态给 alertmanager，让 alertmanager 发送报警恢复邮件 (假设有配置的话)
 
-虽然以上有 4 种，但是在 prometheus 后台的 alert 的监控显示上， 只有前三种，因为对于状态显示来说， 第四种的恢复态，其实就是第一种的 inactive。 也就是只有 alertmanager 才需要恢复态
+虽然以上有 4 种，但是对于 prometheus 的警报来说， 只有前三种，因为对于状态显示来说， 第四种的恢复态，其实就是第一种的 inactive。 也就是只有 alertmanager 才需要恢复态
+
+也就是说，只有 alertmanager 才需要 resolve 状态，事实上  alertmanager 只有两种状态: firing 和 resolve， 因为 prometheus server 传递给 alertmanager 的状态就只有这两个状态
 
 ### 5. 抓取周期(scrape_interval) 和 评估周期 (evaluation_interval)
 在 prometheus server 中， 抓取周期 和 评估周期是分开的，可以各自设置。 但是最好评估周期要 大于等于 抓取周期。 不能小于， 不然就会出现评估的时候，取的是旧值，导致误报。
@@ -356,10 +358,16 @@ Found:
 [root@VM-64-9-centos alertmanager]# systemctl restart alertmanager.service 
 ```
 其实就是去掉了抑制配置，将接收者改成 mail 邮箱，同时增加了 mail 配置，其他都不变。
+> 关于怎么用 qq 邮箱配置 smtp 邮箱服务，可以看我之前的文章: {% post_link sentry-2 %}
 
 二进制包安装的目标目录下有自带一个 yml 文件校验工具 `amtool`, 可以用它来校验 alertmanager 的配置文件是否格式正确
-> 事实上， amtool 不仅仅是校验工具怎么简单，他还是一个可以配置 alertmanager 的 cli 命令工具， 感兴趣的可以看官方文档
-i
+> 事实上， amtool 不仅仅是校验工具怎么简单，他还是一个可以配置 alertmanager 的 cli 命令工具， 感兴趣的可以看官方文档: [amtool](https://github.com/prometheus/alertmanager#amtool)
+
+上面的 yml 文件配置其实是有一些缺省默认值的，具体看完整的配置，我们可以在 alertmanager 后台的 status 查看: `http://ip:9093/#/status`
+> 后面会讲到这些配置项的含义
+
+![](11.png)
+
 ### 3. prometheus 关联 alertmanager
 接下来就要在 prometheus 管理 alertmanager 服务了，加 `alerting` 这个节点就行了，其他不变
 ```text
@@ -402,30 +410,739 @@ Checking rules/test-1.yml
 [root@VM-64-9-centos prometheus]# curl -X POST localhost:9090/-/reload
 ```
 
+### 4. 测试警报发送
+接下来我们测试警报发送， 将 prometheus server 这一台的 node_exporter 服务关闭:
+```text
+systemctl stop node_exporter.service
+```
+接下来可以看到，警报名称为 `节点存活` 的状态变化 `inactive` -> `pending` -> `firing`
+
+当变成 firing 的时候，这时候 alertmanager 就会接收到这一台报警消息，这时候就可以收到这一封报警邮件了
+
+![](12.png)
+
+同时在 alertmanager 后台，我们也可以看到有触发这个警报了
+
+![](13.png)
+
+因为没有设置邮件模板，所以他用的是 alertmanager 的默认的模板， 所以没有明确在 yml 文件配置，但是补上这些默认的缺省值的话，  receivers 这一块邮箱的配置应该是:
+```text
+receivers:
+- name: default-receiver
+  email_configs:
+  - send_resolved: false
+    to: kebingzao@gmail.com
+    from: zachke@foxmail.com
+    hello: localhost
+    smarthost: smtp.qq.com:25
+    auth_username: zachke@foxmail.com
+    auth_password: <secret>
+    headers:
+      From: zachke@foxmail.com
+      Subject: '{{ template "email.default.subject" . }}'
+      To: kebingzao@gmail.com
+    html: '{{ template "email.default.html" . }}'
+    require_tls: false
+templates: []
+```
+
+### 5. 配置文件参数解析
+接下来我们详细讲一下 alertmanager 的 yml 配置文件的相关配置参数，一样直接参照官方配置文档: [alertmanager 配置文档](https://prometheus.io/docs/alerting/latest/configuration/)
+> 这边参照的是当前最新的 `0.24` 版本，后面如果版本有继续迭代，可能会出现有些参数不一样
+
+关于 alertmanager 的配置文件的配置，官方也有提供了 example 参考: [alertmanager simple.yml](https://github.com/prometheus/alertmanager/blob/main/doc/examples/simple.yml)
+
+#### 5.1. [global](https://prometheus.io/docs/alerting/latest/configuration/#configuration-file)
+配置文件，一样分为 7 个小节:
+```text
+# 全局配置，有些可被下面的具体配置替换
+global:
+  # smtp 相关的邮箱发送配置
+  # 邮件发送来源，很多时候要跟 username 的发送邮箱同一个
+  [ smtp_from: <tmpl_string> ]
+  # smtp 协议的发送端点
+  [ smtp_smarthost: <string> ]
+  # 定义的主机名称 (hostname)
+  [ smtp_hello: <string> | default = "localhost" ]
+  # 登录的用户名和密码，以及对应的一些加密协议
+  [ smtp_auth_username: <string> ]
+  [ smtp_auth_password: <secret> ]
+  [ smtp_auth_identity: <string> ]
+  [ smtp_auth_secret: <secret> ]
+  # 是否启用 tls 加密，默认启用
+  [ smtp_require_tls: <bool> | default = true ]
+
+  # 一些第三方的 receivers 配置
+  [ slack_api_url: <secret> ]
+  [ slack_api_url_file: <filepath> ]
+  [ victorops_api_key: <secret> ]
+  [ victorops_api_url: <string> | default = "https://alert.victorops.com/integrations/generic/20131114/alert/" ]
+  [ pagerduty_url: <string> | default = "https://events.pagerduty.com/v2/enqueue" ]
+  [ opsgenie_api_key: <secret> ]
+  [ opsgenie_api_key_file: <filepath> ]
+  [ opsgenie_api_url: <string> | default = "https://api.opsgenie.com/" ]
+  [ wechat_api_url: <string> | default = "https://qyapi.weixin.qq.com/cgi-bin/" ]
+  [ wechat_api_secret: <secret> ]
+  [ wechat_api_corp_id: <string> ]
+  [ telegram_api_url: <string> | default = "https://api.telegram.org" ]
+  # http 客户端配置，允许配置接收方用来与基于 HTTP 的 API 服务通信的 HTTP 客户端
+  [ http_config: <http_config> ]
+
+  # 如果超过这个时间段，prometheus 那边没有给出警报的状态更新，alertmanager 就默认这个警报已经解决
+  # 对于 alertmanager 来说，哪怕 prometheus 一直给 firing 状态，那也是警报有新的状态更新
+  # 一定是要那种没有任何状态值给过来的，比如 prometheus server 挂了，或者 rules 警报规则被删除了这种
+  [ resolve_timeout: <duration> | default = 5m ]
+
+# 模板文件目录
+# 警报模板可以自定义通知的信息格式，以及其包含的对应警报指标数据，可以自定义Email、企业微信的模板，配置指定的存放位置
+templates:
+  [ - <filepath> ... ]
+
+# 警报的路由树
+route: <route>
+
+# 警报通知接收者配置
+receivers:
+  - <receiver> ...
+
+# 抑制规则配置
+inhibit_rules:
+  [ - <inhibit_rule> ... ]
+
+# 静音/激活 的时间间隔的一组数据
+# 他配置的时间点和名称，要匹配 route 节点下的 mute_time_intervals 或者 active_time_intervals
+time_intervals:
+  [ - <time_interval> ... ]
+```
+
+具体的描述，官方文档写的很清楚了， 接下来主要看这个 `route` 节点的配置
+#### 5.2. [route](https://prometheus.io/docs/alerting/latest/configuration/#route)
+警报路由节点(`route`) 描述了在收到 prometheus 生成的警报后，将警报信息发送给接收器 receiver 指定的目标地址规则。 alertmanager 对传入的警报信息进行处理，根据所定义的规则与配置进行匹配。
+
+对于路由可以理解为树状结构，设置的第一个 route 是 root route，往下的就是包含的子节点(子节点的可配置参数跟根节点一样)，每个警报传进来以后，会从配置的跟节点路由进入路由树，按照深度优先从左向右遍历匹配，当匹配的节点后停止，进行警报处理。
+```text
+# 接收器名称，如果下面的子 route 节点没有匹配到，就采用这个默认的接收器
+# 如果没有设置子节点，也是用这个
+[ receiver: <string> ]
+
+# 根据 prometheus 的 lables 进行报警分组，这些警报会合并为一个通知发送给接收器，也就是警报分组。
+# 后面关于 alertmanager 的分组特性，会单独挑一个小篇幅来实践
+[ group_by: '[' <labelname>, ... ']' ]
+
+# 警报是否应继续匹配后续的兄弟节点，默认为 false， 即一旦匹配上，就采用当前这个，不再继续匹配
+[ continue: <boolean> | default = false ]
+
+# 一组匹配规则，通过正则表达式来匹配
+matchers:
+  [ - <matcher> ... ]
+
+# 设置从接受警报到发送的等待时间，若在等待时间中group接收到新的警报信息，这些警报会合并为一条发送
+[ group_wait: <duration> | default = 30s ]
+
+# 此设置控制的是 group 之间发送警报通知的间隔时间
+[ group_interval: <duration> | default = 5m ]
+
+# 此设置控制的是警报发送成功以后，没有对警报做解决操作的话，状态 Firing 没有变成 Inactive 或者 Pending ，会再次发送警报的的间隔时间。
+[ repeat_interval: <duration> | default = 4h ]
+
+# 路由应该静音的时间段
+# root route 不设置这个，一般在 routes 树下面的子 route 节点设置
+# 如果有配置的话，那么在静音期间，哪怕 prometheus 发送警报过来， alertmanager 也不会发送警报通知
+# 他的值是一个 string，也就是上述 time_intervals 所配置的时间段所设置的 name
+mute_time_intervals:
+  [ - <string> ...]
+
+# 路由应该处于活动状态的时间段，默认的空值代表始终处于活动状态，
+# root route 不设置这个，一般在 routes 树下面的子 route 节点设置
+# 只有处于活动状态的时候，alertmanager 才会发送警报通知
+# 他的值是一个 string，也就是上述 time_intervals 所配置的时间段所设置的 name
+# 比如我如果只想在 周一到周五 才想收到邮件， 那么就可以配置这个， 后面会有例子
+active_time_intervals:
+  [ - <string> ...]
+
+# 匹配路由树，上面的每一个 route 配置就跟 root route 配置一样
+routes:
+  [ - <route> ... ]
+```
+上面的配置有点抽象，我们可以用一个例子说一下:
+```text
+# root route 节点
+route:
+  # 默认接收器
+  receiver: 'default-receiver'
+  # 收到警报后，如果在 30s 内还有其他同组的报警，那么就合并成一条报警通知
+  group_wait: 30s
+  # 收到警报后，判断上一条同一组的警报是否是 5 分钟之前，如果是之前，那么等待上述的 30s 过后，就立马发送
+  # 如果上一条同组的发送间隔还不足 5 分钟，这时候就等间隔达到了 5 分钟，再发送
+  group_interval: 5m
+  # 发送警报间隔，如果 4h 之后，该警报还是没有修复，哪怕警报内容重复，也要再次发送报警通知
+  repeat_interval: 4h
+  # 分组依据，根据 prometheus 的 labels 进行报警分组
+  # 以下标签中，根据 cluster 和 alertname 这两个的值来分组
+  group_by: [cluster, alertname]
+  # 子路由节点
+  routes:
+  # 组内等待时间 10s，并且警报的 service 标签是 mysql 或者 cassandra 的警报，那么他的接收者是 database-pager
+  - receiver: 'database-pager'
+    group_wait: 10s
+    matchers:
+    - service=~"mysql|cassandra"
+    
+  # 匹配 team="frontend", 那么就按照 product 和 environment 这两个标签的值来分组，并且设置接收者是 frontend-pager
+  - receiver: 'frontend-pager'
+    group_by: [product, environment]
+    matchers:
+    - team="frontend"
+
+  # 匹配 service="inhouse-service" 标签，并且在下班时间和节假日时间是静音，不发送通知给接收者 dev-pager
+  # 同时继续往下匹配
+  - receiver: 'dev-pager'
+    matchers:
+      - service="inhouse-service"
+    mute_time_intervals:
+      - offhours
+      - holidays
+    continue: true
+
+    # 匹配 service="inhouse-service" 标签, 并且只有在下班时间和节假日才会生效，如果生效，就发送给 on-call-pager 接收者
+    # 简单的来说，如果是下班时间和节假日的警报，那么普通预警比如发邮件之类的不够， 采用打电话之类的预警
+  - receiver: 'on-call-pager'
+    matchers:
+      - service="inhouse-service"
+    active_time_intervals:
+      - offhours
+      - holidays
+```
+
+简单的来说，路由匹配的执行步骤如下：
+1. 先判断警报的 service 标签是 mysql 或者 cassandra，如果是就给接收者 database-pager，然后结束
+2. 如果不是，匹配 team="frontend", 同时按照 product 和 environment 这两个标签的值来分组，抛给接收者 frontend-pager，然后结束
+3. 如果还不是，匹配 service="inhouse-service" 标签，然后分为两种
+  3.1 如果当前不是下班时间和节假日时间，那么就通知给接收者 dev-pager，然后继续匹配到下一条规则，有匹配到但是因为不满足 下班时间和节假日 的激活时间，不发送给接收者 on-call-pager
+  3.2 如果当前是下班时间和节假日时间，那么当前是静音状态，不发送接收者 dev-pager，然后继续匹配到下一条规则，有匹配到，同时满足激活条件，发送给接收者 on-call-pager
+4. 如果都不匹配，发送给默认的接收者 default-receiver
+
+#### 5.3. [time_intervals](https://prometheus.io/docs/alerting/latest/configuration/#time_interval)
+其中 `offhours` 和 `holidays` 这两个 `time_intervals` 是要在上述的子节点 `time_intervals` 配置的，比如这样子:
+```text
+time_intervals:
+  - name: holidays
+    time_intervals:
+      - weekdays: ['saturday', 'sunday']
+  - name: offhours
+    time_intervals:
+      - times:
+        - start_time: 18:00
+          end_time: 24:00
+```
+> 以上的时区都是 UTC 时区，目前不支持其他时区
+
+#### 5.4. [receiver](https://prometheus.io/docs/alerting/latest/configuration/#receiver)
+接受器是一个统称，每个 receiver 都有需要设置一个全局唯一的名称，并且对应一个或者多个通知方式，包括 email 、微信、 Slack 、钉钉等。
+
+接下来我们看一下接收者 (`receiver`) 的配置
+```text
+# The unique name of the receiver.
+name: <string>
+
+# Configurations for several notification integrations.
+email_configs:
+  [ - <email_config>, ... ]
+opsgenie_configs:
+  [ - <opsgenie_config>, ... ]
+pagerduty_configs:
+  [ - <pagerduty_config>, ... ]
+pushover_configs:
+  [ - <pushover_config>, ... ]
+slack_configs:
+  [ - <slack_config>, ... ]
+sns_configs:
+  [ - <sns_config>, ... ]
+victorops_configs:
+  [ - <victorops_config>, ... ]
+webhook_configs:
+  [ - <webhook_config>, ... ]
+wechat_configs:
+  [ - <wechat_config>, ... ]
+telegram_configs:
+  [ - <telegram_config>, ... ]
+```
+
+上面配置很多个， 我们一般只用这几个: **email**， **钉钉**， **webhook**
+> 其中 钉钉 是又是基于 webhook 的
+
+##### 5.4.1 [email_config](https://prometheus.io/docs/alerting/latest/configuration/#email_config)
+邮件的配置如下:
+```text
+# 警报状态恢复是否要发送恢复邮件
+[ send_resolved: <boolean> | default = false ]
+
+# 发送对象邮箱
+to: <tmpl_string>
+
+# 发送者邮箱
+[ from: <tmpl_string> | default = global.smtp_from ]
+
+# The SMTP host
+[ smarthost: <string> | default = global.smtp_smarthost ]
+
+# 主机名称
+[ hello: <string> | default = global.smtp_hello ]
+
+# SMTP 校验信息
+[ auth_username: <string> | default = global.smtp_auth_username ]
+[ auth_password: <secret> | default = global.smtp_auth_password ]
+[ auth_secret: <secret> | default = global.smtp_auth_secret ]
+[ auth_identity: <string> | default = global.smtp_auth_identity ]
+
+# 是否开启 SMTP TLS 
+[ require_tls: <bool> | default = global.smtp_require_tls ]
+
+# TLS 配置
+tls_config:
+  [ <tls_config> ]
+
+# 邮件 HTML body
+[ html: <tmpl_string> | default = '{{ template "email.default.html" . }}' ]
+# 邮件 text body
+[ text: <tmpl_string> ]
+
+# 邮件头部键值对
+[ headers: { <string>: <tmpl_string>, ... } ]
+```
+
+##### 5.4.2 [webhook_config]
+```text
+# 警报状态恢复是否要发送恢复邮件
+[ send_resolved: <boolean> | default = true ]
+
+# HTTP POST url
+url: <string>
+
+# The HTTP client 配置
+[ http_config: <http_config> | default = global.http_config ]
+
+# 配置最大通知数， 0 表示不限制
+[ max_alerts: <int> | default = 0 ]
+```
+
+#### 5.5. [inhibit_rules](https://prometheus.io/docs/alerting/latest/configuration/#inhibit_rule)
+inhibit_rules 模块中设置警报抑制功能，可以指定在特定条件下需要忽略的警报条件。可以使用此选项设置首选，比如优先处理某些警报，如果同一组中的警报同时发生，则忽略其他警报。
+
+合理使用 inhibit_rules ，可以减少频发发送没有意义的警报的产生。
+
+alertmanager 有 3个特性:
+- 分组(`Grouping`)
+- 抑制(`Inhibition`)
+- 静默(`Silences`)
+
+本节不详细讨论这三个特性，后面会单独开篇章来分析。
+
+### 6. group_interval 和 repeat_interval
+我们例子中其实很简单，除了 global 配置全局邮件发送之外，其他就是:
+```text
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 10m
+  receiver: default-receiver
+receivers:
+  - name: 'default-receiver'
+    email_configs:
+    - to: 'kebingzao@gmail.com'
+``` 
+所以其实就很简单， 一旦收到警报，处理步骤如下:
+1. 根据标签 alertname 的值进行分组，如果是首次的话，等待 30s 让相同组的警报过来， 30s 过来，如果有其他组内的警报进来的话， 就合并成一组，然后发送给接收器 default-receiver， 然后这个接收器发送邮件，用的是默认模板
+2. 然后接下来又过了一分钟，又来了一条相同的警报信息，这时候除了等待 30s 归类之外，就要读 group_interval 配置，如果与上一条同组的警报通知间隔不到 5 分钟，那么就要等到 5 分钟，才会发送下一条警报
+3. 然后发送之前，判断本次的警报其实没有恢复，这时候就要读 repeat_interval 的配置，也就是说，要发送重复警报的话，还要再等 10 分钟才行
+
+综上就可以看到，假设一条警报一直没有修复， 就会出现，除了第一次是马上发送警报，接下来要发重复警报的话，就要再过 group_interval + repeat_interval = 15 分钟
+
+![](14.png)
+
+#### 6.1 两台 node 相继挂掉的情况
+接下来我们还是基于上述的配置，测试一下两台 node_exporter (localhost 和 234 这两台) 相继停掉的情况，时间线如下
+1. 15 分的时候， localhost 这一台的 node_exporter 关闭，警报变成 pending
+2. 16 分的时候， 过了 rule 的 for 等待时间(1 分钟)，prometheus 将警报发送给 alertmanager
+3. alertmanager 收到警报，继续等待 30s (`group_wait`), 发现没有同组的警报，并且上一次这个组的警报发送间隔超过了 5 分钟， 所以马上发送邮件
+4. 17 分的时候， 收到了邮件，因为警报内容跟之前测试的一样，所以在 gmail 那边，会归档到之前的那一封
+
+![](15.png)
+
+5. 18 分的时候，234 这一台的 node_exporter 关闭，然后警报变成 pending
+6. 19 分的时候，234 的警报也变成 firing
+
+![](16.png)
+
+7. alertmanager 收到警报，继续等待 30s (`group_wait`), 如果有相同的警报，就合并成一条，然后判断间隔时间是否超过了 5 分钟，发现没有(上一次发是 17 分钟)，继续等待，并且合并警报
+8. 22 分的时候，终于达到了 group 的间隔时间了，这时候触发 repeat_interval 判断，对比了，一下本次的报警信息跟上一次不一样 (本次两条报警)，所以不满足再次等待条件， 发送邮件
+9. 22 分的时候，收到邮件，内容不一样，单独一封
+
+![](17.png)
+
+打开之后，发现内容就是两台的报警信息
+
+![](18.png)
+
+### 7. 发送钉钉通知
+正常工作中，现在大家都有用钉钉在协同办公，所以对于业务预警来说，发送钉钉通知预警是非常有用的事情。 所以接下来我们添加一下钉钉预警的
+
+#### 7.1 安装 Prometheus-webhook-Dingtalk
+首先我们安装钉钉组件: [下载地址](https://github.com/timonwong/prometheus-webhook-dingtalk)
+```text
+# 下载解压
+[root@VM-64-9-centos ~]# cd /usr/local/
+[root@VM-64-9-centos local]# wget https://github.com/timonwong/prometheus-webhook-dingtalk/releases/download/v2.1.0/prometheus-webhook-dingtalk-2.1.0.linux-amd64.tar.gz
+[root@VM-64-9-centos local]# tar xf prometheus-webhook-dingtalk-2.1.0.linux-amd64.tar.gz 
+[root@VM-64-9-centos local]# mv prometheus-webhook-dingtalk-2.1.0.linux-amd64 prometheus-webhook-dingtalk
+
+# 创建 config.yml 配置文件，之前只有一个 example 文件，直接拷贝一份命名 config.yml
+[root@VM-64-9-centos local]# cd prometheus-webhook-dingtalk/
+[root@VM-64-9-centos prometheus-webhook-dingtalk]# cp config.example.yml config.yml
+
+# 配置 config.yml
+[root@VM-64-9-centos local]# cat prometheus-webhook-dingtalk/config.yml 
+## 这个参数要设置为 true, 才会去读自定义的模板，不然就会读程序的默认模板
+no_builtin_template: true
+
+## 模板文件路径， 这边一定要用绝对路径
+templates:
+  - /usr/local/prometheus/templates/dingding-default.tmpl
+
+
+## 设定监听的端点，可以设置多个
+targets:
+  webhook_1:
+    url: https://oapi.dingtalk.com/robot/send?access_token=3aff7c1ac0122xxxxxxxxxxxxxxxxxxxxxxx85ac45f2cc942296
+
+
+# 添加到 system 服务，这边的启动参数不要加双引号包裹，不然会启动失败
+[root@VM-64-9-centos local]# cat /usr/lib/systemd/system/prometheus-webhook-dingtalk.service
+[Unit]
+Description=prometheus webhook dingtalk
+Documentation=https://github.com/timonwong/prometheus-webhook-dingtalk
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/prometheus-webhook-dingtalk/prometheus-webhook-dingtalk --web.listen-address=:8070 --web.enable-ui --config.file=/usr/local/prometheus-webhook-dingtalk/config.yml
+ExecStop=/bin/kill -s QUIT $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+# 启动服务
+[root@VM-64-9-centos local]# systemctl daemon-reload
+[root@VM-64-9-centos local]# systemctl enable prometheus-webhook-dingtalk
+Created symlink from /etc/systemd/system/multi-user.target.wants/prometheus-webhook-dingtalk.service to /usr/lib/systemd/system/prometheus-webhook-dingtalk.service.
+[root@VM-64-9-centos local]# systemctl start prometheus-webhook-dingtalk
+
+# 查看服务启动状态，可以看到有在监听 8070 端口了
+[root@VM-64-9-centos local]# systemctl status prometheus-webhook-dingtalk -l
+● prometheus-webhook-dingtalk.service - prometheus webhook dingtalk
+   Loaded: loaded (/usr/lib/systemd/system/prometheus-webhook-dingtalk.service; disabled; vendor preset: disabled)
+   Active: active (running) since Fri 2022-12-02 11:25:59 CST; 1min 55s ago
+     Docs: https://github.com/timonwong/prometheus-webhook-dingtalk
+ Main PID: 4942 (prometheus-webh)
+   CGroup: /system.slice/prometheus-webhook-dingtalk.service
+           └─4942 /usr/local/prometheus-webhook-dingtalk/prometheus-webhook-dingtalk --web.listen-address=:8070 --web.enable-ui --config.file=/usr/local/prometheus-webhook-dingtalk/config.yml
+
+Dec 02 11:25:59 VM-64-9-centos systemd[1]: Started prometheus webhook dingtalk.
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.452Z caller=main.go:59 level=info msg="Starting prometheus-webhook-dingtalk" version="(version=2.1.0, branch=HEAD, revision=8580d1395f59490682fb2798136266bdb3005ab4)"
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.452Z caller=main.go:60 level=info msg="Build context" (gogo1.18.1,userroot@177bd003ba4d,date20220421-08:19:05)=(MISSING)
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.452Z caller=coordinator.go:83 level=info component=configuration file=/usr/local/prometheus-webhook-dingtalk/config.yml msg="Loading configuration file"
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.452Z caller=coordinator.go:91 level=info component=configuration file=/usr/local/prometheus-webhook-dingtalk/config.yml msg="Completed loading of configuration file"
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.452Z caller=main.go:97 level=info component=configuration msg="Loading templates" templates=contrib/templates/default.tmpl
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.453Z caller=main.go:113 component=configuration msg="Webhook urls for prometheus alertmanager" urls=http://localhost:8070/dingtalk/webhook_1/send
+Dec 02 11:25:59 VM-64-9-centos prometheus-webhook-dingtalk[4942]: ts=2022-12-02T03:25:59.453Z caller=web.go:208 level=info component=web msg="Start listening for connections" address=:8070
+```
+
+从上面的配置文件可以看到，我们只设置了一个 webhook 的端口，也就是这个:
+```text
+http://localhost:8070/dingtalk/webhook_1/send
+```
+后面在填 alertmanager 的 webhook 的 url 的时候，就是填这个， `webhook_1` 就是上面所配置的 target， 可以配置多个， 然后程序就会生成多个监听 url， 然后在 alertmanager 那边灵活分配到发送 webhook 到哪一个端点
+
+上面有两个细节要注意:
+1. **一个是这个配置要设置为 true，程序才会去读取自定义的模板**
+```text
+no_builtin_template: true
+```
+刚开始这个没有设置，默认为 false，不管怎么设置，发现 钉钉通知都是发送默认的模板，因为项目文档太少，到后面我直接看源代码去了，结果才发现要读自定义模板，跟这个配置有关，以下是源代码:
+```golang
+func FromGlobs(loadBuiltinTemplate bool, paths ...string) (*Template, error) {
+	tmpl := template.New("").
+		Option("missingkey=zero").
+		Funcs(defaultFuncs).
+		Funcs(sprig.TxtFuncMap())
+
+	if loadBuiltinTemplate {
+		f, err := Assets.Open("/templates/default.tmpl")
+		if err != nil {
+			return nil, err
+		}
+
+		defer f.Close()
+		b, err := io.ReadAll(f)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := tmpl.Parse(string(b)); err != nil {
+			return nil, err
+		}
+	}
+
+	for _, tp := range paths {
+		// ParseGlob in the template packages errors if not at least one file is
+		// matched. We want to allow empty matches that may be populated later on.
+		p, err := filepath.Glob(tp)
+		if err != nil {
+			return nil, err
+		}
+		if len(p) > 0 {
+			if _, err := tmpl.ParseGlob(tp); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return &Template{tmpl: tmpl}, nil
+}
+```
+然后他的调用方式是反着来的:
+```text
+tmpl, err := template.FromGlobs(!conf.NoBuiltinTemplate, conf.Templates...)
+```
+也就是要 `NoBuiltinTemplate` 为 true，里面才会变成 false， 才会读自定义模板路径
+
+2. **还有就是模板路径要绝对路径**
+这个也是很坑， 因为实例里面是相对路径的 `contrib/templates/legacy/template.tmpl`, 导致我配置自定义的时候，刚开始也是放在这个 contrib 目录下的，结果一直报这个错误
+```text
+[root@VM-64-9-centos templates]# journalctl -f -u prometheus-webhook-dingtalk.service
+-- Logs begin at Mon 2022-11-14 09:42:41 CST. --
+Dec 02 16:06:04 VM-64-9-centos systemd[1]: Unit prometheus-webhook-dingtalk.service entered failed state.
+Dec 02 16:06:04 VM-64-9-centos systemd[1]: prometheus-webhook-dingtalk.service failed.
+...
+Dec 02 16:07:28 VM-64-9-centos prometheus-webhook-dingtalk[12891]: ts=2022-12-02T08:07:28.953Z caller=dingtalk.go:90 level=error component=web target=webhook_1 msg="Failed to build notification" err="template: :1:12: executing \"\" at <{{template \"ding.link.title\" .}}>: template \"ding.link.title\" not defined"
+```
+一直报这个 `ding.link.title` 参数没有定义， 但是明明模板有定义，为啥找不到，后面改成绝对路径，就可以找到了
+
+> 可以使用 journalctl -f -u service 来跟进某一个 system server 的日志
+
+#### 7.2 模板配置
+从上面的配置文件来看，除了配置端点之外，我们还自己创建了一个模板文件:
+```text
+/usr/local/prometheus/templates/dingding-default.tmpl
+```
+内容如下:
+```text
+[root@VM-64-9-centos prometheus-webhook-dingtalk]# cat /usr/local/prometheus/templates/dingding-default.tmpl
+{{/* 定义子标题 */}}
+{{ define "__subject" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }} {{ if gt (len .CommonLabels) (len .GroupLabels) }}({{ with .CommonLabels.Remove .GroupLabels.Names }}{{ .Values | join " " }}{{ end }}){{ end }}{{ end }}
+{{ define "__alertmanagerURL" }}{{ .ExternalURL }}/#/alerts?receiver={{ .Receiver }}{{ end }}
+
+
+{{/* 定义警报内容*/}}
+{{ define "default.__text_alert_list" }}{{ range . }}
+**Trigger Time:** {{ dateInZone "2006.01.02 15:04:05" (.StartsAt) "Asia/Shanghai" }}
+
+**Summary:** {{ .Annotations.summary }}
+
+**Description:** {{ .Annotations.description }}
+
+**Details:**
+{{ range .Labels.SortedPairs }}{{ if and (ne (.Name) "severity") (ne (.Name) "summary") }}> - {{ .Name }}: {{ .Value | markdown | html }}
+{{ end }}{{ end }}
+{{ end }}{{ end }}
+
+
+{{/* 定义警报恢复内容 */}}
+{{ define "default.__text_resolved_list" }}{{ range . }}
+
+**Trigger Time:** {{ dateInZone "2006.01.02 15:04:05" (.StartsAt) "Asia/Shanghai" }}
+
+**Resolved Time:** {{ dateInZone "2006.01.02 15:04:05" (.EndsAt) "Asia/Shanghai" }}
+
+**Summary:** {{ .Annotations.summary }}
+
+**Details:**
+{{ range .Labels.SortedPairs }}{{ if and (ne (.Name) "severity") (ne (.Name) "summary") }}> - {{ .Name }}: {{ .Value | markdown | html }}
+{{ end }}{{ end }}
+{{ end }}{{ end }}
+
+
+
+{{/* 定义标题和内容 */}}
+{{ define "default.title" }}{{ template "__subject" . }}{{ end }}
+{{ define "default.content" }}#### \[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] **[{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+
+{{/* 判断是警报还是恢复 */}}
+
+{{/* 如果是警报 */}}
+{{ if gt (len .Alerts.Firing) 0 -}}
+**Alerts Firing**
+{{ template "default.__text_alert_list" .Alerts.Firing }}
+{{ range .AtMobiles }}@{{ . }}{{ end }}
+{{- end }}
+
+{{/* 如果是恢复警报 */}}
+{{ if gt (len .Alerts.Resolved) 0 -}}
+**Alerts Resolved**
+{{ template "default.__text_resolved_list" .Alerts.Resolved }}
+{{ range .AtMobiles }}@{{ . }}{{ end }}
+{{- end }}
+{{- end }}
+
+
+
+{{/* 下面这两个钉钉的字段定义是一定要有的，因为程序会执行 */}}
+{{ define "ding.link.title" }}{{ template "default.title" . }}{{ end }}
+{{ define "ding.link.content" }}{{ template "default.content" . }}{{ end }}
+```
+这个模板语法用的 golang 的语法模板: 
+- [console template](https://prometheus.io/docs/visualization/consoles/)
+- [golang template](https://pkg.go.dev/text/template)
+
+而且对于这个钉钉模板来说， 他发送钉钉通知的代码是这样子的:
+```text
+	DefaultTargetMessage = TargetMessage{
+		Title: `{{ template "ding.link.title" . }}`,
+		Text:  `{{ template "ding.link.content" . }}`,
+	}
+```
+也就是我们必须要在模板文件里面至少要定义这两个值，哪怕只是以下这种极简单的硬编码也是可以 work 的
+```text
+{{ define "ding.link.title" }} hello title {{ end }}
+{{ define "ding.link.content" }} hello content {{ end }}
+```
+
+
+至于参数匹配的规则大概是这样子
+1. 首先 alertmanager 那边的 webhook 请求的 post body 体是这样子的([相关文档地址](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)):
+```text
+{
+  "version": "4",
+  "groupKey": <string>,              // key identifying the group of alerts (e.g. to deduplicate)
+  "truncatedAlerts": <int>,          // how many alerts have been truncated due to "max_alerts"
+  "status": "<resolved|firing>",
+  "receiver": <string>,
+  "groupLabels": <object>,
+  "commonLabels": <object>,
+  "commonAnnotations": <object>,
+  "externalURL": <string>,           // backlink to the Alertmanager.
+  "alerts": [
+    {
+      "status": "<resolved|firing>",
+      "labels": <object>,
+      "annotations": <object>,
+      "startsAt": "<rfc3339>",
+      "endsAt": "<rfc3339>",
+      "generatorURL": <string>,      // identifies the entity that caused the alert
+      "fingerprint": <string>        // fingerprint to identify the alert
+    },
+    ...
+  ]
+}
+```
+2. 然后将这边 body 体转换对 struct 对象:
+```text
+type Data struct {
+	Receiver string `json:"receiver"`
+	Status   string `json:"status"`
+	Alerts   Alerts `json:"alerts"`
+
+	GroupLabels       KV `json:"groupLabels"`
+	CommonLabels      KV `json:"commonLabels"`
+	CommonAnnotations KV `json:"commonAnnotations"`
+
+	ExternalURL string `json:"externalURL"`
+	AtMobiles   []string
+}
+
+// Alert holds one alert for notification templates.
+type Alert struct {
+	Status       string    `json:"status"`
+	Labels       KV        `json:"labels"`
+	Annotations  KV        `json:"annotations"`
+	StartsAt     time.Time `json:"startsAt"`
+	EndsAt       time.Time `json:"endsAt"`
+	GeneratorURL string    `json:"generatorURL"`
+	Fingerprint  string    `json:"fingerprint"`
+}
+
+// Alerts is a list of Alert objects.
+type Alerts []Alert
+```
+3. 然后接下来就是模板插值了
+
+#### 7.3 配置到 alertmanager
+同时可以配置: alertmanager ,将其加进去, 多了一个恢复状态的回执 `send_resolved`
+```text
+[root@VM-64-9-centos ~]# cat /usr/local/alertmanager/alertmanager.yml 
+global:
+  smtp_smarthost: 'smtp.qq.com:25'
+  smtp_from: 'zachke@foxmail.com'
+  smtp_auth_username: 'zachke@foxmail.com'
+  smtp_auth_password: 'ypgtrcxnvvcnbcea' 
+  smtp_require_tls: false
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 10m
+  receiver: default-receiver
+receivers:
+  - name: 'default-receiver'
+    email_configs:
+    - to: 'kebingzao@gmail.com'
+    webhook_configs:
+    - url: http://localhost:8070/dingtalk/webhook_1/send
+      send_resolved: true
+
+# 检查格式是否正确
+[root@VM-64-9-centos alertmanager]# ./amtool check-config alertmanager.yml 
+Checking 'alertmanager.yml'  SUCCESS
+Found:
+ - global config
+ - route
+ - 0 inhibit rules
+ - 1 receivers
+ - 0 templates
+ 
+# 最后重启
+[root@VM-64-9-centos ~]# systemctl restart alertmanager
+```
+
+#### 7.4 接下来测试
+先把 node_exporter 关掉一台，然后过段时间再开启，这时候就可以收到报警和恢复的钉钉通知了
+
+![](19.png)
+
+### 8. 邮件配置自定义模板
+通过上面我们可以看到 钉钉通知可以发送自定义模板，也可以设置恢复警报， 那么对于邮件通知来说，也是可以的
+
+Prometheus 支持在警报的注释和标签以及服务的控制台页面中进行模板化。模板能够对本地数据库运行查询、迭代数据、使用条件、格式化数据等。Prometheus 模板语言基于[Go 模板系统](https://pkg.go.dev/text/template)。
+
+发送给接收者的通知是通过模板构建的。 alertmanager 带有默认模板，但也可以自定义。其中默认模板就是这个: [alertmanager default.tmpl](https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl)
+
+你们的很多语法都跟我们刚才创建钉钉通知的模板的语法一样，因为都是从相同的地方取值的，所以我们简单改造一下，新建一个:
 
 
 
 
+## [通知模板的数据结构](https://prometheus.io/docs/alerting/latest/notifications/#alert)
+上述无论是 钉钉通知的模板还是邮件的模板，他所读取的数据都是 prometheus 发送给 alertmanager 中，这些数据结构包含的 键值对 的含义如下
+> alertmanager 的通知模板基于Go 模板系统。请注意，某些字段被评估为文本，而其他字段被评估为 HTML，这将影响转义。
 
 
 
+## 很多有用的警报规则
 
 
-
-
-
-
-
----
-
-
-
-
-
-
-
-
-
+## 总结
 
 
 
@@ -438,6 +1155,8 @@ Checking rules/test-1.yml
 - [prometheus alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
 - [通知模板参考](https://prometheus.io/docs/alerting/latest/notifications/)
 - [Awesome Prometheus alerts](https://awesome-prometheus-alerts.grep.to/)
+- [TEMPLATE EXAMPLES](https://prometheus.io/docs/prometheus/latest/configuration/template_examples/)
+- [通知模板参考](https://prometheus.io/docs/alerting/latest/notifications/#alert)
 
 
 
