@@ -20,7 +20,7 @@ categories: prometheus 相关
 2. 触发警报之后(firing)，prometheus 将报警信息转发给独立组件 alertmanager，然后经过 alertmanager 对报警信息处理之后，最后通过接收器发送给指定用户
 
 同时 alertmanager 支持多种接收器(`receiver`), 比如 `Email`, `Slack` , `钉钉`, `企业微信` , `Webhook`
-
+<!--more-->
 ## 再添加一台 node 节点监控
 为了便于后面更好的测试警报， 我这边又在另外的云服务器上添加另一个 node_exporter 监控，对应配置改成:
 ```text
@@ -137,7 +137,7 @@ rule_files:
 
 可以看到出现了一个 group 为 `test-1` 的警报规则组， 里面有一条警报，名称为 `节点存活`
 
-alerts 那边也可以看到确实存在一个警告了， 但是出于 未激活的 `inactive` 状态， 这个说明当前状态是正常的
+alerts 那边也可以看到确实存在一个警告了， 但是处于 未激活的 `inactive` 状态， 这个说明当前状态是正常的
 
 ![](6.png)
 
@@ -189,9 +189,7 @@ annotations:
   [ <labelname>: <tmpl_string> ]
 ```
 
-这边需要注意的是， for 这个参数，一般我们不希望偶尔的网络波动导致 prometheus 抓取数据失败，就会马上触发警报(firing 状态)，从而就收到警报邮件了
-
-因此我们就会设置一个比较合理的等待值。 在等待周期之内，如果触发评估规则了，并且 expr 表达式为 false，那么就会将状态变成 inactive，这时候就不会触发警报了
+这边需要注意的是， for 这个参数，一般我们不希望偶尔的网络波动导致 prometheus 抓取数据失败，就会马上触发警报(firing 状态)，从而就收到警报邮件了，因此我们就会设置一个比较合理的等待值。 在等待周期之内，如果触发评估规则了，并且 expr 表达式为 false，那么就会将状态变成 inactive，这时候就不会触发警报了
 
 这个值要大于评估周期 `evaluation_interval` 才有价值，比如评估周期是 15s， 然后 for 设置的是 20s，然后触发顺序是这样子:
 1. 触发评估周期，然后执行 expr 表达式，为 true， 警报状态从 `inactive` 变成 `pending`, 进入等待期(执行 for 子句)
@@ -210,7 +208,7 @@ prometheus 警报有 4 种状态:
 
 虽然以上有 4 种，但是对于 prometheus 的警报来说， 只有前三种，因为对于状态显示来说， 第四种的恢复态，其实就是第一种的 inactive。 也就是只有 alertmanager 才需要恢复态
 
-也就是说，只有 alertmanager 才需要 resolve 状态，事实上  alertmanager 只有两种状态: firing 和 resolve， 因为 prometheus server 传递给 alertmanager 的状态就只有这两个状态
+所以对于 alertmanager 的警报来说，只有两种状态: firing 和 resolve， 因为 prometheus server 传递给 alertmanager 的状态就只有这两个状态
 
 ### 5. 抓取周期(scrape_interval) 和 评估周期 (evaluation_interval)
 在 prometheus server 中， 抓取周期 和 评估周期是分开的，可以各自设置。 但是最好评估周期要 大于等于 抓取周期。 不能小于， 不然就会出现评估的时候，取的是旧值，导致误报。
@@ -218,8 +216,8 @@ prometheus 警报有 4 种状态:
 举个例子，假设抓取周期是 2 分钟， 然后评估周期是 15s， 等待周期是 1m，这时候就会出现这种情况:
 1. 第一次抓取的时候，节点挂了， up 为 0
 2. 15s 后触发评估周期，发现节点挂了，状态变成 pending， 启动等待周期 1m
-3. 有过了 10s，节点启动正常
-4. 有过了 5s，触发第二次评估，但是因为还没有触发抓取周期，评估的数据还是旧的，所以判断还是 pending
+3. 又过了 10s，节点启动正常
+4. 又过了 5s，触发第二次评估，但是因为还没有触发抓取周期，评估的数据还是旧的，所以判断还是 pending
 5. 又过了 45s，期间触发了 3 轮的评估，因为都是旧值，同时因为过了等待周期，状态变为 firing，触发报警
 6. 又过了一分钟， 触发抓取周期，节点正常，同时时间周期也触发了评估周期，表达式返回 false， 状态从 firing 变成 inactive，警报恢复正常
 
@@ -329,8 +327,8 @@ inhibit_rules:
 [root@VM-64-9-centos alertmanager]# cat alertmanager.yml 
 global:
   smtp_smarthost: 'smtp.qq.com:25'
-  smtp_from: 'zachke@foxmail.com'
-  smtp_auth_username: 'zachke@foxmail.com'
+  smtp_from: 'z***e@foxmail.com'
+  smtp_auth_username: 'z***e@foxmail.com'
   smtp_auth_password: 'ypgtxxxxxxxxxxxxx' 
   smtp_require_tls: false
 route:
@@ -342,7 +340,7 @@ route:
 receivers:
   - name: 'default-receiver'
     email_configs:
-    - to: 'kebingzao@gmail.com'
+    - to: 'k****o@gmail.com'
 
 # 使用工具检查 yml 格式
 [root@VM-64-9-centos alertmanager]# ./amtool check-config alertmanager.yml
@@ -431,16 +429,16 @@ receivers:
 - name: default-receiver
   email_configs:
   - send_resolved: false
-    to: kebingzao@gmail.com
-    from: zachke@foxmail.com
+    to: k****o@gmail.com
+    from: z***e@foxmail.com
     hello: localhost
     smarthost: smtp.qq.com:25
-    auth_username: zachke@foxmail.com
+    auth_username: z***e@foxmail.com
     auth_password: <secret>
     headers:
-      From: zachke@foxmail.com
+      From: z***e@foxmail.com
       Subject: '{{ template "email.default.subject" . }}'
-      To: kebingzao@gmail.com
+      To: k****o@gmail.com
     html: '{{ template "email.default.html" . }}'
     require_tls: false
 templates: []
@@ -740,6 +738,7 @@ alertmanager 有 3个特性:
 
 ### 6. group_interval 和 repeat_interval
 我们例子中其实很简单，除了 global 配置全局邮件发送之外，其他就是:
+
 ```text
 route:
   group_by: ['alertname']
@@ -750,12 +749,13 @@ route:
 receivers:
   - name: 'default-receiver'
     email_configs:
-    - to: 'kebingzao@gmail.com'
-``` 
+    - to: 'k****o@gmail.com'
+```
+
 所以其实就很简单， 一旦收到警报，处理步骤如下:
-1. 根据标签 alertname 的值进行分组，如果是首次的话，等待 30s 让相同组的警报过来， 30s 过来，如果有其他组内的警报进来的话， 就合并成一组，然后发送给接收器 default-receiver， 然后这个接收器发送邮件，用的是默认模板
+1. 根据标签 alertname 的值进行分组，如果是首次的话，等待 30s 让相同组的警报过来， 30s 之内，如果有其他组内的警报进来的话， 就合并成一组，然后发送给接收器 default-receiver， 然后这个接收器发送邮件，用的是默认模板
 2. 然后接下来又过了一分钟，又来了一条相同的警报信息，这时候除了等待 30s 归类之外，就要读 group_interval 配置，如果与上一条同组的警报通知间隔不到 5 分钟，那么就要等到 5 分钟，才会发送下一条警报
-3. 然后发送之前，判断本次的警报其实没有恢复，这时候就要读 repeat_interval 的配置，也就是说，要发送重复警报的话，还要再等 10 分钟才行
+3. 然后发送之前，判断本次的警报是否有恢复(状态是否有改变)，这时候就要读 repeat_interval 的配置，也就是说，要发送重复警报的话，还要再等 10 分钟才行
 
 综上就可以看到，假设一条警报一直没有修复， 就会出现，除了第一次是马上发送警报，接下来要发重复警报的话，就要再过 group_interval + repeat_interval = 15 分钟
 
@@ -1084,9 +1084,9 @@ type Alerts []Alert
 [root@VM-64-9-centos ~]# cat /usr/local/alertmanager/alertmanager.yml 
 global:
   smtp_smarthost: 'smtp.qq.com:25'
-  smtp_from: 'zachke@foxmail.com'
-  smtp_auth_username: 'zachke@foxmail.com'
-  smtp_auth_password: 'ypgtrcxnvvcnbcea' 
+  smtp_from: 'z***e@foxmail.com'
+  smtp_auth_username: 'z***e@foxmail.com'
+  smtp_auth_password: 'ypgtxxxxxxxxxxxx' 
   smtp_require_tls: false
 route:
   group_by: ['alertname']
@@ -1097,7 +1097,7 @@ route:
 receivers:
   - name: 'default-receiver'
     email_configs:
-    - to: 'kebingzao@gmail.com'
+    - to: 'k****o@gmail.com'
     webhook_configs:
     - url: http://localhost:8070/dingtalk/webhook_1/send
       send_resolved: true
@@ -1126,25 +1126,500 @@ Found:
 
 Prometheus 支持在警报的注释和标签以及服务的控制台页面中进行模板化。模板能够对本地数据库运行查询、迭代数据、使用条件、格式化数据等。Prometheus 模板语言基于[Go 模板系统](https://pkg.go.dev/text/template)。
 
-发送给接收者的通知是通过模板构建的。 alertmanager 带有默认模板，但也可以自定义。其中默认模板就是这个: [alertmanager default.tmpl](https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl)
+发送给接收者的通知是通过模板构建的。 alertmanager 带有默认模板，但也可以自定义。其中默认模板就是这个: 
+- [alertmanager default.tmpl](https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl)
+- 还有一个就是邮件的 html 模板: [alertmanager template email.html](https://github.com/prometheus/alertmanager/blob/main/template/email.html)
 
-你们的很多语法都跟我们刚才创建钉钉通知的模板的语法一样，因为都是从相同的地方取值的，所以我们简单改造一下，新建一个:
+很多语法都跟我们刚才创建钉钉通知的模板的语法一样，因为都是从相同的地方取值的，所以我们简单改造一下，新建一个:
+```html
+[root@VM-64-9-centos alertmanager]# cat  /usr/local/prometheus/templates/mail.tmpl 
+{{ define "custom_mail_subject" }} {{ template "__subject" . }} {{ end }}
+{{ define "custom_mail_html" }}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{{ template "__subject" . }}</title>
+<style>
+/* -------------------------------------
+    GLOBAL
+    A very basic CSS reset
+------------------------------------- */
+* {
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  font-size: 14px;
+}
 
+img {
+  max-width: 100%;
+}
 
+body {
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: none;
+  width: 100% !important;
+  height: 100%;
+  line-height: 1.6em;
+  /* 1.6em * 14px = 22.4px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 22px;*/
+}
 
+/* Let's make sure all tables have defaults */
+table td {
+  vertical-align: top;
+}
+
+/* -------------------------------------
+    BODY & CONTAINER
+------------------------------------- */
+body {
+  background-color: #f6f6f6;
+}
+
+.body-wrap {
+  background-color: #f6f6f6;
+  width: 100%;
+}
+
+.container {
+  display: block !important;
+  max-width: 600px !important;
+  margin: 0 auto !important;
+  /* makes it centered */
+  clear: both !important;
+}
+
+.content {
+  max-width: 600px;
+  margin: 0 auto;
+  display: block;
+  padding: 20px;
+}
+
+/* -------------------------------------
+    HEADER, FOOTER, MAIN
+------------------------------------- */
+.main {
+  background-color: #fff;
+  border: 1px solid #e9e9e9;
+  border-radius: 3px;
+}
+
+.content-wrap {
+  padding: 30px;
+}
+
+.content-block {
+  padding: 0 0 20px;
+}
+
+.header {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.footer {
+  width: 100%;
+  clear: both;
+  color: #999;
+  padding: 20px;
+}
+.footer p, .footer a, .footer td {
+  color: #999;
+  font-size: 12px;
+}
+
+/* -------------------------------------
+    TYPOGRAPHY
+------------------------------------- */
+h1, h2, h3 {
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  color: #000;
+  margin: 40px 0 0;
+  line-height: 1.2em;
+  font-weight: 400;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 500;
+  /* 1.2em * 32px = 38.4px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 38px;*/
+}
+
+h2 {
+  font-size: 24px;
+  /* 1.2em * 24px = 28.8px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 29px;*/
+}
+
+h3 {
+  font-size: 18px;
+  /* 1.2em * 18px = 21.6px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 22px;*/
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+p, ul, ol {
+  margin-bottom: 10px;
+  font-weight: normal;
+}
+p li, ul li, ol li {
+  margin-left: 5px;
+  list-style-position: inside;
+}
+
+/* -------------------------------------
+    LINKS & BUTTONS
+------------------------------------- */
+a {
+  color: #348eda;
+  text-decoration: underline;
+}
+
+.btn-primary {
+  text-decoration: none;
+  color: #FFF;
+  background-color: #348eda;
+  border: solid #348eda;
+  border-width: 10px 20px;
+  line-height: 2em;
+  /* 2em * 14px = 28px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 28px;*/
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+/* -------------------------------------
+    OTHER STYLES THAT MIGHT BE USEFUL
+------------------------------------- */
+.last {
+  margin-bottom: 0;
+}
+
+.first {
+  margin-top: 0;
+}
+
+.aligncenter {
+  text-align: center;
+}
+
+.alignright {
+  text-align: right;
+}
+
+.alignleft {
+  text-align: left;
+}
+
+.clear {
+  clear: both;
+}
+
+/* -------------------------------------
+    ALERTS
+    Change the class depending on warning email, good email or bad email
+------------------------------------- */
+.alert {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 500;
+  padding: 20px;
+  text-align: center;
+  border-radius: 3px 3px 0 0;
+}
+.alert a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+}
+.alert.alert-warning {
+  background-color: #E6522C;
+}
+.alert.alert-bad {
+  background-color: #D0021B;
+}
+.alert.alert-good {
+  background-color: #68B90F;
+}
+
+/* -------------------------------------
+    INVOICE
+    Styles for the billing table
+------------------------------------- */
+.invoice {
+  margin: 40px auto;
+  text-align: left;
+  width: 80%;
+}
+.invoice td {
+  padding: 5px 0;
+}
+.invoice .invoice-items {
+  width: 100%;
+}
+.invoice .invoice-items td {
+  border-top: #eee 1px solid;
+}
+.invoice .invoice-items .total td {
+  border-top: 2px solid #333;
+  border-bottom: 2px solid #333;
+  font-weight: 700;
+}
+
+/* -------------------------------------
+    RESPONSIVE AND MOBILE FRIENDLY STYLES
+------------------------------------- */
+@media only screen and (max-width: 640px) {
+  body {
+    padding: 0 !important;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 800 !important;
+    margin: 20px 0 5px !important;
+  }
+
+  h1 {
+    font-size: 22px !important;
+  }
+
+  h2 {
+    font-size: 18px !important;
+  }
+
+  h3 {
+    font-size: 16px !important;
+  }
+
+  .container {
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .content {
+    padding: 0 !important;
+  }
+
+  .content-wrap {
+    padding: 10px !important;
+  }
+
+  .invoice {
+    width: 100% !important;
+  }
+}
+</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/EmailMessage">
+
+<table class="body-wrap">
+  <tr>
+    <td></td>
+    <td class="container" width="600">
+      <div class="content">
+        <table class="main" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            {{ if gt (len .Alerts.Firing) 0 }}
+            <td class="alert alert-warning">
+            {{ else }}
+            <td class="alert alert-good">
+            {{ end }}
+              {{ .Alerts | len }} alert{{ if gt (len .Alerts) 1 }}s{{ end }} for {{ range .GroupLabels.SortedPairs }}
+                {{ .Name }}={{ .Value }} 
+              {{ end }}
+            </td>
+          </tr>
+          <tr>
+            <td class="content-wrap">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td class="content-block">
+                    <a href='{{ template "__alertmanagerURL" . }}' class="btn-primary">View in {{ template "__alertmanager" . }}</a>
+                  </td>
+                </tr>
+                {{ if gt (len .Alerts.Firing) 0 }}
+                <tr>
+                  <td class="content-block">
+                    <strong>[{{ .Alerts.Firing | len }}] Firing</strong>
+                  </td>
+                </tr>
+                {{ end }}
+                {{ range .Alerts.Firing }}
+                <tr>
+                  <td class="content-block">
+                    <strong>标签组:</strong><br />
+                    {{ range .Labels.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+                    {{ if gt (len .Annotations) 0 }}<strong>描述:</strong><br />{{ end }}
+                    {{ range .Annotations.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+					<strong>触发时间(UTC):</strong>** {{ .StartsAt }} <br />
+                    <a href="{{ .GeneratorURL }}">查看详情</a><br />
+                  </td>
+                </tr>
+                {{ end }}
+
+                {{ if gt (len .Alerts.Resolved) 0 }}
+                  {{ if gt (len .Alerts.Firing) 0 }}
+                <tr>
+                  <td class="content-block">
+                    <br />
+                    <hr />
+                    <br />
+                  </td>
+                </tr>
+                  {{ end }}
+                <tr>
+                  <td class="content-block">
+                    <strong>[{{ .Alerts.Resolved | len }}] Resolved</strong>
+                  </td>
+                </tr>
+                {{ end }}
+                {{ range .Alerts.Resolved }}
+                <tr>
+                  <td class="content-block">
+                    <strong>标签:</strong><br />
+                    {{ range .Labels.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+                    {{ if gt (len .Annotations) 0 }}<strong>详情:</strong><br />{{ end }}
+                    {{ range .Annotations.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+					<strong>触发时间(UTC):</strong>** {{ .StartsAt }} <br />
+					<strong>恢复时间(UTC):</strong>** {{ .EndsAt }} <br />
+                    <a href="{{ .GeneratorURL }}">点击详情</a><br />
+                  </td>
+                </tr>
+                {{ end }}
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <div class="footer">
+          <table width="100%">
+            <tr>
+              <td class="aligncenter content-block"><a href='{{ .ExternalURL }}'>Sent by {{ template "__alertmanager" . }}</a></td>
+            </tr>
+          </table>
+        </div></div>
+    </td>
+    <td></td>
+  </tr>
+</table>
+
+</body>
+</html>
+{{ end }}
+```
+
+看似很长，其实是直接将原先的 html 模板拿来进行改造的，添加了两个自定义模板对象
+- `custom_mail_subject` -> 对应标题
+- `custom_mail_html` -> 对应 html 内容体
+
+这两个模板对象都会在下面的配置文件中指定
+
+接下来配置 alertmanager.yml， 增加了 `templates` 的配置和 `email_configs` 这两个小节，主要是用来定制 mail 的 subject 和 html content， 所对应的模板就是上述创建的模板文件所定义的
+```text
+[root@VM-64-9-centos alertmanager]# cat alertmanager.yml 
+global:
+  smtp_smarthost: 'smtp.qq.com:25'
+  smtp_from: 'z***e@foxmail.com'
+  smtp_auth_username: 'z***e@foxmail.com'
+  smtp_auth_password: 'ypgtxxxxxxxxxxxx' 
+  smtp_require_tls: false
+templates:
+  - '/usr/local/prometheus/templates/mail.tmpl'
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 10m
+  receiver: default-receiver
+receivers:
+  - name: 'default-receiver'
+    email_configs:
+    - to: 'k****o@gmail.com'
+      send_resolved: true
+      headers:
+        subject: '{{ template "custom_mail_subject" .  }}'
+      html: '{{ template "custom_mail_html" . }}'
+    webhook_configs:
+    - url: http://localhost:8070/dingtalk/webhook_1/send
+      send_resolved: true
+
+# 验证
+[root@VM-64-9-centos alertmanager]# ./amtool check-config alertmanager.yml 
+Checking 'alertmanager.yml'  SUCCESS
+Found:
+ - global config
+ - route
+ - 0 inhibit rules
+ - 1 receivers
+ - 1 templates
+  SUCCESS
+
+# 重启配置生效
+[root@VM-64-9-centos alertmanager]# systemctl restart alertmanager.service
+```
+
+后面就可以看到发送的结果，一个是警报，一个是警报恢复的 (可以看到跟原先相比，之前的英文改成中文了，并且添加了时间)
+
+![](20.png)
+
+下面这个是恢复的
+
+![](21.png)
+
+这样子我们就可以自己定制我们的邮件通知的模板了
+
+### 9. alertmanager 也可以热更新配置文件
+alertmanager 除了上述的用 system 来重启让配置生效之外，也可以用热更新来生效配置文件: [重新加载](https://prometheus.io/docs/alerting/latest/management_api/#reload)
+```text
+curl -X POST localhost:9093/-/reload
+```
 
 ## [通知模板的数据结构](https://prometheus.io/docs/alerting/latest/notifications/#alert)
-上述无论是 钉钉通知的模板还是邮件的模板，他所读取的数据都是 prometheus 发送给 alertmanager 中，这些数据结构包含的 键值对 的含义如下
+上述无论是 钉钉通知的模板还是邮件的模板，他所读取的数据都是 prometheus 发送给 alertmanager 的，这些数据结构包含的 键值对 的含义如下
 > alertmanager 的通知模板基于Go 模板系统。请注意，某些字段被评估为文本，而其他字段被评估为 HTML，这将影响转义。
 
+|Name |	Type	|Notes|
+|---|---|---|
+| Receiver |	string	| 接受警报通知的接收器名称
+|Status | 	string	| 警报状态，例如：Firing或Resolved的通知
+| Alerts |	alert |警报通知的真实内容，警报中的所有列表
+| GroupLabels |	KV	| 包含警报通知的组标签
+| CommonLabels |	KV |	所有警报的公共标签，包含GroupLabels的所有标签
+| CommonAnnotations	| KV	| 注释，比如自定义的一些字符串
+| ExternalURL	| string | 警报信息中的Alertmanager地址
 
+其中 alert 包含:
 
-## 很多有用的警报规则
+|Name	|Type	 |Notes|
+|---|---|---|
+| Status |	string | 定义警报是已解决还是正在触发。
+| Labels |	KV	| 要附加到警报的一组标签。
+| Annotations | 	KV |警报的一组注释。rule 规则定义的
+| StartsAt	| time.Time |	警报开始触发的时间
+| EndsAt	| time.Time |	警报恢复时间，仅当警报的结束时间已知时才设置
+ | GeneratorURL |	string |	标识此警报的引起实体的反向链接
+| Fingerprint	| string	| 可用于识别警报的指纹。
 
 
 ## 总结
+通过本节，我们已经在 prometheus server 配置警报规则并触发，然后通过 alertmanager 进行警报通知发送， 而且可以做到使用钉钉发送和邮件发送了，并且模板都可以自定义。
 
-
+下一节，我们写个综合的例子来测试一下
 
 ---
 
@@ -1157,6 +1632,8 @@ Prometheus 支持在警报的注释和标签以及服务的控制台页面中进
 - [Awesome Prometheus alerts](https://awesome-prometheus-alerts.grep.to/)
 - [TEMPLATE EXAMPLES](https://prometheus.io/docs/prometheus/latest/configuration/template_examples/)
 - [通知模板参考](https://prometheus.io/docs/alerting/latest/notifications/#alert)
-
-
+- [How to change Prometheus Alertmanager E-Mail template](https://velenux.wordpress.com/2021/04/23/how-to-change-prometheus-alertmanager-e-mail-template/)
+- [Prometheus监控神器-Rules篇](https://blog.csdn.net/wang7531838/article/details/107856842)
+- [Prometheus监控神器-Alertmanager篇(1)](https://blog.csdn.net/wang7531838/article/details/107809870)
+- [Prometheus监控神器-Alertmanager篇(2)](https://blog.csdn.net/wang7531838/article/details/107837250)
 
