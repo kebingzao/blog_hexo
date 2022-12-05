@@ -83,6 +83,8 @@ Checking rules/test-1.yml
 
 > 一个规则文件里面可以包含多个警报规则，可以写在同一组 group 里面的 rules 下面，也可以单独写在另一个 group 中。
 
+为了使告警信息具有更好的可读性，prometheus 支持使用变量来获取指定标签中的值。比如 `$labels.<labelname>` 变量可以访问当前告警实例中指定标签的值。`$value` 可以获取当前 PromQL 表达式计算的样本值。
+
 ### 2. 将警报规则添加到 prometheus 配置文件中
 在 prometheus 文件中，添加 `rule_files` 这个节点，其他不变
 ```text
@@ -613,8 +615,8 @@ route:
 ```
 
 简单的来说，路由匹配的执行步骤如下：
-1. 先判断警报的 service 标签是 mysql 或者 cassandra，如果是就给接收者 database-pager，然后结束
-2. 如果不是，匹配 team="frontend", 同时按照 product 和 environment 这两个标签的值来分组，抛给接收者 frontend-pager，然后结束
+1. 先判断警报的 service 标签是 mysql 或者 cassandra，如果是就给接收者 database-pager，然后结束, 同时继承 root route 的 group by，按照 cluster 和 alertname 这两个标签的值来分组
+2. 如果不是，匹配 team="frontend", 同时按照 product 和 environment 这两个标签的值来分组 (重写了 root route 的 group by)，抛给接收者 frontend-pager，然后结束
 3. 如果还不是，匹配 service="inhouse-service" 标签，然后分为两种
   3.1 如果当前不是下班时间和节假日时间，那么就通知给接收者 dev-pager，然后继续匹配到下一条规则，有匹配到但是因为不满足 下班时间和节假日 的激活时间，不发送给接收者 on-call-pager
   3.2 如果当前是下班时间和节假日时间，那么当前是静音状态，不发送接收者 dev-pager，然后继续匹配到下一条规则，有匹配到，同时满足激活条件，发送给接收者 on-call-pager
@@ -709,7 +711,7 @@ tls_config:
 [ headers: { <string>: <tmpl_string>, ... } ]
 ```
 
-##### 5.4.2 [webhook_config]
+##### 5.4.2 [webhook_config](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)
 ```text
 # 警报状态恢复是否要发送恢复邮件
 [ send_resolved: <boolean> | default = true ]
@@ -1615,11 +1617,16 @@ curl -X POST localhost:9093/-/reload
  | GeneratorURL |	string |	标识此警报的引起实体的反向链接
 | Fingerprint	| string	| 可用于识别警报的指纹。
 
+## 其他 webhook 集成接收器
+除了上述 钉钉是 通过 webhook 接收器来处理的之外，alertmanager 的 webhook 接收器也集成了很多第三方的通知，比如 gitlab，jira，telegram，zoom 等等， 具体可以看到: [Alertmanager Webhook Receiver](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver)
 
 ## 总结
 通过本节，我们已经在 prometheus server 配置警报规则并触发，然后通过 alertmanager 进行警报通知发送， 而且可以做到使用钉钉发送和邮件发送了，并且模板都可以自定义。
 
-下一节，我们写个综合的例子来测试一下
+下一节，我们再详细分析一下 alertmanager 的三个特性, 理解这 3 个特性，能够更好的帮助我们去设置警报:
+- 分组(`Grouping`)
+- 抑制(`Inhibition`)
+- 静默(`Silences`)
 
 ---
 
