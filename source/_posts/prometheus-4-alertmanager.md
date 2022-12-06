@@ -1643,4 +1643,5 @@ curl -X POST localhost:9093/-/reload
 - [Prometheus监控神器-Rules篇](https://blog.csdn.net/wang7531838/article/details/107856842)
 - [Prometheus监控神器-Alertmanager篇(1)](https://blog.csdn.net/wang7531838/article/details/107809870)
 - [Prometheus监控神器-Alertmanager篇(2)](https://blog.csdn.net/wang7531838/article/details/107837250)
+- [prometheus使用 (十四) 告警模板配置](https://blog.csdn.net/qq_42883074/article/details/115354277)
 
