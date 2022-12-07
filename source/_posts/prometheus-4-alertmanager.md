@@ -38,7 +38,7 @@ categories: prometheus 相关
 ## 创建警报规则
 prometheus 可以创建两种规则:
 1. [记录规则(`recording rules`)](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
-2. [警报规则](`alerting rules`)](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
+2. [警报规则(`alerting rules`)](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
 
 其中 `记录规则` 不在本次警报章节中，后面会单独开篇章讲述。 本章主要讲的是如何用 `警报规则` 创建一条警报
 
@@ -1530,6 +1530,7 @@ a {
 - `custom_mail_html` -> 对应 html 内容体
 
 这两个模板对象都会在下面的配置文件中指定
+> 而这个模板一旦被定义好，是可以一直被使用的，不仅仅是用于 mail 的模板，其他的通知手段如果想用的话，一样可以用。
 
 接下来配置 alertmanager.yml， 增加了 `templates` 的配置和 `email_configs` 这两个小节，主要是用来定制 mail 的 subject 和 html content， 所对应的模板就是上述创建的模板文件所定义的
 ```text
@@ -1644,4 +1645,5 @@ curl -X POST localhost:9093/-/reload
 - [Prometheus监控神器-Alertmanager篇(1)](https://blog.csdn.net/wang7531838/article/details/107809870)
 - [Prometheus监控神器-Alertmanager篇(2)](https://blog.csdn.net/wang7531838/article/details/107837250)
 - [prometheus使用 (十四) 告警模板配置](https://blog.csdn.net/qq_42883074/article/details/115354277)
+- [Prometheus学习系列（十七）之模板参考](https://www.jianshu.com/p/cfd1361ffcc6)
 
