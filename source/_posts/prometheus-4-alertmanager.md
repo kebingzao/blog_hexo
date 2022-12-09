@@ -248,6 +248,9 @@ prometheus 警报有 4 种状态:
 
 接下来也试过先关掉服务，然后再过了等待期之前，再开启服务，这时候只要新一轮的评估周期在等待期内，一样会从 pending 变成 inactive，不会触发 firing
 
+### 7. 警报规则的单元测试
+我们可以用 `promtool` 来对警报规则进行单元测试: 具体可以看官方文档: [规则的单元测试](https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/)
+
 ## alertmanager
 我们已经能够从 prometheus server 中创建警报规则，并成功触发警报了， 但是我们还缺少触发之后的报警手段，比如发送 mail 到运维人员之类的手段
 ### 1. 安装
