@@ -85,7 +85,7 @@ rules:
 然后创建了一个 alert 的目录来存放这个规则，然后设置组别为 node
 
 ### 5. step 4 设置通知手段
-这一块可以自定义，但是我们直接用默认的 root route 就行了，他跟 alertmanager 的配置一样，只不过他没有设置的时候，是会自动给一个叫 `root route` 的接收者来发送
+这一块可以自定义，但是我们直接用默认的 root route 就行了，他跟 alertmanager 的配置一样，只不过他没有设置的时候，是会自动给默认的接收者来发送
 
 ![](7.png)
 
@@ -338,6 +338,17 @@ img {
 
 ![](33.png)
 
+不过有看到这边的 `来源` 和 `设置静默` 的连接都是 localhost，所以点进去其实落地页是错的， 我们要改成正确的 url 地址， 这个是需要在 grafana 的配置文件上改的: `/etc/grafana/grafana.ini`， 其实就是将 domain 改成正确的 ip 地址，或者域名(本例就是 ip):
+```text
+# The public facing domain name used to access grafana from a browser
+;domain = localhost
+domain = 43.153.96.96
+```
+
+然后重启 grafana， 这样子链接就对了
+
+![](39.png)
+
 #### 遇到的几个坑
 1. 刚开始是 `my.title` 和 `my.message` 是写在一起的，就跟我那时候在 alertmanager 那样子，但是 `my.title` 会一直报错:
 
@@ -347,8 +358,7 @@ Dec 09 16:49:55 VM-64-9-centos grafana-server[15553]: logger=alerting.notifier.e
 
 后面发现，分开就可以。 但是写在一起就是不行，甚至我试过直接写在 mail 或者 钉钉 的消息体输入框，也是可以的，就是写在一起不行。 最后没办法就分开定义了
 
-2. resolved 邮件的时候，发现 `.ValueString` 这个变量竟然为空，甚至 summary 里面的变量也没有，不知道是不是 bug 的原因，但是 alertmanager 是可以的
-
+2. resolved 邮件的时候，发现 `.ValueString` 这个变量竟然为空，甚至 summary 里面的变量也没有，不知道是不是 bug 的原因，但是 alertmanager 是可以的， 后面查了一下 grafana 的 issues， 发现确实有人提了这个 issue: [valueString webhook body is empty](https://github.com/grafana/grafana/issues/45459), 并且在最新的版本依然问题存在，所以我猜测这个应该是 grafana 的 bug。
 
 ## 创建通知策略
 grafana 的通知策略也允许跟 alertmanager 一样，创建这三个参数:
@@ -376,7 +386,13 @@ grafana 也有跟 alertmanager 一样的静默策略， 不再赘述
 
 当然，在生产环境中， 看是要用 grafana 自己的警报系统，还是用 alertmanager ，这个要看个人的喜好。
 
-如果是重度依赖监控 + 警报 的用户，我是觉得 alertmanager 其实会更加的灵活和可定制化。
+如果是重度依赖监控 + 警报 的用户，我是觉得 alertmanager 其实会更加的灵活和可定制化。 毕竟 alertmanager 至少有两个功能是 grafana 的警报没有的:
+1. 抑制规则
+2. 可配置的有效时间和静默时间
+
+但是 grafana 有一个优点就是，直接在 grafana 后台配置即可，不需要上服务器修改 `alertmanager.yml` 和 `rule/*.yml` 系列配置文件。 这一个是真的方便。
+
+接下来我们将重心重新回到 prometheus 上，之前我们的数据采集都是用现成的 exporter，但是其实生产环境上， 我们的业务程序也是要抛送 prometheus 数据，那么怎么在我们的业务程序上使用 prometheus 来采集自定义数据呢?
 
 
 ---
