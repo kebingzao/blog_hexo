@@ -3,6 +3,7 @@ title: 基于 prometheus 打造监控报警后台 (8) - 业务程序自定义添
 date: 2022-12-12 14:07:56
 tags: 
 - prometheus
+- golang
 categories: prometheus 相关
 ---
 ## 前言

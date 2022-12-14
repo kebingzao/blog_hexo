@@ -135,6 +135,12 @@ Checking ../rules/test-record.yml
 
 ![](7.png)
 
+## 记录规则的命名
+官方有针对`记录规则`推荐了最佳实践: [记录规则最佳实践](https://prometheus.io/docs/practices/rules/)
+
+一般以这种形式命名 `level:metric:operations`. 其中 `level` 表示规则输出的聚合级别和标签, `metric` 是指标名称，`operations` 是应用于指标的操作行为列表
+
+
 ## 总结
 我们可以通过创建记录规则来保存一些常见的 prometheus 计算表达式，并且将记录规则当做指标来进行查询。
 
