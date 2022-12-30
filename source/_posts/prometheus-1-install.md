@@ -598,7 +598,7 @@ ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/p
 - [官方配置文件文档](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
 - [基于Prometheus + Grafana搭建IT监控报警最佳实践(1)](https://zhuanlan.zhihu.com/p/574729059)
 - [Prometheus + Grafana详解](https://blog.51cto.com/kaliarch/4921421)
-
+- [各种导出器](https://prometheus.io/docs/instrumenting/exporters/)
 
 
 
