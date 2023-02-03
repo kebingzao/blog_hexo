@@ -84,4 +84,17 @@ The frame-ancestors directive obsoletes the X-Frame-Options header. If a resourc
 #### 站点测试
 可以通过 https://clickjacker.io/  来检测你的站点是否有 Clickjacking 的安全缺陷。
 
-#### 除了X-Frame-Options之外，Firefox的"Content Security Policy"以及Firefox的NoScript扩展也能够有效防御ClickJacking，这些方案为我们提供了更多的选择
+#### 总结
+除了 `X-Frame-Options` 之外，`Content Security Policy` 以及 Firefox的NoScript扩展也能够有效防御 ClickJacking，这些方案为我们提供了更多的选择
+- {% post_link csp %}
+
+`Content Security Policy` 除了可以用来防 XSS 之外，他的 `frame-ancestors` 也可以来防 ClickJacking, 比如我在 nginx 上添加:
+
+```javascript
+add_header Content-Security-Policy "frame-ancestors 'self'";
+```
+
+那么当你页面被内嵌的时候， 浏览器就会报这个错误:
+```javascript
+Refused to frame 'https://example.com/' because an ancestor violates the following Content Security Policy directive: "frame-ancestors 'self'".
+```
