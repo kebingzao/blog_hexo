@@ -205,10 +205,29 @@ Age: 2451
 
 说明成功生效了。
 
+## 直接配置 cloudfront 的源域属性
+除了上面的 lambda 方式之后， 后面还发现了一种更简单的方式可以获取子目录的根文件
+
+之前之所以不行是因为我们在配置 cloudfront 的源域的时候，选择是 s3 作为存储桶的源域名，比如
+
+![1](10.png)
+
+这时候 cloudfront 会提示你是否要将这个源域设置成 `S3 存储桶`， 还是要设置为 `S3 网站端点`, 这两种的域名是不一样的，而且效果也不一样。
+
+如果只是当做云端的存储桶，供用户下载文件， 那么就设置为 `S3 存储桶`，这时候 cloudfront 只有准确匹配到路径，才会获取文件。
+
+如果是当做站点来访问的话，那么就要设置为 `S3 网站端点`, 这时候 cloudfront 在遇到子目录检索的时候，对于缺省的文件路径，是会默认获取根目录文件的，比如 `index.html` 这种。
+
+因此对于本例来说，肯定是要设置为 `S3 网站端点` 才行，也就是点击下面的 `使用网站端点`
+
+![1](11.png)
+
+这样子就可以了，就可以访问子目录的根文件了。
+
 ---
 
 参考资料
 - [Implementing Default Directory Indexes in Amazon S3-backed Amazon CloudFront Origins Using Lambda@Edge](https://aws.amazon.com/cn/blogs/compute/implementing-default-directory-indexes-in-amazon-s3-backed-amazon-cloudfront-origins-using-lambdaedge/?nc1=h_ls)
 - [Lambda@Edge 事件结构](https://docs.aws.amazon.com/zh_cn/AmazonCloudFront/latest/DeveloperGuide/lambda-event-structure.html)
-
+- [使用AWS CodePipeline 以及相关服务自动部署个人静态网站](https://juejin.cn/post/6844904160807108622)
 
