@@ -49,7 +49,7 @@ prometheus 可以创建两种规则:
 ![](4.png)
 
 ### 1. 创建一条警报文件
-首先就要创建一个警报规则:
+首先就要创建一个`警报规则`:
 ```text
 # 先在 prometheus 目录下创建一个 rules 目录，专门用来存放 rules 的 yml 文件
 [root@VM-64-9-centos prometheus]# mkdir rules
