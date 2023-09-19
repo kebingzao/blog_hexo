@@ -513,6 +513,15 @@ sum(topk(10, http_response_count_total{job="server-nginx", server_type="nginx-lo
 sum by (request_uri)(rate(http_response_count_total{job="server-nginx", server_type="nginx-log", env="$env",product_line="$product_line", region="$region", wan="$wan", project="$project", request_uri!=""}[5m]) > 0.2)
 ```
 
+### 6. 跟真实的 nginx-access.log 的延迟差距
+事实上，Prometheus 采集到的数据，跟真实的 `nginx-access.log` 的记录是有存在一个采集周期的延迟。
+
+因为 `nginx-access.log` 是实时录入的，而 Prometheus 是在当前周期采集上一个周期的数据的，假设你的采集周期是 60s。
+
+那么你 Prometheus 在 `07` 分钟采集的数据，其实是对应 `nginx-access.log` 中的 `06:00 -- 06:59` 这个时间段的数据，所以在对数据的时候，其实是差一个采集周期的。
+
+而且实际的生产环境中，考虑到 Prometheus 采集请求的网络延迟，一般是超过了一个采集周期再加几秒，比如如果是 60s 一个采集周期，那么Prometheus 在 `07` 分钟采集的数据， 这数据大部分就是在 `nginx-access.log` 中的 `06:00 -- 07:05` 这个时间段的数据
+
 
 ## 总结
 通过 `nginx-vts-export` 和 `prometheus-nginxlog-exporter` 这两个导出器，我们基本上可以抓取 nginx 上的服务的情况，包括流量，请求等等。

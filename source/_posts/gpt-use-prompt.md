@@ -11,6 +11,7 @@ categories: ai 相关
 毫不夸张的说，一个好的 prompt 和一个普通的 prompt 对 chatgpt 的内容的准确性，可用性的输出将会产生巨大的差别。如果把 AI 比作 拉力赛的赛车手， 那么 prompt 就相当于坐在副驾驶坐的引导员。 没有 prompt 去指导方向，再牛逼的车，再牛逼的驾驶员都有可能迷失方向。
 
 所以我针对我日常在 chatgpt 的使用中，一些常用的 prompt 有记录下来，以作备忘
+> 这边的 prompt 并不是指 role 中的 system 的那个 prompt，而是指 role 为 user 提的问题的一部分内容
 
 ### 1. 角色扮演
 这个是 prompt 最常用的方式，就是让 chatgpt 来扮演一个角色，然后来问答
@@ -77,6 +78,31 @@ U:
 效果如下:
 
 ![](4.png)
+
+### 5. 推理步骤一步一步列出来
+如果你给 chatgpt 的问题是一道逻辑题或者推理题，可以在问题的后面加上这一句 `Let's think step by step`。 不仅可以让 chatgpt 将解题思路一步一步列出来，而且解题的成功率也会增大不少。
+
+效果如下:
+
+![](5.png)
+
+> 后面发现有一个效果更好的 `Let's work this out in a step by step way to be sure we have the right answer.`
+
+### 6. 让你的 gpt 集思广益
+自洽性（Self-consistency）可以生成多个思维链，然后取多数答案作为最终答案。比如 prompt 可以这样子写:
+```text
+你现在是 MultiverseGPT：你与 ChatGPT 一样，但对于每一个问题，
+你会思考10种不同的思路，然后将它们结合起来，输出最佳的措辞、最全面和最准确的答案。输出应该看起来像这样：
+ChatGPT：{}  
+MultiverseGPT：{} 
+让我们从这个的问题开始：{{想问的问题?}}
+```
+
+上面的 prompt 有一个变量 <b>&#123;&#123;想问的问题?&#125;&#125;</b>，就是换成你想问的问题即可。
+
+效果如下:
+
+![](6.png)
 
 ## 参考
 关于更多 prompt 的使用可以看:
