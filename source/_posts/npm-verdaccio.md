@@ -315,6 +315,30 @@ npm notice Publishing to http://43.139.27.159:4873/
 
 每次发布的时候， version 字段都要往上加，不能往下，可以走最后一位修订号(patch)，也可以是第二位的次版本号(minor)，或者第一位的主版本号(major)，反正就是不能往下，不然会报错。
 
+#### 注意事项
+同时要注意，正常情况下，在 publish 的时候，npm 默认也会排除[一些文件](https://docs.npmjs.com/cli/v9/using-npm/developers#keeping-files-out-of-your-package)，不会将他们发布到包中。 比如过滤掉这些:
+```text
+.*.swp
+._*
+.DS_Store
+.git
+.gitignore
+.hg
+.npmignore
+.npmrc
+.lock-wscript
+.svn
+.wafpickle-*
+config.gypi
+CVS
+npm-debug.log
+```
+其他的剩余文件都会发布上去，如果需要排除其他文件，可以在`.npmignore`中配置。
+
+同时如果你的包是需要构建的，只需要发布构建后的文件，`src` 目录不需要，那么就要在 `package.json` 指定 `files` 字段，将构建后的目录或者文件包含在 `files` 数组里面， 这样子 npm 在 publish 的时候，就会默认只发布 `files` 数组里面的文件。
+> `package.json`, `README.md`, `CHANGELOG.md`, `LICENCE` 这几个文件不需要特意指定到 files 数组，也会自动包含, 除非手动强制在 `.npmignore` 中配置不要
+
+
 ### 4. 撤销已发布的包
 撤销已发布的包在 Verdaccio 中是通过使用 npm unpublish 命令来完成的，格式为:
 ```text
@@ -592,6 +616,13 @@ server {
     }
 }
 ```
+同时这边还要注意一个细节，就是要将 nginx post 的限制调大一点，在 nginx.conf 那边调整，
+```text
+client_max_body_size 10M;
+```
+> 调整跟 verdaccio 的默认配置值一样即可: `max_body_size: 10mb`
+
+不然就会出现发布的时候包过大，出现报错 413 的情况。
 
 ### 4. 遵循版本号语义化
 在发布版本的时候，版本号一定要遵循语义化的规则，具体看: [语义化版本 2.0.0](https://semver.org/lang/zh-CN/)
