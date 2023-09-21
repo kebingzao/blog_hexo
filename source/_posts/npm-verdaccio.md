@@ -659,6 +659,7 @@ npm version [<newversion> | major | minor | patch | premajor | preminor | prepat
 ## 总结
 通过使用 verdaccio 搭建私有 npm 仓库，可以让前端的内部私有包得到规范的开发和流通，大大提供了前端开发的效率。
 
+接下来说一下团队协作上的私有包的开发和发布规范: {% post_link npm-publish %}
 
 ---
 参考资料:
