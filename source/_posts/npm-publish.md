@@ -93,7 +93,7 @@ export function add(a, b) {
 4. `module`：指定 ES6 模块的入口文件位置。（使用ESM规范引入文件时，通常会引入module字段指向的文件，main字段通常用于指向CommonJs规范的文件）
 5. `files`: 一个数组，当你的包被发布或安装时，只有在 files 字段中列出的文件或文件夹才会被包含。
 6. `scripts`：包含脚本的对象，用于运行测试或构建你的代码等。
-7. `repository`：项目的仓库地址。
+7. `repository`：项目的仓库地址, url 字段要是 http/https 协议的，不能是 git 协议的，就可以在 verdaccio 详情页面显示出来
 8.  `bugs`：一个URL，用户可以通过这个URL报告你的包的问题。
 9.  `homepage`：你的项目的主页URL。
 10. `engines`： 用于指定项目运行所需的 node 和 npm 版本。这对确保你的项目在特定的 Node.js 或 npm 环境中运行非常重要。
