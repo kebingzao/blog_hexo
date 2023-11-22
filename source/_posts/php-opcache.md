@@ -174,14 +174,14 @@ opcache.enable_cli=1
 
 我们只需要将其下载到服务器的某一个目录下
 ```text
-cd /data/airdroid/wwwroot/
+cd /data/wwwroot/
 git clone https://github.com/rlerdorf/opcache-status.git --depth=1
 cd opcache-status
 ```
 然后在 nginx 那边增加一个路由，然后转发解析到这个目录下的 `opcache.php` 就行了，注意最好只能内网才能访问
 ```text
 location ^~ /opcache  {
-    root    /data/airdroid/wwwroot/opcache-status/;
+    root    /data/wwwroot/opcache-status/;
     try_files $uri /opcache.php;
     fastcgi_pass 127.0.0.1:9000;
     include    fastcgi.conf;
