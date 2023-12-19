@@ -32,7 +32,25 @@ newWnd.location = url;
 
 当然如果只是点击下载的问题，那么可以不使用 window.open， 改成 a 标签跳转 或者 iframe 下载也是可以的。 
 
-
+但是在一些手机浏览器，比如 Android 和 iOS 的 opera、iOS 的 UC，`window.open()` 为 null, 所以可以扩展为:
+```text
+export function safeOpenWindow(url, target = '_blank') {
+  const newWnd = window.open()
+  // 这边要注意 Android和iOS的opera、iOS的UC，window.open() 为 null
+  if (newWnd) {
+    newWnd.opener = null
+    newWnd.location = url
+  } else {
+    const aLink = document.createElement('a')
+    aLink.setAttribute('target', target)
+    aLink.setAttribute('href', url)
+    aLink.setAttribute('rel', 'nofollow noopener noreferrer')
+    document.body.appendChild(aLink)
+    aLink.click()
+    aLink.remove()
+  }
+}
+```
 
 
 
