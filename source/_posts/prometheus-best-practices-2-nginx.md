@@ -311,6 +311,11 @@ air_id_http_response_size_bytes{method="GET",status="200"} 55841
 ```
 可以看到他的指标采集成功了，并且所有的指标都是以所配置的name `air_id` 作为前缀
 
+同时如果要查看具体运行的 log，包括错误 log 的话，可以用:
+```text
+sudo journalctl -u prometheus-nginxlog-exporter -f
+```
+
 ### 2. 添加到 prometheus 监控 instance
 接下来将其添加到 `file_sd/server-nginx.yml` 的后面 (通过文件服务发现添加的新的实例不需要重启 prometheus)
 ```text
@@ -337,6 +342,17 @@ air_id_http_response_size_bytes{method="GET",status="200"} 55841
 
 ![](7.png)
 
+根据不同配置的 nginx 的 log 格式配置不一样，比如我这边 nginx log 的配置格式是:
+```text
+log_format main      '$host $remote_addr "$clientRealIp" - $remote_user [$time_local] "$request" '
+                             '"$status" $body_bytes_sent "$http_referer" "$http_user_agent" '
+                             '$request_time $bytes_sent $request_length [$upstream_response_time]';
+```
+那么设置的正则就是:
+```text
+format: "$host $remote_addr \"$clientRealIp\" - $remote_user [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
+```
+
 后面参考了一下配置，最后形成的配置文件如下:
 ```text
 [kbz@VM-16-9-centos ~]$ cat /etc/prometheus-nginxlog-exporter.yml
@@ -346,7 +362,7 @@ listen:
 
 namespaces:
   - name: air_id
-    format: "$host $remote_addr \"$clientRealIp\" - - [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
+    format: "$host $remote_addr \"$clientRealIp\" - $remote_user [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
     source:
       files:
         - /var/log/nginx/test.example.com.access.log
@@ -356,10 +372,12 @@ namespaces:
       split: 2
       separator: ' '
       matches:
-      - regexp: "^(/)(.*)\\?(.*)"
-        replacement: "$1$2"
+      - regexp: "^(.*?)(\\?.*)?$"
+        replacement: "$1"
 ```
-其实就是加了 `relabel_configs` 配置, 大概的意思就是增加了 `request_uri` 标签，获取的途径就是获取 access log 中的 request 的值，然后通过空格拆分，获取第二个值，最后应用正则表达式，获取 `?` 之前的路由，如果没有 `?` 的话，直接获取全部
+其实就是加了 `relabel_configs` 配置, 大概的意思就是增加了 `request_uri` 标签，获取的途径就是获取 access log 中的 request 的值，然后通过空格拆分，获取第二个值，最后应用正则表达式获取 url path
+
+这个正则表达式匹配的是一个字符串，该字符串可能包含一个问号，问号前的部分会被第一组捕获，问号及其后面的部分会被第二组捕获。如果没有问号，整个字符串会被第一组捕获。 简单来说就是匹配 url 字串中 `?` 之前的部分。
 
 所以原先的一条 access log 为:
 ```text
@@ -410,7 +428,7 @@ listen:
 
 namespaces:
   - name: id
-    format: "$host $remote_addr \"$clientRealIp\" - - [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
+    format: "$host $remote_addr \"$clientRealIp\" - $remote_user [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
     source:
       files:
         - /var/log/nginx/test.example.com.access.log
@@ -424,11 +442,11 @@ namespaces:
       split: 2
       separator: ' '
       matches:
-      - regexp: "^(/)(.*)\\?(.*)"
-        replacement: "$1$2"
+      - regexp: "^(.*?)(\\?.*)?$"
+        replacement: "$1"
 
   - name: srv
-    format: "$host $remote_addr \"$clientRealIp\" - - [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
+    format: "$host $remote_addr \"$clientRealIp\" - $remote_user [$time_local] \"$request\" \"$status\" $body_bytes_sent \"$http_referer\" \"$http_user_agent\" $request_time $bytes_sent $request_length [$upstream_response_time]"
     source:
       files:
         - /var/log/nginx/srv.example.com.access.log
@@ -441,8 +459,8 @@ namespaces:
       split: 2
       separator: ' '
       matches:
-      - regexp: "^(/)(.*)\\?(.*)"
-        replacement: "$1$2"
+      - regexp: "^(.*?)(\\?.*)?$"
+        replacement: "$1"
 ```
 这样子我们就可以看到同一个 nginx-log 实例的不同的项目的区别
 
