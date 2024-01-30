@@ -236,6 +236,11 @@ echo "<?php opcache_reset(); ?>" > ${WEBDIR}${RANDOM_NAME}.php
 curl http://localhost/${RANDOM_NAME}.php
 rm ${WEBDIR}${RANDOM_NAME}.php
 ```
+
+> 上面的脚本意思就是，先生成一个随机的字符串 `RANDOM_NAME`,长度为13，包含大写字母、小写字母和数字,接下来创建一个新的PHP文件，文件名为 `${RANDOM_NAME}.php`，并且这个文件在 `${WEBDIR}` 目录下。这个PHP文件的内容是`<?php opcache_reset(); ?>`, 接下来使用 curl 命令访问这个新创建的PHP文件。由于这个文件的内容是 `opcache_reset()`，所以这会导致服务器上的`OPcache`被重置, 最后，删除这个临时创建的PHP文件
+
+总的来说，这个脚本的目的是在Web服务器上重置 OPcache ，而不需要在服务器的PHP代码中硬编码这个功能, 很适合在 Jenkins 构建结束的时候直接执行这个脚本来刷新 OPcache，因为如果不刷新的话，就有可能会在 Jenkins 构建更新程序 php 文件的时候，出现新旧 php 缓存不一致，导致当前请求报 500 的情况。
+
 或者直接走 php 的 CLI 指令，不过这种方式如果是在 php-fpm 下是没有效果的，只能用上面那种 http 请求 php 文件的方式。
 ```text
 #!/bin/bash
