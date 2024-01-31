@@ -247,6 +247,10 @@ rm ${WEBDIR}${RANDOM_NAME}.php
 php -r "opcache_reset();"
 ```
 
+如果要确定执行刷新是否有效果的话，可以查看状态面板的 `start_time`, 如果刷新成功的话，`start_time` 就是刷新时间
+
+![1](7.png)
+
 ### 2. 增加 hugepage 配置
 启用 `opcache.huge_code_pages` 将 PHP 代码（文本段）拷贝到 HUGE PAGES 中。这应该会提高性能，但是需要适当的 OS 配置。自 PHP 7.0.0 起可在 Linux 上使用，自 PHP 7.4.0 上可在 FreeBSD 上使用。
 ```text
