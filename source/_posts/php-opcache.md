@@ -247,7 +247,7 @@ rm ${WEBDIR}${RANDOM_NAME}.php
 php -r "opcache_reset();"
 ```
 
-如果要确定执行刷新是否有效果的话，可以查看状态面板的 `start_time`, 如果刷新成功的话，`start_time` 就是刷新时间
+如果要确定执行刷新是否有效果的话，可以查看状态面板的 `last_restart_time`, 如果刷新成功的话，`last_restart_time` 就是刷新时间
 
 ![1](7.png)
 
