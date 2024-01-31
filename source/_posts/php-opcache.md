@@ -247,7 +247,7 @@ rm ${WEBDIR}${RANDOM_NAME}.php
 php -r "opcache_reset();"
 ```
 
-如果要确定执行刷新是否有效果的话，可以查看状态面板的 `last_restart_time`, 如果刷新成功的话，`last_restart_time` 就是刷新时间
+如果要确定执行刷新是否有效果的话，可以查看状态面板的 `last_restart_time`, 如果刷新成功的话，`last_restart_time` 就是刷新时间, 然后 `manual_restarts` 表示手动刷新的次数，本次这种脚本执行就是手动刷新行为，所以每次执行完脚本，就会累加一
 
 ![1](7.png)
 
