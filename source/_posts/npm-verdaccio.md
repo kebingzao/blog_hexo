@@ -578,6 +578,18 @@ packages:
 ```
 但是为了安全，我是不建议在私有库的资源里面再去代理下载公网的包的，所以应该将 proxy 的配置去掉，私有库就只负责下载私有库里面的私有包就行了。
 
+但是需要注意的一点就是，一旦关闭了私有库的 package 代理功能，但是在涉及到全局安装(`-g`)的时候，就要注意了，就会出现该包的第三方依赖无法安装。
+
+解决这个问题需要在安装之前设置私有源地址 例如：全局安装`@zach-js-library` 这个 scope 下的包全局依赖之前，需要设置scope `@zach-js-library` 的源地址，可以通过以下命令设置：
+```text
+npm config set @zach-js-library:registry http://43.139.27.159:4873
+```
+接下来，再安装包到全局：
+```text
+npm install @zach-js-library/<package-name> -g
+```
+这样子就可以安装全局的私有库了。
+
 ### 3. nginx 代理 https
 Verdaccio 是支持 tls 的 https 配置，但是我们一般还是用 nginx 来代理 https 请求，一方面是便于证书的管理，每年换证书的时候，统一换 nginx 的证书就够了，其他服务的证书不需要额外去换。
 
