@@ -390,28 +390,8 @@ logs_stat_info_detail 有四个标签，多了两个，一个是错误的模块�
 ###########定义一堆的常量
 ######################################
 const ANY /.*/
-# yii2 相关
-## yii2 的通用日志错误
+# yii2 的通用日志错误
 const YII_ERROR /\[error\]/
-## yii2 通用异常抛出
-const YII_BASE_EXCEPTION /yii\\base\\ErrorException/
-## 数组越界
-const UNDEFINED_OFFSET /Undefined offset:/
-## yii2 路由有问题，比如不存在
-const YII_ROUTE_INVALID_EXCEPTION /yii\\base\\InvalidRouteException/
-
-# mysql 相关
-const MYSQL_POD_EXCEPTION /\[PDOException\]/
-# 数据库执行状态错误
-const MYSQL_SQL_STATE_FAIL /SQLSTATE\[/
-
-# 系统相关
-## 内存超出分配
-const MEM_EXHAUSTED /Allowed memory size of/
-
-
-# 企业版 相关
-const BIZ_EXCEPTION /\[api\\utils\\BizException\]/
 
 ######################################
 ###########定义指标
@@ -437,31 +417,31 @@ YII_ERROR {
 }
 
 
-// + YII_ERROR + ANY + YII_BASE_EXCEPTION {
+// + YII_ERROR + ANY + /yii\\base\\ErrorException/ {
   logs_stat_info_detail["id"]["error"]["yii"]["base_exception"]++
 }
 
-// + YII_ERROR + ANY + YII_ROUTE_INVALID_EXCEPTION {
+// + YII_ERROR + ANY + /yii\\base\\InvalidRouteException/ {
   logs_stat_info_detail["id"]["error"]["yii"]["route_invalid"]++
 }
 
-// + YII_ERROR + ANY + UNDEFINED_OFFSET {
+// + YII_ERROR + ANY + /Undefined offset:/ {
   logs_stat_info_detail["id"]["error"]["yii"]["undefined_offset"]++
 }
 
-// + YII_ERROR + ANY + MYSQL_POD_EXCEPTION {
+// + YII_ERROR + ANY + /\[PDOException\]/ {
   logs_stat_info_detail["id"]["error"]["mysql"]["pdo_exception"]++
 }
 
-// + YII_ERROR + ANY + MYSQL_SQL_STATE_FAIL {
+// + YII_ERROR + ANY + /SQLSTATE\[/ {
   logs_stat_info_detail["id"]["error"]["mysql"]["sql_state_fail"]++
 }
 
-// + YII_ERROR + ANY + BIZ_EXCEPTION {
+// + YII_ERROR + ANY + /\[api\\utils\\BizException\]/ {
   logs_stat_info_detail["id"]["error"]["biz"]["biz_exception"]++
 }
 
-// + YII_ERROR + ANY + MEM_EXHAUSTED {
+// + YII_ERROR + ANY + /Allowed memory size of/ {
   logs_stat_info_detail["id"]["error"]["os"]["mem_exhausted"]++
 }
 ```
@@ -494,13 +474,13 @@ Prometheus 那边就可以配采集了 (这边采用的是 sd 的外挂方式，
 
 如果规则有问题的话，errors 那一栏就会显示编译错误，比如我将
 ```text
-// + YII_ERROR + ANY + MEM_EXHAUSTED {
+// + YII_ERROR + ANY + /Allowed memory size of/ {
   logs_stat_info_detail["id"]["error"]["os"]["mem_exhausted"]++
 }
 ```
 改成:
 ```text
-YII_ERROR + ANY + MEM_EXHAUSTED {
+YII_ERROR + ANY + /Allowed memory size of/ {
   logs_stat_info_detail["id"]["error"]["os"]["mem_exhausted"]++
 }
 ```
