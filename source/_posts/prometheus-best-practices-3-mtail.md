@@ -176,6 +176,8 @@ counter mem_not_allow_total by project
 - 一个是记录 Error 信息的指标 `project_error_total`, 这个指标有个 project 标签，如果是抓取 id 项目的，那么 project 标签就是 id，如果是抓取 pay 项目的 log 文件的，那么 project 标签就是 pay，抓取规则就是日志中含有字符串 `Error:` 就符合
 - 一个是记录是否内存溢出的指标 `mem_not_allow_total`，标签规则同 `project_error_total` 一样，抓取规则就是 日志中含有字符串 `Allowed memory size of` 就符合
 
+> mtail 中的 counter、gauge、histogram 三种类型与prometheus类型中描述的作用一致, 本例用的是 counter 这个类型
+
 他们各自的 log 日志文件地方也不一样:
 - id 项目的 log 目录是: `/var/log/test_log/id/app.log`
 - pay 项目的 log 目录是: `/var/log/test_log/pay/2024-01-01.log`, 他是每天都滚一个 log，也就是在 pay 这个目录下，每天都会新增 log
