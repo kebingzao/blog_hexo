@@ -25,8 +25,8 @@ func ClientIp(r *http.Request) string {
 首先我们来看一下 nginx 的转发配置， 这样是为了记录完整的代理过程:
 ```html
     location /p20/ {
-        access_by_lua_file "$lua_dir/access/jwt.lua";
         proxy_pass http://p20/;
+        proxy_set_header  Host            $host;
         proxy_set_header  X-Real-IP       $remote_addr;
         proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -135,6 +135,37 @@ public static function getClientIP()
     return $ip;
 }
 ```
+
+## 正确设置转发 X-Real-IP 字段
+后面发现有些框架有自带获取 clientIp 的工具库，这些工具库的获取的顺序有可能是先获取 `X-Real-IP`, 再获取 `X-Forwarded-For`, 就跟我们没有改之前的一样, 这时候 `$remote_addr` 在客户端有走代理的情况下 (比如翻墙行为)，就会变成是代理服务器的 ip，而不是客户端的真实 ip
+```text
+proxy_set_header  X-Real-IP  $remote_addr;
+```
+这时候如果不想去改框架自带的工具库方法的话，那么就要正确的设置 `X-Real-IP` 的值， 这时候就两种方式:
+> 而且 `X-Real-Ip` 不设置时，nginx 原样转发，有可能请求端可能通过设置这个头来伪造 IP ，在一些和区域严格相关（比如风控）的业务上有风险。还是建议设置上，将其设置为原始的客户端 IP 而不是代理的上一跳 IP。
+
+### 1. $realip_remote_addr
+```text
+proxy_set_header X-Real-IP $realip_remote_addr;
+```
+改成设置这个 `$realip_remote_addr`, 这个就是客户端的真实 ip 了，不过这个参数需要加载 nginx 模块 `--with-http_realip_module` 才能取到
+
+### 2. 自定义获取 $clientRealIp
+这种方式就是在 nginx 配置文件中定义一个 `$clientRealIp` 的真实 ip，然后就可以用了
+```text
+# 写在 nginx.conf 中
+map $http_x_forwarded_for  $clientRealIp {
+        ""      $remote_addr;
+        ~^(?P<firstAddr>[0-9\.]+),?.*$  $firstAddr;
+}
+```
+这段代码的目的是提取出客户端的真实IP地址。如果请求头中包含`X-Forwarded-For`字段（通常在客户端通过代理服务器连接时会有这个字段），则使用这个字段中的第一个IP地址作为客户端的真实IP地址；否则，使用`$remote_addr`作为客户端的真实IP地址。
+
+然后就可以在配置代理转发的时候，直接用了
+```text
+proxy_set_header X-Real-IP $clientRealIp;
+```
+
 ## 参考
 [HTTP 请求头中的 X-Forwarded-For，X-Real-IP](https://www.cnblogs.com/diaosir/p/6890825.html)
 [X-Forwarded-For的一些理解](https://www.cnblogs.com/huaxingtianxia/p/6369089.html)
