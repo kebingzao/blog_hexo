@@ -4,7 +4,7 @@ date: 2022-09-27 17:51:07
 tags: 
 - google
 - seo
-categories: seo 相关
+categories: 服务浅谈系列
 ---
 ## 前言
 随着对 SEO 的越来越重视， 我们也希望我们提供的站点在加载性能上也会越来越快，越来越好。

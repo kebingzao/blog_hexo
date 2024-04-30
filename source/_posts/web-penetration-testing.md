@@ -2,7 +2,7 @@
 title: 浅谈之 - web 安全渗透测试方案
 date: 2022-01-11 20:13:50
 tags: security
-categories: web安全
+categories: 服务浅谈系列
 ---
 ## 前言
 前段时间公司有请了安全服务公司来给公司的项目做 安全渗透， 尤其是 web 应用的安全渗透。 其中可测试点非常多。 
