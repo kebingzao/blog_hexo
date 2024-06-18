@@ -555,6 +555,24 @@ sum by (request_uri)(rate(http_response_count_total{job="server-nginx", server_t
 
 ![](19.png)
 
+### 8. 内存消耗过多的情况
+在实践过程中，有发现当出现 nginx 的 access log 特别大的时候，会出现这个 exporter 占用内存过多的情况。
+
+![](21.png)
+
+正常 nginx 的 access log 的日志归档是一天一次归档，但是发现在一些请求量特别大的项目，一天的 nginx 的 access log 就可以达到超过 6G 以上。
+
+这时候这个 exporter 在统计的时候，因为需要将整个 access log 读取到内存中，然后进行统计，就会出现以下两个问题:
+1. exporter 占用的内存过大，甚至比业务程序所占用的内存大很多，这个是因为 access log 太大，导致统计读取到内存的时候，过多的占用服务器内存，从而可能会影响到业务
+2. 抓取统计的速度会越来越慢，甚至高峰期 Prometheus 来抓取的时候会超时，这也是因为要计算的数据太多了。
+
+所以如果你的程序也有类似的情况的话，那 nginx 的 access log 就要按小时来归档，同时每一次脚本在归档的时候，也要重启这个 exporter，让它释放之前的内存，从而读取归档后的文件。
+
+不过这样子也会有一个小小的问题，就是因为 exporter 每小时重启一次，释放内存，这时候因为有些数据是 counter 类型的，就会出现数据断掉，就会出现在整点那个时间抓取的数据，跟前面的数据关联不上
+
+比如 QPM 和 QPS 这种 `irate` 计算方式，在整点 01 分的那个统计节点就会不准确。其他时间就会正常。
+
+![](20.png)
 
 ## 总结
 通过 `nginx-vts-export` 和 `prometheus-nginxlog-exporter` 这两个导出器，我们基本上可以抓取 nginx 上的服务的情况，包括流量，请求等等。
