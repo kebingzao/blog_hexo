@@ -494,6 +494,69 @@ YII_ERROR + ANY + /Allowed memory size of/ {
 
 ![](3.png)
 
+## 抓取 php-fpm show log
+除了可以抓取特定项目的 log 之外，mtail 还可以抓取一些程序的 log，比如这个 php-fpm 程序的 show log。
+
+而且因为一台服务器有可能会部署多个 php 程序，他们都用 php-fpm 来进行托管，所以在抓取的时候，也要可以识别是哪个 php 程序产生的慢查询，所以 `php-fpm.mtail` 文件可以这样写:
+```text
+# php-fpm 的规则匹配文件
+
+######################################
+###########定义一堆的常量
+######################################
+const SLOW_LOG_TIMESTAMP  /\[\d{2}-\w{3}-\d{4} \d{2}:\d{2}:\d{2}\]/
+const SLOW_LOG_SCRIPT_FILENAME  /script_filename = .*wwwroot\/(?P<project_full>[^\/]+)\/\S+/
+
+######################################
+###########定义指标
+######################################
+counter logs_stat_info_total  by project, level
+hidden text project_name
+
+######################################
+###########判断文件过滤
+######################################
+getfilename() !~ /php-fpm\.slow\.log/ {
+  stop
+}
+
+
+######################################
+########### 规则文件 (每一个 php-fpm 的慢查询的设定时长都不太一样，要看 php-fpm.conf 的具体配置)
+######################################
+
+SLOW_LOG_TIMESTAMP {
+  logs_stat_info_total["php-fpm"]["error"]++
+}
+
+# 匹配脚本文件名
+SLOW_LOG_SCRIPT_FILENAME {
+  # 提取 wwwroot 目录后的第一个子目录，并且只取点的第一部分
+  project_name = "fpm-" + subst(/\..*/, "", $project_full)
+  logs_stat_info_total[project_name]["error"]++
+}
+```
+正常一个 php-fpm 的慢查询 log 的格式是:
+```text
+[17-Jun-2024 22:10:23]  [pool www] pid 24047
+script_filename = /data/server/wwwroot/id4.example.com/api/web/index.php
+[0x00007fef978e8638] execute() /data/server/wwwroot/id4.example.com/id/vendor/yiisoft/yii2/db/Command.php:771
+[0x00007fef978e8468] execute() /data/server/wwwroot/id4.example.com/id/api/models/business/master/BusinessBaseModel.php:383
+....
+```
+我们只取前面两条就够了。其中第一条时间有记录时间的，就当作这一台服务器通用的 php-fpm 的慢查询 log。第二条的 filename 因为是有项目路径。所以就可以直接通过正则将项目名称取出来，然后取前缀即可。
+
+最后就可以得到类似的
+```text
+logs_stat_info_total{level="error",prog="php-fpm.mtail",project="fpm-id-rs"} 2
+logs_stat_info_total{level="error",prog="php-fpm.mtail",project="fpm-id4"} 230
+logs_stat_info_total{level="error",prog="php-fpm.mtail",project="php-fpm"} 232
+```
+
+然后图表选项目的时候，就可以看到这几个 project 可以选了
+
+![](4.png)
+
 ## 总结
 通过 mtail 的采集，我们可以很灵活的采集我们服务程序中的错误，尤其是当我们的服务的 log 非常规范的时候，不仅 level 很规范，错误抛出的 error msg 和 error code 也很规范的时候， 其实 mtail 的规则文件，就会大同小异了。 基本上写一份，后面基本上就是拷贝了。
 
