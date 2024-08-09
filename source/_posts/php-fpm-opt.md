@@ -106,6 +106,67 @@ pm.max_spare_servers = 50
 **缺点:**
 1. 由于 PHP-FPM 是短连接，所以每次请求都会先建立连接，建立连接的过程会耗费系统之源，当流量很大时，频繁的创建销毁进程开销很大，不适合大流量环境部署
 
+## 开启 php-fpm 的状态接口
+我们可以开启当前 php-fpm 的当前状态查询接口，也是在这边 `php-fpm.conf` 这边配置:
+> 如果是 php 7 以上的，就会在 `php-fpm.d/www.conf` 这个里面
+
+```javascript
+pm.status_path = /status
+```
+`service php-fpm reload` 重新加载配置文件, 然后访问这个路由就行了，如果是 nginx 反代的，还需要在 nginx 那边针对这个路由进行转发配置:
+```javascript
+location ~ /status$ {
+    fastcgi_pass   127.0.0.1:9000;
+    include        fastcgi.conf;
+}
+```
+就可以直接请求了，比如本机请求
+```javascript
+curl localhost/status
+
+pool:                 www
+process manager:      static
+start time:           08/Aug/2024:03:48:16 +0000
+start since:          83230
+accepted conn:        10722713
+listen queue:         0
+max listen queue:     129
+listen queue len:     128
+idle processes:       90
+active processes:     10
+total processes:      100
+max active processes: 100
+max children reached: 0
+slow requests:        17
+```
+各字段含义
+
+|字段|	含义|
+|---|---|
+|pool |	php-fpm pool的名称，大多数情况下为www
+|process | manager	进程管理方式
+|start time |	php-fpm上次启动的时间
+|start since |	php-fpm已运行了多少秒
+|accepted conn |	pool接收到的请求数
+|listen queue |	处于等待状态中的连接数，如果不为0，需要增加php-fpm进程数
+|max listen queue |	从php-fpm启动到现在处于等待连接的最大数量
+|listen queue len |	处于等待连接队列的套接字大小
+|idle processes	| 处于空闲状态的进程数
+|active processes	| 处于活动状态的进程数
+|total processess	| 进程总数
+|max active process	| 从php-fpm启动到现在最多有几个进程处于活动状态
+|max children reached |	当pm试图启动更多的children进程时，却达到了进程数的限制，达到一次记录一次，如果不为0，需要增加php-fpm pool进程的最大数
+|slow requests	| 当启用了php-fpm slow-log功能时，如果出现php-fpm慢请求这个计数器会增加，一般不当的Mysql查询会触发这个值
+
+这时候有几个参数可以判断你当前的 php-fpm 的进程数是否足够:
+- `listen queue`：这个就是此时此刻我们的 php-fpm 作为服务端，处于 accept 队列 的数量。
+- `max listen queue`： 从 php-fpm 进程启动到现在处于等待连接的最大数量（说白了，就是我们上面说的 listen queue 的最大值持久化）
+- `listen queue len` ： 有过 socket 网络编程经验的同学都知道。`int listen(int sockfd, int backlog);` 是可以设置该参数，但是他和系统设置有关系。
+
+当 php-fpm 进程处理不过来的时候，请求就会放在 accept 队列，也就是 `listen queue` 会不为 0。
+
+以上述的请求来说，我们设置的是静态模式，常驻的进程有 100 个，但是在最高峰的时候， 100 进程是不够用的，因为 `max listen queue` 已经是 129 了，也就是在某一个时间点的时候，100 个常驻的 php 进程都已经在使用的情况下，依然有超过 129 个请求无人接收
+> 这边之所以是 129，但是并不是说只有 129 个请求， 而是它受到另一个参数 `listen queue len` 系统设置的最大上限 128 的限制，所以才是至少有 129 个请求处于等待中， 这时候一旦超过 nginx 的 upstream 的等待时间，就有可能 nginx 会返回 502 或者 504 的错误码
 
 ## 最后调整
 从上面的三种模式来看， 对于生产环境，尤其是有比较大并发的业务线，静态模式肯定是最合适的， 动态模式和按需模式 每次都要频繁的启动停止进程，开销太大了，响应根本来不及。
@@ -143,4 +204,8 @@ www      26192 26190  0 07:03 ?        00:00:39 php-fpm: pool www
 - [php-fpm.conf 全局配置段](https://www.php.net/manual/zh/install.fpm.configuration.php)
 - [PHP-FPM 进程管理的三种模式](https://juejin.cn/post/7018583928978014245)
 - [对线面试官：php-fpm优化总结](https://learnku.com/articles/68365)
+- [php-fpm的status可以查看汇总信息和详细信息](https://www.cnblogs.com/tinywan/p/6848269.html)
+- [感觉PHP-FPM进程数不够？](https://learnku.com/articles/63432)
+- [记一次PHP并发性能调优实战 -- 性能提升104%](https://zhuanlan.zhihu.com/p/66684473)
+- [linux中net.core.somaxconn 的作用](https://www.cnblogs.com/leonardchen/p/9635407.html)
 
