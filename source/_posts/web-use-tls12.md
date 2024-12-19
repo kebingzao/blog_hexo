@@ -8,7 +8,13 @@ tags:
 categories: web安全
 ---
 ## 前言
-之前有出一版是针对 后端服务升级到 tls 1.2 支持的: {% post_link set-tls-12 %}
+2020年，四大主流浏览器不再支持 TLS1.0 和 1.1。这些旧版本容易受到攻击和利用，不再具备实用性。
+- [Firefox – March 2020](https://blog.mozilla.org/security/2018/10/15/removing-old-versions-of-tls/)
+- [Safari – March 2020](https://webkit.org/blog/8462/deprecation-of-legacy-tls-1-0-and-1-1-versions/)
+- [Chrome – Chrome 81](https://security.googleblog.com/2018/10/modernizing-transport-security.html)
+- [Edge – First half of 2020](https://blogs.windows.com/msedgedev/2018/10/15/modernizing-tls-edge-ie11/)
+
+所以我们需要将我们的 web 站点提升到支持 tls 1.2 的版本。之前有出一版是针对 后端服务升级到 tls 1.2 支持的: {% post_link set-tls-12 %}
 
 之前是考虑到客户端那边有些旧设备可能还在用，贸然从服务端那边直接将 tls 1.0 和 tls 1.1 去掉的话，可能会导致原先可以用的设备和客户端，突然就不行了，可能会对用户造成影响。所以对于客户端来说，我们采用了自然过渡的方式，慢慢淘汰掉旧设备，然后新的版本都会开始支持 tls 1.2.
 
