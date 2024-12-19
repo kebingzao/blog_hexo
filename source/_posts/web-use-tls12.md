@@ -21,7 +21,7 @@ categories: web安全
 但是对于 web 来说，不需要那么麻烦，早期在站点，不将 站点支持的 tls 1.0 和 tls 1.1 拿掉是因为有些 ie 的浏览器，比如 ie 11以下可能会受影响。 但是自从 2022-06， 微软已经宣布要抛弃掉 ie 系列浏览器了。 所以我们其实可以将一部分的 web 站点，慢慢的去掉 tls 1.0 和 tls 1.1 的支持了。
 
 所以这次就补一个针对 web 站点的升级情况。 
-
+<!--more-->
 我们的 web 站点部署和请求方式有几种:
 1. 直接部署在服务器，然后用 nginx 做托管
 2. 直接部署在云服务的云存储 ，然后走 CDN，其中包含 `aws s3 -> cloudfront` 和 `腾讯云 cos -> 腾讯云 cdn`
@@ -37,7 +37,6 @@ ssl_protocols               TLSv1.2;
 ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256;
 ssl_prefer_server_ciphers   on;
 ```
-<!--more-->
 ## 第三方 cdn 后台操作
 其他几个都是在云服务，要在各自的后台配置
 
