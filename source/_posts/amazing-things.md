@@ -80,3 +80,10 @@ categories: 杂文
 
 ## [边玩边学正则表达式](https://regexlearn.com/zh-cn)
 推荐理由: 正则表达式入门学习网站，里面有56个关卡循序渐进，边学边写，对入门非常友好
+
+## [给好奇者的 WebRTC](https://webrtcforthecurious.com/zh/)
+推荐理由: 学习 webrtc 必看, 对很多协议讲的非常好, 很多初学 webrtc 的人, 只会应用，对原理一知半解，不知其所以然, 急需这个来导盲
+
+## [git book](https://git-scm.com/book/zh/v2)
+推荐理由: 学习 git 绝对不能错过的学习资料
+
