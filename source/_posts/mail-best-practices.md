@@ -131,7 +131,48 @@ categories: 服务浅谈系列
 
 针对第二点，我们一般会在营销邮件的 footer 底部会有一个链接，点击表示后续不再接收此类的营销邮件，让用户可以自己选择。
 
+### 3. ses 投诉如何产生和处理
+在 AWS SES（Simple Email Service）中，Complaint 投诉通常是由收件人通过其邮件客户端的 "标记为垃圾邮件" 或类似功能触发的。当收件人认为某封邮件是不需要的或是垃圾邮件时，他们可以在邮件客户端中选择此选项。这一操作会将邮件标记为投诉，并通过邮件提供商的反馈循环（Feedback Loop，FBL）将该信息传递给 AWS SES。
 
+![1](2.png)
+
+具体过程如下：
+
+1. **收件人操作**：收件人在其邮件客户端中标记邮件为垃圾邮件或不需要的邮件。
+2. **邮件提供商处理**：邮件提供商（如 Gmail、Yahoo、Outlook 等）会将此操作记录为投诉，并通过反馈循环将此信息发送给 AWS。
+3. **AWS SES 接收投诉信息**：AWS SES 收到反馈信息后，会将该邮件标记为投诉，并在您的 SES 控制台中记录此事件。
+
+为了减少投诉率，可以考虑以下做法：
+
+- 确保邮件内容相关且有价值。
+- 提供明确的退订选项。
+- 定期清理和更新邮件列表，移除不活跃或不再有效的邮箱地址。
+- 确保您有收件人的明确同意才发送邮件。
+
+监控和管理投诉率对于保持良好的发件人声誉至关重要。AWS SES 提供了一些工具和报告来帮助您跟踪和管理这些事件。
+
+### 4. Prometheus 预警监控
+既然我们可以通过 sns 来接收 mail 的状态，那么就可以做采集和预警了, 以 `投诉率` 来看，近一天的投诉率大概就是:
+```text
+-- 投诉率
+SELECT IFNULL((complaints.count / deliveries.count) * 100, 0) AS result
+FROM (SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Complaint' AND created_at >= NOW() - INTERVAL 1 DAY) AS complaints,
+(SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Delivery' AND created_at >= NOW() - INTERVAL 1 DAY) AS deliveries;
+```
+然后通过 Prometheus 采集，最后在 grafana 那边进行预警
+> 通过 {% post_link prometheus-best-practices-4-cron-pushgateway %}
+
+然后退信率也算一样的情况:
+```text
+-- 退信率
+SELECT IFNULL((bounces.count / sends.count) * 100, 0) AS result
+FROM (SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Bounce' AND created_at >= NOW() - INTERVAL 1 DAY) AS bounces,
+(SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Send' AND created_at >= NOW() - INTERVAL 1 DAY) AS sends;
+```
+
+类似于这样子
+
+![1](3.png)
 
 ---
 参考资料:
