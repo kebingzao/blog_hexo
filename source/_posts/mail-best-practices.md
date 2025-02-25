@@ -162,11 +162,13 @@ FROM (SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event
 然后通过 Prometheus 采集，最后在 grafana 那边进行预警
 > 通过 {% post_link prometheus-best-practices-4-cron-pushgateway %}
 
-然后退信率也算一样的情况:
+然后退信率也算一样的情况(这边要算硬退信率, `bounceType` 只算 `Undetermined` 和 `Permanent`):
+> [适用于亚马逊的亚马逊SNS通知内容 SES - 退信类型](https://docs.aws.amazon.com/zh_cn/ses/latest/dg/notification-contents.html#bounce-types)
+
 ```text
 -- 退信率
 SELECT IFNULL((bounces.count / sends.count) * 100, 0) AS result
-FROM (SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Bounce' AND created_at >= NOW() - INTERVAL 1 DAY) AS bounces,
+FROM (SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Bounce' AND created_at >= NOW() - INTERVAL 1 DAY AND bounce_type IN ('Undetermined','Permanent')) AS bounces,
 (SELECT COUNT(DISTINCT(mail_tid)) AS count FROM mail_stat202502 WHERE event_type = 'Send' AND created_at >= NOW() - INTERVAL 1 DAY) AS sends;
 ```
 
